@@ -1,0 +1,29 @@
+/* Global Styles */
+body {
+    background-color: #ffffff; /* Assuming theme.palette.common.white is #ffffff */
+}
+
+/* Paper */
+.papersignup {
+    margin-top: 64px; /* Assuming theme.spacing(8) is 64px */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Avatar */
+.avatasignup {
+    margin: 8px; /* Assuming theme.spacing(1) is 8px */
+    background-color: #f50057; /* Assuming theme.palette.secondary.main is #f50057 */
+}
+
+/* Form */
+.formsignup {
+    width: 100%; /* Fix IE 11 issue */
+    margin-top: 24px; /* Assuming theme.spacing(3) is 24px */
+}
+
+/* Submit */
+.submitsignup {
+    margin: 24px 0 16px; /* Assuming theme.spacing(3, 0, 2) translates to 24px 0 16px */
+}

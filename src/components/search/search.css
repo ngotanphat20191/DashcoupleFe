@@ -1,0 +1,61 @@
+
+.center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.filtersContainersearch {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.filtersButtonContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    position: relative;
+}
+
+.sliderContainer {
+    position: absolute;
+    background-color: red;
+}
+
+.slidersearch {
+    width: 100%;
+}
+
+.menuItemSearch {
+    width: 600px;
+    height: 300px;
+    text-decoration: none;
+}
+
+.titleGutterbottom {
+    margin-bottom: 16px; /* Assuming theme.spacing(2) is 16px */
+}
+.titleGutterbottomSilder{
+    margin-bottom: 16px; /* Assuming theme.spacing(2) is 16px */
+    width: 100%;
+}
+.interestChipsSearch {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.interestChipsSearch > * {
+    margin: 4px; /* Assuming theme.spacing(0.5) is 4px */
+}
+.textFieldsearch {
+    max-width: 400px;
+    width: 100%;
+}
+

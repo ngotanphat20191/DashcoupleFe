@@ -1,0 +1,52 @@
+.root {
+    flex-grow: 1;
+}
+.Appbarnav{
+    width: 100%;
+    height: 100%;
+}
+.LogonavIcon{
+    color: red;
+}
+.menuButton {
+    margin-right: 16px; /* Assuming theme.spacing(2) is 16px */
+}
+
+.matchaLogo {
+    flex-grow: 1;
+    color: red;
+}
+
+.navIcon {
+    color: white;
+    text-decoration: none; /* Default state */
+}
+
+.navIcon:focus {
+    text-decoration: none;
+}
+
+.navIcon:hover {
+    text-decoration: none;
+    color: #f50057; /* Assuming theme.palette.secondary.main is #f50057 */
+}
+
+.navIcon:visited {
+    text-decoration: none;
+}
+
+.navIcon:link {
+    text-decoration: none;
+}
+
+.navIcon:active {
+    text-decoration: none;
+}
+
+.notReadNotif {
+    background-color: #edf2fa;
+}
+
+.noNotificationsDrawer {
+    margin: 8px; /* Assuming theme.spacing(1) is 8px */
+}

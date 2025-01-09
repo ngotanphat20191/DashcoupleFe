@@ -1,0 +1,108 @@
+
+.homeWrapper {
+    height: calc(100vh - 64px);
+    width: 100%;
+    padding: 16px;
+}
+
+.bgImage {
+    height: 100%;
+    width: 100%;
+    background-image: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Flovepik.com%2Fimage-500582381%2Flove-background.html&psig=AOvVaw1wcBax7YcJmqqTvaOUJfnp&ust=1736428035190000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMiM3deY5ooDFQAAAAAdAAAAABAE'); /* Replace with actual path */
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.homeTextDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+    border-radius: 5px;
+}
+
+.CTA {
+    margin-top: 32px; /* Assuming theme.spacing(4) is 32px */
+    margin-left: 8px; /* Assuming theme.spacing(1) is 8px */
+    margin-right: 8px; /* Assuming theme.spacing(1) is 8px */
+}
+
+.signIn {
+    background-color: rgb(255, 255, 255);
+    border: 3px solid black;
+}
+.gridWrapperHome {
+    height: 100%;
+}
+.CTAWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard {
+    height: 100%;
+}
+
+.upDivWrapperHome {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+}
+
+.avatarHome {
+    width: 56px; /* Assuming theme.spacing(7) is 56px */
+    height: 56px;
+    margin-right: 24px; /* Assuming theme.spacing(3) is 24px */
+}
+
+.leftColumnHome {
+    height: 100%;
+    background-color: white; /* Replace with actual color */
+
+}
+
+.leftColumnIconHome {
+    color: yellow; /* Replace with actual color */
+}
+
+.leftColumnTextHome {
+    color: yellow;
+}
+
+.columnCTAS {
+    background-color: #f4f4f4;
+    min-height: 100%;
+    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+}
+
+.columnPaper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.paperCTA {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+    max-width: 450px;
+}
+
+.paperText {
+    margin-top: 24px; /* Assuming theme.spacing(3) is 24px */
+    margin-bottom: 24px; /* Assuming theme.spacing(3) is 24px */
+}
+
+.findMatchTitleHome {
+    margin-bottom: 48px; /* Assuming theme.spacing(6) is 48px */
+}

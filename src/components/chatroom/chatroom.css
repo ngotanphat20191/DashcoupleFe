@@ -1,0 +1,101 @@
+.chatWrapper {
+    position: relative;
+}
+
+.chatInfoWrapper {
+    padding: 16px;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.avatarchatroom {
+    margin-right: 16px; /* replace with actual spacing value from theme.spacing(2) */
+}
+
+.chatInfoAvatarWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.chatInfoAvatarWrapper:focus {
+    text-decoration: none;
+}
+
+.chatInfoAvatarWrapper:hover {
+    text-decoration: none;
+    color: #1976d2; /* Replace with your theme.palette.secondary.main value */
+}
+
+.chatInfoAvatarWrapper:visited {
+    text-decoration: none;
+}
+
+.chatInfoAvatarWrapper:link {
+    text-decoration: none;
+}
+
+.chatInfoAvatarWrapper:active {
+    text-decoration: none;
+}
+
+.chatContent {
+    width: 100%;
+    padding-left: 16px; /* replace with actual value from theme.spacing(2) */
+    padding-right: 16px; /* replace with actual value from theme.spacing(2) */
+    padding-top: 32px; /* replace with theme.spacing(4) */
+    padding-bottom: 32px; /* replace with theme.spacing(4) */
+    height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.boxMessageOther {
+    display: flex;
+    flex-direction: row;
+}
+
+.boxMessageMe {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.textBubbleOther {
+    background-color: #f4f4f4;
+    border-radius: 1.3em;
+    padding: 10px 20px;
+    margin-left: 16px; /* replace with theme.spacing(2) */
+    margin-bottom: 8px; /* replace with theme.spacing(1) */
+    max-width: 600px;
+}
+
+.textBubbleMe {
+    background-color: #1976d2; /* Replace with theme.palette.primary.main value */
+    border-radius: 1.3em;
+    padding: 10px 20px;
+    max-width: 600px;
+    color: white;
+    margin-bottom: 8px; /* replace with theme.spacing(1) */
+}
+
+.messageInput {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    padding-left: 24px; /* replace with theme.spacing(3) */
+    padding-right: 24px; /* replace with theme.spacing(3) */
+    padding-top: 16px; /* replace with theme.spacing(2) */
+    padding-bottom: 16px; /* replace with theme.spacing(2) */
+    background-color: #f4f4f4;
+}
+
+.textFieldChatroom {
+    background-color: #ffffff;
+}

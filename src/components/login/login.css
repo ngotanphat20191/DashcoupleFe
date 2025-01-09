@@ -1,0 +1,25 @@
+/* Global styles */
+body {
+    background-color: #ffffff; /* Assuming theme.palette.common.white is #ffffff */
+}
+
+.paperlogin {
+    margin-top: 64px; /* Assuming theme.spacing(8) is 64px */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.avatarlogin {
+    margin: 8px; /* Assuming theme.spacing(1) is 8px */
+    background-color: #f50057; /* Assuming theme.palette.secondary.main is #f50057 */
+}
+
+.formlogin {
+    width: 100%;
+    margin-top: 8px; /* Assuming theme.spacing(1) is 8px */
+}
+
+.submitlogin {
+    margin: 24px 0 16px; /* Assuming theme.spacing(3, 0, 2) corresponds to 24px, 0px, and 16px */
+}

@@ -1,0 +1,21 @@
+.buttonChatroom{
+    width: 100%;
+    height: 100%;
+    text-transform: none;
+    padding: 0;
+}
+.notReadMessage{
+    background-color: #edf2fa;
+}
+.emptyChat{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.emptyChatTitle{
+    margin: 8px;
+}
+.rootchat {
+    flex-grow: 1;
+}

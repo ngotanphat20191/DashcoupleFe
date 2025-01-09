@@ -1,0 +1,208 @@
+/* Global Styles */
+body {
+    background-color: #ffffff; /* Assuming theme.palette.common.white is #ffffff */
+}
+
+
+/* Profile Wrapper */
+.wrapperProfile {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1500px;
+}
+
+
+/* Box Up Profile */
+.boxUpProfile {
+    margin: 8px; /* Assuming theme.spacing(1) is 8px */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+/* Container Up Profile */
+.containerUpProfile {
+    max-width: 1500px;
+}
+
+.containerUpProfileLeft {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.containerUpProfileLeftInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.containerUpProfileRight {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.containerUpProfileRightFabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+/* Grid Column Profile */
+.gridColumnProfile {
+    padding: 8px; /* Assuming theme.spacing(1) is 8px */
+}
+
+/* Grid Pictures Wrapper */
+.gridPicturesWrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+/* Picture Container */
+.modifyPictureButton {
+    padding: 8px; /* Assuming theme.spacing(1) is 8px */
+    position: relative;
+    width: 100%;
+    height: fit-content;
+}
+
+/* Picture Button Container */
+.pictureButtonContainer {
+    overflow: hidden;
+    position: relative;
+    height: fit-content;
+    width: 100%;
+}
+
+/* Picture */
+.pictureprofile {
+    object-fit: cover;
+}
+
+/* Delete Button Picture */
+.deleteButtonPicture {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 0;
+}
+
+/* Profile Picture */
+.profilePicture {
+    border: 3px solid #f50057;
+    box-sizing: border-box;
+    object-fit: cover;
+}
+
+/* Tabs */
+.tabsprofile {
+    margin: 8px; /* Assuming theme.spacing(1) is 8px */
+}
+
+.tabprofile {
+    opacity: 1;
+}
+
+.tabprofile:focus {
+    outline: none;
+}
+
+.activeTabprofile {
+    opacity: 1;
+    border-bottom: 3px solid;
+    border-bottom-color: #f50057; /* Assuming theme.palette.secondary.main is #f50057 */
+}
+
+.activeTabprofile:focus {
+    outline: none;
+}
+
+/* Divider */
+.dividerprofile {
+    margin: 8px; /* Assuming theme.spacing(1) is 8px */
+}
+
+/* Modify Picture Button */
+.modifyPictureButton {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px; /* Assuming theme.spacing(1) is 8px */
+    text-align: center;
+}
+
+/* Upload Input */
+.uploadInputprofile {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+/* Summary Field */
+.summaryFieldprofile {
+    width: 90%;
+}
+
+/* Form Control */
+.formControlprofile {
+    margin-bottom: 24px; /* Assuming theme.spacing(3) is 24px */
+}
+
+/* Text Field */
+.textFieldprofile {
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Interest Chips */
+.interestChips {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.interestChips > * {
+    margin: 4px; /* Assuming theme.spacing(0.5) is 4px */
+}
+
+/* Paper Account */
+.paperAccountProfile {
+    margin-top: 24px; /* Assuming theme.spacing(3) is 24px */
+    padding: 40px 16px; /* Assuming theme.spacing(5, 2) is 40px 16px */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #f3e5f5; /* Assuming theme.palette.secondary.A300 is #f3e5f5 */
+}
+
+/* Div Account */
+.divAccountProfile {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px; /* Assuming theme.spacing(2) is 16px */
+}
+
+/* Button Account */
+.buttonAccountProfile {
+    width: 100%;
+}
+.pictureContainerprofile {
+    padding:  8px;
+    position: relative;
+    width: 100%;
+    height: fit-content;
+}
