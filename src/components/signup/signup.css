@@ -5,10 +5,17 @@ body {
 
 /* Paper */
 .papersignup {
-    margin-top: 64px; /* Assuming theme.spacing(8) is 64px */
+    max-width: 50% ;
+    margin-block: 64px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 170, 215, 0.52);
+    padding: 20px 50px;
+    transform: translateX(52%);
+    border: 5px solid #f851e0;
+    border-radius: 20px;
 }
 
 /* Avatar */
@@ -20,7 +27,7 @@ body {
 /* Form */
 .formsignup {
     width: 100%; /* Fix IE 11 issue */
-    margin-top: 24px; /* Assuming theme.spacing(3) is 24px */
+    margin-top: 12px; /* Assuming theme.spacing(3) is 24px */
 }
 
 /* Submit */

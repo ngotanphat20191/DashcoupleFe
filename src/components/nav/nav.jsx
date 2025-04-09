@@ -4,9 +4,8 @@ import NotificationDrawer from './components/notificationDrawer.jsx';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import './nav.css'
-import {notification} from '../../datas/template.jsx'
+import {baseAxios} from "../../config/axiosConfig.jsx";
 
 const Nav = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -17,36 +16,68 @@ const Nav = () => {
         right: false,
     });
     useEffect(() => {
-        const fetchTotalNotifications = async () => {
-            setTotalNotifications(3);
+        const fetchData = async () => {
+            try {
+                await fetchNotifications();
+                await fetchTotalNotifications();
+                await fetchTotalMessages();
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         };
-
-        const fetchTotalMessages = async () => {
-            setTotalMessages(3);
-        };
-        fetchTotalNotifications();
-        fetchTotalMessages();
+        fetchData();
     }, []);
     const fetchNotifications = async () => {
-        setNotifications(notification);
+        baseAxios.get('/notification', {
+        }).then((res) => {
+            console.log(res.data)
+            setNotifications(res.data)
+        }).catch(err => {
+            if(err.status === 400){
+                alert(err.response.data)
+            }
+        })
     };
-
+    const fetchTotalMessages = async () => {
+        setTotalMessages(3);
+    };
+    const fetchTotalNotifications = async () => {
+        let unreadCount = 0;
+        notifications.forEach(notification => {
+            if (notification.is_read !== 1) {
+                unreadCount++;
+            }
+        });
+        setTotalNotifications(unreadCount);
+    };
     const toggleDrawer = open => async () => {
         if (open) {
-            await fetchNotifications();
-            setTotalNotifications(0);
+            if(totalNotifications !== 0) {
+                setTotalNotifications(0);
+                const notificationIdList = notifications.map(n => n.notificationId);
+                baseAxios.post('/notification/check', {
+                    notificationIdList: notificationIdList,
+                }).then((res) => {
+                    console.log(res.data)
+                }).catch(err => {
+                    if (err.status === 400) {
+                        alert(err.response.data)
+                    }
+                })
+            }
         }
         setNotifMenu({ ...notifMenu, right: open });
     };
     return (
-        <AppBar position="static" className="Appbarnav">
+        <AppBar position="static" className="Appbarnav" style={{backgroundColor: "#fc6ae7"}}>
             <Toolbar>
                 <Typography variant="h6" className="matchaLogo">
                     <Link
                         href="/"
                         className="LogonavIcon"
+                        style={{color:"white",  textDecoration: "none"}}
                     >
-                        Matcha
+                        DashCouple
                     </Link>
                 </Typography>
                 {isLoggedIn ? (
@@ -64,9 +95,6 @@ const Nav = () => {
                         <IconButton color="inherit" href="profile">
                             <AccountCircleIcon className="navIcon" />
                         </IconButton>
-                        <IconButton color="inherit">
-                            <ExitToAppIcon className="navIcon" />
-                        </IconButton>
                         <SwipeableDrawer
                             anchor="right"
                             open={notifMenu.right}
@@ -82,10 +110,10 @@ const Nav = () => {
                 ) : (
                     <>
                         <Button color="inherit" href="/signup">
-                            Signup
+                            Đăng ký
                         </Button>{' '}
                         <Button color="inherit" href="/login">
-                            Login
+                            Đăng nhập
                         </Button>
                     </>
                 )}

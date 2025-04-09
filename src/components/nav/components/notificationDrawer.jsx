@@ -1,34 +1,37 @@
-import React, { Fragment } from 'react';
+import React, {Fragment, useState} from 'react';
 import moment from 'moment';
 import {List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography} from '@mui/material';
 import _ from 'lodash';
 import '../nav.css'
 const NotificationDrawer = ({ toggleDrawer, notifications }) => {
-    const messageToDisplay = (sender, event) => {
+    const [notifLink, setnotifLink] = useState(null);
+    const messageToDisplay = (type, content) => {
         let message = '';
-        if (event) {
-            switch (event) {
-                case 'message':
-                    message = `${sender} sent you a new message`;
+        if (type) {
+            switch (type) {
+                case 'Like':
+                    message = `${content}`;
                     break;
-                case 'like':
-                    message = `${sender} liked you`;
+                case 'Create':
+                    message = `${content}`;
                     break;
-                case 'visit':
-                    message = `${sender} visited your profile!`;
+                case 'Delete':
+                    message = `${content}`;
                     break;
-                case 'match':
-                    message = `${sender} liked you back, it's a match!`;
-                    break;
-                case 'unmatch':
-                    message = `${sender} unliked you, no more match. Sorry!`;
+                case 'Chat':
+                    message = `${content}`;
                     break;
                 default:
             }
             return message;
         }
     };
-
+    function handleNotificationLink(data) {
+       if(data === 'Like') {setnotifLink('/likes')};
+       if(data === 'Create') {setnotifLink('/chat')};
+       if(data === 'Delete') {setnotifLink('/suggestions')};
+       if(data === 'Chat') {setnotifLink('/chat')};
+    }
     return (
         <div
             className="list"
@@ -38,30 +41,29 @@ const NotificationDrawer = ({ toggleDrawer, notifications }) => {
             {_.isEmpty(notifications) ? (
                 <Typography className="noNotificationsDrawer">
           <span role="img" aria-label="emoji">
-            You don't have any notifications yet! Be patient, it's coming 😌
+              Hiện tại bạn chưa có thông báo nào cả, hãy cố gắng lên 😌
           </span>
                 </Typography>
             ) : (
                 <List>
                     {notifications.map(notification => {
-                        const notifLink = `/profile/${notification.username}`;
                         return (
-                            <Fragment key={notification.id}>
+                            <Fragment key={notification.createTime}>
                                 <ListItem
                                     button
                                     component="a"
                                     href={notifLink}
-                                    className={notification.read ? null : "notReadNotif"}
+                                    className={notification.is_read === 1 ? null : "notReadNotif"}
                                 >
                                     <ListItemAvatar>
-                                        <Avatar alt="avatar" src={notification.profilePicture} />
+                                        <Avatar alt="avatar" src={notification.image} />
                                     </ListItemAvatar>
                                     <ListItemText
                                         primary={messageToDisplay(
-                                            notification.username,
-                                            notification.event,
+                                            notification.type,
+                                            notification.content,
                                         )}
-                                        secondary={moment(notification.date).fromNow()}
+                                        secondary={moment(notification.createTime).fromNow()}
                                     />
                                 </ListItem>
                                 <Divider />

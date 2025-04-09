@@ -1,91 +1,122 @@
-import React, { useContext, useState } from 'react';
-import { Box, Typography, Fab, Avatar, Grid, List, ListItem, ListItemIcon, ListItemText, Paper,} from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ChatIcon from '@mui/icons-material/Chat';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useState, useEffect, memo, useMemo } from 'react';
+import { Box, Typography, Fab, Avatar, Grid, Paper, CircularProgress, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchIcon from '@mui/icons-material/Search';
+import axios from 'axios';
+import QuizButton from './components/quizbutton.jsx'
 import './home.css'
-import {currentUser} from '../../datas/template.jsx'
+import Homenav from './homenav.jsx';
+import {baseAxios, createCancelToken} from "../../config/axiosConfig.jsx";
+
+// Memoize the Homenav component to prevent unnecessary re-renders
+const MemoizedHomenav = memo(Homenav);
 
 const Home = () => {
-    const secureAuth=true;
-    if (secureAuth) {
+    const [homepageData, setHomepageData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    useEffect(() => {
+        // Create a cancel token for the request outside the async function
+        const cancelTokenSource = createCancelToken();
+        
+        const fetchHomepageData = async () => {
+            setIsLoading(true);
+            
+            try {
+                const res = await baseAxios.get('/homepage', {
+                    cancelToken: cancelTokenSource.token
+                });
+                setHomepageData(res.data);
+                setIsLoading(false);
+            } catch (err) {
+                if (err.response?.status === 400) {
+                    setError(err.response.data);
+                } else if (!axios.isCancel(err)) {
+                    setError("Error fetching homepage data");
+                    console.error("Error fetching homepage data:", err);
+                }
+                setIsLoading(false);
+            }
+        };
+        
+        fetchHomepageData();
+        
+        // Cleanup function to cancel request if component unmounts
+        return () => {
+            cancelTokenSource.cancel('Component unmounted');
+        };
+    }, []);
+    // Memoize the content to prevent unnecessary re-renders
+    const homeContent = useMemo(() => {
+        // Loading state
+        if (isLoading) {
+            return (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+                    <CircularProgress />
+                    <Typography sx={{ ml: 2 }}>Đang tải dữ liệu...</Typography>
+                </Box>
+            );
+        }
+        
+        // Error state
+        if (error) {
+            return (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
+                    <Typography color="error" variant="h6" sx={{ mb: 2 }}>
+                        {error}
+                    </Typography>
+                    <Button variant="contained" onClick={() => window.location.reload()}>
+                        Thử lại
+                    </Button>
+                </Box>
+            );
+        }
+        
+        // No data state
+        if (!homepageData) {
+            return (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+                    <Typography>Không có dữ liệu</Typography>
+                </Box>
+            );
+        }
+        
+        // Main content when data is loaded
         return (
             <Box className="dashboard">
                 <Box className="upDivWrapperHome">
                     <Avatar
-                        alt="Remy Sharp"
-                        src={currentUser.profilePicture}
+                        alt={homepageData.name}
+                        src={homepageData.images[0]}
                         className="avatarHome"
                     />
                     <Typography variant="h4" color="primary">
-                        Welcome {currentUser.username}
+                        Xin chào {homepageData.name}
                     </Typography>
                 </Box>
                 <Grid container className="gridWrapperHome">
-                    <Grid item xs={12} sm={3} lg={2} className="leftColumnHome">
-                        <List>
-                            <ListItem button component="a" href="/profile">
-                                <ListItemIcon>
-                                    <AccountCircleIcon className="leftColumnIconHome" />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary="My profile"
-                                    className="leftColumnTextHome"
-                                />
-                            </ListItem>
-                            <ListItem button component="a" href="/chat">
-                                <ListItemIcon>
-                                    <ChatIcon className="leftColumnIconHome" />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary="Messages"
-                                    className="leftColumnTextHome"
-                                />
-                            </ListItem>
-                            <ListItem button component="a" href="/visits">
-                                <ListItemIcon>
-                                    <VisibilityIcon className="leftColumnIconHome" />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary="Visits"
-                                    className="leftColumnTextHome"
-                                />
-                            </ListItem>
-                            <ListItem button component="a" href="/likes">
-                                <ListItemIcon>
-                                    <ThumbUpAltIcon className="leftColumnIconHome" />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary="They liked me"
-                                    className="leftColumnTextHome"
-                                />
-                            </ListItem>
-                        </List>
-                    </Grid>
-                    <Grid item xs={12} sm={9} lg={10} className="columnCTAS">
+                    <MemoizedHomenav />
+                    <Grid className="columnCTAS">
                         <Typography
-                            variant="h3"
                             color="primary"
                             gutterBottom
                             align="center"
                             className="findMatchTitleHome"
+                            style={{ fontSize: "30px", fontWeight: "bold", marginBottom: "25px"}}
                         >
-                            Find your perfect Match
+                            Tìm kiếm người hẹn hò của bạn
                         </Typography>
                         <Grid container spacing={5}>
                             <Grid item xs={12} sm={6} className="columnPaper">
-                                <Paper elevation={3} className="paperCTA">
+                                <Paper elevation={3} className="paperCTA" style={{borderRadius:"20px"}}>
                                     <FavoriteIcon fontSize="large" color="secondary" />
                                     <Typography variant="h4" color="primary">
-                                        Suggestions
+                                        Gợi ý
                                     </Typography>
                                     <Typography className="paperText">
-                                        We gathered profiles that could be a good fit for you!
-                                        Here's a bunch
+                                        Chúng tôi sẽ sử dụng các thông tin bạn cung cấp để gợi ý người hẹn hò phù hợp với bạn nhất
                                     </Typography>
                                     <Fab
                                         size="large"
@@ -98,14 +129,13 @@ const Home = () => {
                                 </Paper>
                             </Grid>
                             <Grid item xs={12} sm={6} className="columnPaper">
-                                <Paper elevation={3} className="paperCTA">
+                                <Paper elevation={3} className="paperCTA" style={{borderRadius:"20px"}}>
                                     <SearchIcon fontSize="large" color="secondary" />
                                     <Typography variant="h4" color="primary">
-                                        Search
+                                        Tìm kiếm
                                     </Typography>
                                     <Typography className="paperText">
-                                        You can filter users according to your interests, age,
-                                        distance... Have fun!
+                                        Bạn có thể sử dụng bộ lọc với các thông tin về sở thích, tuổi, vị trí,... để tìm người hẹn hò của bạn
                                     </Typography>
                                     <Fab
                                         size="large"
@@ -120,45 +150,12 @@ const Home = () => {
                         </Grid>
                     </Grid>
                 </Grid>
+                <QuizButton />
             </Box>
         );
-    }
-    return (
-        <>
-            <Box className="homeWrapper">
-                <Box className="bgImage">
-                    <Box className="homeTextDiv">
-                        <Typography variant="h3" color="primary" gutterBottom>
-                            Make the first move
-                        </Typography>
-                        <Typography>
-                            Start meeting new people in your area! If you already have an
-                            account, sign in to use Matcha.
-                        </Typography>
-                        <div className="CTAWrapper">
-                            <Fab
-                                variant="extended"
-                                color="secondary"
-                                aria-label="add"
-                                className="CTA"
-                                href="/signup"
-                            >
-                                Sign up
-                            </Fab>
-                            <Fab
-                                variant="extended"
-                                aria-label="add"
-                                className="signIn CTA"
-                                href="/login"
-                            >
-                                Sign in
-                            </Fab>
-                        </div>
-                    </Box>
-                </Box>
-            </Box>
-        </>
-    );
+    }, [isLoading, error, homepageData]);
+    
+    return homeContent;
 };
 export default Home;
 

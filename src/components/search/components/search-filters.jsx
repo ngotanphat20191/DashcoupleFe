@@ -1,135 +1,161 @@
-import React from 'react';
-import {Autocomplete, TextField, Typography, Slider, Grid} from '@mui/material';
-import '../search.css'
+import {Autocomplete, TextField, Typography, Slider, Stack} from '@mui/material';
+import '../search.css';
+import React from "react";
 const sortOptions = [
     {
-        value: '',
-        label: '',
+        value: 'score',
+        label: 'Điểm phù hớp',
     },
     {
         value: 'distance',
-        label: 'Distance',
+        label: 'Khoảng cách',
     },
     {
         value: 'ageAsc',
-        label: 'Age: Low to high',
+        label: 'Tuổi: từ nhỏ đến lớn',
     },
     {
         value: 'ageDesc',
-        label: 'Age: High to low',
-    },
-    {
-        value: 'popularity',
-        label: 'Popularity',
+        label: 'Tuổi: từ lớn đến nhỏ',
     },
     {
         value: 'interests',
-        label: 'Interests',
+        label: 'sở thích',
     },
 ];
 
-const SearchFilters = ({searchOptions, interestNames}) => {
+const SearchFilters = ({preference, interestNames, religionNames, setpreference}) => {
+
+    const [ageRange, setageRange] = React.useState([preference.preferenceRecord.preferenceAgeMin,preference.preferenceRecord.preferenceAgeMax]);
+    const handleAgeChange = (event, newageRange) => {
+        setageRange(newageRange);
+    };
     return (
-        <div className="filtersContainersearch">
-            <Grid container spacing={5} direction="row" justify="center">
-                <Grid item sm={2} xs={6}>
-                    <Typography
-                        id="discrete-slider"
-                        className="titleGutterbottom"
-                        align="center"
-                    >
-                        Age
-                    </Typography>
-                    <Slider
-                        className="slidersearch"
-                        value={searchOptions.ageRange}
-                        valueLabelDisplay="auto"
-                        aria-labelledby="range-slider"
-                        getAriaValueText={value => `${value} kms`}
-                        min={18}
-                        max={60}
-                    />
-                </Grid>
-                <Grid item sm={2} xs={6}>
-                    <Typography
-                        id="discrete-slider"
-                        className="titleGutterbottom"
-                        align="center"
-                    >
-                        Popularity
-                    </Typography>
-                    <Slider
-                        className="slidersearch"
-                        value={searchOptions.popularityRange}
-                        valueLabelDisplay="auto"
-                        aria-labelledby="range-slider"
-                        getAriaValueText={value => `${value} kms`}
-                        min={0}
-                        max={100}
-                    />
-                </Grid>
-                <Grid item sm={2} xs={6}>
-                    <Typography
-                        id="discrete-slider"
-                        className="titleGutterbottom"
-                        align="center"
-                    >
-                        Interests
-                    </Typography>
-                    <div className="interestChipsSearch">
-                        <div>
-                            <Autocomplete
-                                className="slidersearch"
-                                multiple
-                                options={interestNames}
-                                getOptionLabel={option => option.name}
-                                name="interest"
-                                renderInput={params => (
-                                    <TextField
-                                        {...params}
-                                        variant="outlined"
-                                        placeholder="Add interest"
-                                        fullWidth
-                                    />
-                                )}
-                            />
-                        </div>
-                    </div>
-                </Grid>
-                <Grid item sm={2} xs={6}>
-                    <form className="container" noValidate autoComplete="off">
-                        <Typography
-                            id="discrete-slider"
-                            className="titleGutterbottom"
-                            align="center"
-                        >
-                            Sort by
-                        </Typography>
-                        <TextField
-                            id="outlined-select-currency-native"
-                            select
-                            className="textFieldsearch"
-                            value={searchOptions.sort}
-                            fullWidth
-                            SelectProps={{
-                                native: true,
-                                MenuProps: {
-                                    className: "menuItemSearch",
+        <Stack className="filtersContainerSuggest" direction="row" justifyContent="space-between" >
+            <div>
+                <Typography
+                    id="discrete-slider"
+                    className="titleGutterbottom"
+                    align="center"
+                >
+                    Tuổi
+                </Typography>
+                <Slider
+                    className="slidersearch"
+                    valueLabelDisplay="auto"
+                    value={ageRange}
+                    onChange={handleAgeChange}
+                    aria-labelledby="range-slider"
+                    getAriaValueText={value => `${value} kms`}
+                    min={18}
+                    max={60}
+                    style={{paddingTop:"30px"}}
+                />
+            </div>
+            <div>
+                <Typography
+                    id="discrete-slider"
+                    className="titleGutterbottom"
+                    align="center"
+                >
+                    Sở thích
+                </Typography>
+                <div className="interestChipsSearch">
+                    <div>
+                        <Autocomplete
+                            className="slidersearch"
+                            multiple
+                            options={interestNames}
+                            getOptionLabel={(option) => option.name}
+                            sx={{
+                                width: '100%',
+                                backgroundColor: 'white',
+                                '.MuiAutocomplete-tag': {
+                                    fontSize: '14px',
+                                    padding: '2px 6px',
+                                    height: '24px'
                                 },
+                                '.MuiInputBase-root': {
+                                    minHeight: '32px',
+                                    fontSize: '14px'
+                                },
+                                '.MuiOutlinedInput-root': {
+                                    padding: '4px'
+                                }
                             }}
-                            variant="outlined"
-                        >
-                            {sortOptions.map(option => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </TextField>
-                    </form>
-                </Grid>
-            </Grid>
-        </div>
+                            value={interestNames.filter(interest =>
+                                preference?.interests.includes(interest.InterestID)
+                            )}
+                            onChange={(event, newValue) => {
+                                const selectedIds = newValue.map(interest => interest.InterestID);
+                                setpreference({ ...preference, preferenceInterest: selectedIds });
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    variant="outlined"
+                                    placeholder="Thêm sở thích"
+                                    fullWidth
+                                />
+                            )}
+                        />
+                    </div>
+                </div>
+            </div>
+            <div>
+                <Typography
+                    id="discrete-slider"
+                    className="titleGutterbottomSuggest"
+                    align="center"
+                >
+                    Tôn giáo
+                </Typography>
+                <div className="interestChipsSuggest">
+                    <Autocomplete
+                        className="sliderSuggest"
+                        disablePortal
+                        options={religionNames}
+                        value={preference.preferenceRecord.preferenceLocation}
+                        getOptionLabel={option => option.title}
+                        sx={{ width: 200 }}
+                        renderInput={(params) =>
+                            <TextField {...params} variant="outlined" placeholder="Thêm tôn giáo" fullWidth/>}
+                    />
+                </div>
+            </div>
+            <div>
+                <form className="container" noValidate autoComplete="off" style={{width: "150%", paddingRight:"50px"}}
+                >
+                    <Typography
+                        id="discrete-slider"
+                        className="titleGutterbottom"
+                        align="center"
+                        style={{marginTop: "4px"}}
+                    >
+                        Sắp xếp theo
+                    </Typography>
+                    <TextField
+                        id="outlined-select-currency-native"
+                        select
+                        className="textFieldsearch"
+                        value="score"
+                        fullWidth
+                        SelectProps={{
+                            native: true,
+                            MenuProps: {
+                                className: "menuItemSearch",
+                            },
+                        }}
+                        variant="outlined">
+                        {sortOptions.map(option => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </TextField>
+                </form>
+            </div>
+        </Stack>
     );
 };
 export default SearchFilters;
-

@@ -1,10 +1,9 @@
 .herotitle {
-    background-color: #f4f4f4;
-    width: 100%;
-    color: white;
+    width: fit-content;
     display: flex;
     justify-content: center;
     padding-top: 16px; /* Assuming theme.spacing(2) is 16px */
     padding-bottom: 16px; /* Assuming theme.spacing(2) is 16px */
     margin-bottom: 32px; /* Assuming theme.spacing(4) is 32px */
+    font-size: 500px;
 }

@@ -1,4 +1,3 @@
-
 .homeWrapper {
     height: calc(100vh - 64px);
     width: 100%;
@@ -22,14 +21,14 @@
     justify-content: center;
     align-items: center;
     background-color: rgba(255, 255, 255, 0.9);
-    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+    padding: 24px;
     border-radius: 5px;
 }
 
 .CTA {
-    margin-top: 32px; /* Assuming theme.spacing(4) is 32px */
-    margin-left: 8px; /* Assuming theme.spacing(1) is 8px */
-    margin-right: 8px; /* Assuming theme.spacing(1) is 8px */
+    margin-top: 32px;
+    margin-left: 8px;
+    margin-right: 8px;
 }
 
 .signIn {
@@ -54,33 +53,44 @@
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+    padding: 24px;
 }
 
 .avatarHome {
-    width: 56px; /* Assuming theme.spacing(7) is 56px */
+    width: 56px;
     height: 56px;
-    margin-right: 24px; /* Assuming theme.spacing(3) is 24px */
+    margin-right: 24px;
 }
 
 .leftColumnHome {
-    height: 100%;
-    background-color: white; /* Replace with actual color */
-
+    top: 50%;
+    height: fit-content;
+    position: fixed;
+    left: 10px;
+    background-color: #ffbdfc;
+    width: 5%;
+    transform: translateY(-50%);
+    border-start-end-radius: 30px;
+    border-end-start-radius: 30px;
 }
 
 .leftColumnIconHome {
-    color: yellow; /* Replace with actual color */
+    margin-left: 5px;
 }
 
 .leftColumnTextHome {
-    color: yellow;
+    color: white;
 }
 
 .columnCTAS {
-    background-color: #f4f4f4;
-    min-height: 100%;
-    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+    height: fit-content;
+    width: 100%;
+    padding: 24px;
+    margin-left: 200px;
+    margin-right: 100px;
+    border: 2px solid #fc6ae7;
+    border-radius: 20px;
+    background-color:#ffe8fd ;
 }
 
 .columnPaper {
@@ -94,15 +104,52 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 24px; /* Assuming theme.spacing(3) is 24px */
+    padding: 24px;
     max-width: 450px;
+    margin-bottom: 50px;
 }
 
 .paperText {
-    margin-top: 24px; /* Assuming theme.spacing(3) is 24px */
-    margin-bottom: 24px; /* Assuming theme.spacing(3) is 24px */
+    margin-top: 24px;
+    margin-bottom: 24px;
 }
 
 .findMatchTitleHome {
-    margin-bottom: 48px; /* Assuming theme.spacing(6) is 48px */
+    border: 2px ;
+    border-radius: 20px;
+    width: 55%;
+    transform: translateX(50%);
+    background-color: #ffe0fd;
+    font-size: 18px;
 }
+.progress {
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.QuizButtonImage {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.QuizButtonContainer {
+    position: absolute;
+    top: 85%;
+    right: -2%;
+    transform: translate(-50%, -50%);
+    padding: 4px 8px;
+    background-color: rgba(0, 123, 255, 0);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.QuizButtonContainer:hover {
+    background-color: white;
+}
+

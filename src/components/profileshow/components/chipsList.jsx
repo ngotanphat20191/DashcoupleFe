@@ -12,6 +12,8 @@ const findEquivalence = number => {
             label = 'Man';
             break;
         default:
+            label = label
+            break;
     }
     return label;
 };
@@ -30,7 +32,7 @@ const ChipsList = ({list, type }) => {
         return (
             <Box className="genderChips">
                 {list.map(item => (
-                    <Chip key={item} label={item} />
+                    <Chip key={item} label={findEquivalence(item)} />
                 ))}
             </Box>
         );

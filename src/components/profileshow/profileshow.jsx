@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import {Grid, Divider, Typography, Box, Paper} from '@mui/material';
 import Slider from "react-slick";
 import _ from 'lodash';
 import ChipsList from './components/chipsList.jsx';
-import UpperBoxProfile from '../profile/components/upperBoxProfile.jsx';
 import './profileshow.css';
 import {usermatch} from '../../datas/template.jsx';
 

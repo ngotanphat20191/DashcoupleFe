@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import LockIcon from '@mui/icons-material/Lock';
 import TextField from '@mui/material/TextField';
@@ -8,15 +8,30 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import './forgotpassword.css';
+import CircularProgress from '@mui/material/CircularProgress';
+
 const ForgotPassword = () => {
+    const [loaded, setLoaded] = useState(false);
+    useEffect(() => {
+        setTimeout(() => {
+            setLoaded(true);
+        }, 200);
+    }, []);
+    if (loaded === false) {
+        return (
+            <div className="progress">
+                <CircularProgress color="primary" />
+            </div>
+        );
+    }
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main">
             <div className="paperforgotpassword">
                 <Avatar className="avatarforgotpassword">
                     <LockIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Forgot your password?
+                    Quên mật khẩu
                 </Typography>
                 <form className="formforgotpassword">
                     <TextField
@@ -38,17 +53,17 @@ const ForgotPassword = () => {
                         fullWidth
                         className="submitforgotpassword"
                     >
-                        Reset password
+                        Đổi mật khẩu
                     </Button>
-                    <Grid container>
+                    <Grid container style={{marginTop: '15px'}}>
                         <Grid item xs>
                             <Link href="/login" variant="body2">
-                                Login
+                                Đăng nhập
                             </Link>
                         </Grid>
                         <Grid item>
                             <Link href="/signup" variant="body2">
-                                {"Don't have an account? Sign Up"}
+                                Bạn đã có tài khoản, hãy đăng nhập!
                             </Link>
                         </Grid>
                     </Grid>

@@ -4,7 +4,7 @@ import './title.css'
 const Title = ({ textTitle }) => {
     return (
         <div className="herotitle">
-            <Typography variant="h4" color="primary">
+            <Typography color="primary" style={{fontSize:'45px', fontWeight:'bold'}}>
                 {textTitle}
             </Typography>
         </div>

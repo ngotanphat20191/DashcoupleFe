@@ -37,6 +37,12 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    align-items: flex-end;
+    text-align: right;
+    padding-right: 200px;
+    font-family: "Roboto", serif; /* Use 'sans-serif' as fallback */
+    font-size:20px;
+    font-weight: bold;
 }
 
 .containerUpProfileRight {
@@ -156,9 +162,11 @@ body {
 
 /* Form Control */
 .formControlprofile {
-    margin-bottom: 24px; /* Assuming theme.spacing(3) is 24px */
+    margin-bottom: 12px; /* Assuming theme.spacing(3) is 24px */
 }
-
+.titleParameters{
+    margin-top: 24px;
+}
 /* Text Field */
 .textFieldprofile {
     max-width: 400px;
@@ -174,6 +182,7 @@ body {
 
 .interestChips > * {
     margin: 4px; /* Assuming theme.spacing(0.5) is 4px */
+    width:100dvh;
 }
 
 /* Paper Account */
@@ -184,7 +193,7 @@ body {
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    background-color: #f3e5f5; /* Assuming theme.palette.secondary.A300 is #f3e5f5 */
+    border-radius: 20px;
 }
 
 /* Div Account */
@@ -205,4 +214,263 @@ body {
     position: relative;
     width: 100%;
     height: fit-content;
+}
+.edit-profile {
+    max-width: 400px;
+    font-family: Arial, sans-serif;
+    background-color: #eeeeee;
+    border-radius: 10px ;
+    margin: auto auto;
+    overflow-y: auto;
+    max-height: 75vh;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-left: 16px;
+}
+.edit-profile::-webkit-scrollbar {
+    display: none;
+}
+.headerButton {
+    max-width: 400px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    display: flex;
+    margin: 20px auto auto;
+    justify-content: space-around;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    background-color: #f6f6f6;
+    border-radius: 10px;
+}
+
+.headerButton button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.headerButton .editButton {
+    font-weight: bold;
+}
+.previewButton {
+    font-weight: bold;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px;
+}
+
+.photo-slot {
+    width: 110px;
+    height: 135px;
+    background: #f3f3f3;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.add, .remove {
+    background: red;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: black;
+}
+
+.save {
+    background: linear-gradient(to right, red, orange);
+    color: white;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 20px;
+    display: flex;
+    margin: 10px auto auto;
+}
+.title-photo {
+    font-size: 20px;
+    padding-top: 10px;
+}
+/* Container for the settings */
+.settings-container {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-top: 0px;
+    width: 300px;
+    background-color: white;
+    font-family: Arial, sans-serif;
+    height: 520px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: auto;
+}
+.settings-container::-webkit-scrollbar {
+    display: none;
+}
+/* Title: "ACCOUNT SETTINGS" */
+.settings-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+/* Remove default list styles */
+.settings-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Each setting item */
+.settings-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+/* Hover effect */
+.settings-list-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* Text labels */
+.settings-label {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Right-side value (email, phone number) */
+.settings-value {
+    font-size: 14px;
+    color: #000;
+    flex-grow: 1;
+    text-align: right;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Arrow icon */
+.settings-icon {
+    color: #999;
+    font-size: 18px;
+}
+.settings-icon-profile {
+    color: #999;
+    font-size: 18px;
+}
+/* Custom Slider */
+.PrefercenceSilder .MuiSlider-track {
+    background-color: rgb(248, 81, 224);
+    border: 0px;
+}
+
+/* Handle (Thumb) */
+.PrefercenceSilder .MuiSlider-thumb {
+    width: 25px ; /* Adjust size */
+    height: 25px ;
+    background-color: white ; /* White circle */
+    border: 2px solid #7d8792 ; /* Gray border */
+}
+
+/* Remove focus ring */
+.PrefercenceSilder .MuiSlider-thumb:focus,
+.PrefercenceSilder .MuiSlider-thumb:hover,
+.PrefercenceSilder .MuiSlider-thumb.Mui-focusVisible {
+    box-shadow: none ;
+}
+.email-label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.email-input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.email-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.email-text {
+    font-size: 14px;
+    color: #000;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.email-text:hover {
+    text-decoration: underline;
+}
+
+.check-icon {
+    color: blue;
+}
+
+.verified-text {
+    color: #0073e6;
+}
+.upgrade-card {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 2px solid #e3e3e3;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    padding: 16px;
+    width: 280px;
+    text-align: center;
+    margin: 16px auto;
+
+}
+.upgrade-card-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+}
+.upgrade-card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #FF6B6B;
+    text-transform: none;
+}
+.upgrade-card-subtitle {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #555;
+    text-transform: none;
 }

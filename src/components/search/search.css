@@ -6,13 +6,19 @@
     align-items: center;
 }
 
-
 .filtersContainersearch {
-    width: 100%;
+    width: fit-content;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 10px;
+    column-gap: 60px;
+    padding: 16px;
+    border: 2px solid #fc6ae7;
+    border-radius: 20px;
+    background-color: #fcd7f9;
+}
+.filtersContainersearch > div{
+    width: 20%;
 }
 
 .filtersButtonContainer {
@@ -55,7 +61,7 @@
     margin: 4px; /* Assuming theme.spacing(0.5) is 4px */
 }
 .textFieldsearch {
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
 }
 

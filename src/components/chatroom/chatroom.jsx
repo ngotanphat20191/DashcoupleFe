@@ -9,7 +9,7 @@ import Link from '@mui/material/Link';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import _ from 'lodash';
 import './chatroom.css';
-import {chatroominfo, chatRoomMessages} from '../../datas/template.jsx'
+import {chatroomInfo, chatroomMessages, currentUser} from '../../datas/template.jsx'
 
 const ChatRoom = () => {
     const chatroomInfo = chatroominfo;
@@ -56,7 +56,7 @@ const ChatRoom = () => {
                 </Box>
                 <Box className="chatContent" id="chat">
                     {_.map(chatroomMessages, message => {
-                        if (currentUser !== message.author) {
+                        if (currentUser.username !== message.author) {
                             return (
                                 <Box key={message.id} className="boxMessageOther">
                                     <Avatar alt="Avatar" src={message.profilePicture} />

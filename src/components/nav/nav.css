@@ -2,11 +2,10 @@
     flex-grow: 1;
 }
 .Appbarnav{
+    margin-top: 20px;
     width: 100%;
-    height: 100%;
-}
-.LogonavIcon{
-    color: red;
+    /*height: 100%;*/
+    border-radius: 200px;
 }
 .menuButton {
     margin-right: 16px; /* Assuming theme.spacing(2) is 16px */
