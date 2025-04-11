@@ -7,7 +7,7 @@ import '../profile.css';
 import Sheet from "@mui/joy/Sheet";
 import Done from "@mui/icons-material/Done.js";
 import Checkbox from "@mui/joy/Checkbox";
-import {baseAxios, paymentAxios} from "../../../config/axiosConfig.jsx";
+import {baseAxios, loginSignUpAxios, paymentAxios} from "../../../config/axiosConfig.jsx";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
@@ -32,9 +32,10 @@ const Settings = ({interests ,formData, setFormData}) => {
     });
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(true);
     const handleClose = () => {
         setOpen(false);
+        handleToggleChange('main');
     };
     const handleToggleChange = (name) => {
         setToggles((prev) => ({
@@ -44,6 +45,19 @@ const Settings = ({interests ,formData, setFormData}) => {
             }, {}),
             [name]: true,
         }));
+    };
+    const handleToggleChangeUpgread = (name) => {
+        setToggles((prev) => ({
+            ...Object.keys(prev).reduce((acc, key) => {
+                acc[key] = false;
+                return acc;
+            }, {}),
+            [name]: true,
+        }));
+        setOpen(true);
+    };
+    const handleSendChangeEmail = (name) => {
+        sendchangeEmail(name);
     };
     const [isEditing, setIsEditing] = useState(false);
     const [bankcode, setBankCode] = useState("NCB");
@@ -73,9 +87,24 @@ const Settings = ({interests ,formData, setFormData}) => {
         }).then((res) => {
             console.log(res.data)
         }).catch(err => {
-            alert(err.response.data)
+            console.log(err.response.data)
         })
     };
+    function sendchangeEmail(data){
+        baseAxios.post('/sendchangeemail', null, {
+            params: {
+                email: data
+            }
+        })
+        .then(res => {
+            alert(res.data);
+        })
+        .catch(err => {
+            if(err.response && err.response.status === 400) {
+                alert(err.response.data);
+            }
+        });
+    }
     useEffect(() => {
         const handleBeforeUnload = () => {
             myFunction();
@@ -97,7 +126,7 @@ const Settings = ({interests ,formData, setFormData}) => {
                         Thiết lập tài khoản
                     </Typography>
                     <List className="settings-list">
-                        <Button className="upgrade-card" style={{marginLeft: "5px", border: "1px solid #e3e3e3", borderRadius: "20px", backgroundColor: "#f8f8f8"}} onClick={() => handleToggleChange("upgrade")}>
+                        <Button className="upgrade-card" style={{marginLeft: "5px", border: "1px solid #e3e3e3", borderRadius: "20px", backgroundColor: "#f8f8f8"}} onClick={() => handleToggleChangeUpgread("upgrade")}>
                             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center"}}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                     <img
@@ -181,7 +210,7 @@ const Settings = ({interests ,formData, setFormData}) => {
                             )}
                         </div>
                         <Typography style={{ width: '95%', paddingLeft:'10px', paddingTop: '5px',fontSize: '15px', cursor: 'pointer'}}>Có thể thay đổi email thông qua quá trình xác thực email</Typography>
-                        <Typography className="verified-text" style={{ paddingLeft:'10px', paddingTop: '5px',fontSize: '16px', marginTop: '5px', cursor: 'pointer', fontWeight: 'bold'}}>Xác thực</Typography>
+                        <Typography className="verified-text" style={{ paddingLeft:'10px', paddingTop: '5px',fontSize: '16px', marginTop: '5px', cursor: 'pointer', fontWeight: 'bold'}} onClick={() => handleSendChangeEmail(formData.email)}>Xác thực</Typography>
                         <Typography className="verified-text" style={{ paddingLeft:'10px', paddingTop: '5px', fontSize: '16px', marginTop: '5px', cursor: 'pointer', fontWeight: 'bold'}} onClick={() => handleToggleChange('main')}>Back</Typography>
                     </div>
                 ): toggles.matkhau === true ? (
@@ -362,14 +391,15 @@ const Settings = ({interests ,formData, setFormData}) => {
                 ) : toggles.upgrade === true ? (
                     <Dialog
                         fullScreen={fullScreen}
-                        open={true}
+                        open={open}
                         onClose={handleClose}
                         aria-labelledby="responsive-dialog-title"
+                        sx={{borderRadius: "500px"}}
                     >
-                        <DialogTitle id="responsive-dialog-title">
+                        <DialogTitle id="responsive-dialog-title" sx={{textAlign: 'center', justifyContent: 'center', fontSize: "26px"}}>
                             Các phiên bản nâng cấp
                         </DialogTitle>
-                        <DialogActions style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <DialogActions style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: "10px"}}>
                             <Button
                                 autoFocus
                                 style={{
@@ -382,61 +412,105 @@ const Settings = ({interests ,formData, setFormData}) => {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     textAlign: "center",
-                                    gap: "10px" // Ensures spacing between rows
+                                    gap: "10px",
+                                    height: "72dvh"
                                 }}
                                 onClick={() => {
-                                    paymentAxios.get('/vn-pay', {
-                                        params: {
-                                            id: formData.userRecord.userId,
-                                            bankcode: bankcode,
-                                            amount: amount
-                                        }
-                                    })
-                                        .then((res) => {
-                                            if (res.data) {
-                                                console.log("Redirecting to:", res.data);
-                                                window.open(res.data, "_blank");
+                                    if(formData.type !== "PREMIUM") {
+                                        paymentAxios.get('/vn-pay', {
+                                            params: {
+                                                id: formData.userRecord.userId,
+                                                bankcode: bankcode,
+                                                amount: amount
                                             }
                                         })
-                                        .catch((err) => {
-                                            alert(err.response?.data || "An error occurred");
-                                        });
+                                            .then((res) => {
+                                                if (res.data) {
+                                                    console.log("Redirecting to:", res.data);
+                                                    window.open(res.data, "_blank");
+                                                }
+                                            })
+                                            .catch((err) => {
+                                                alert(err.response?.data || "An error occurred");
+                                            });
+                                    }else {alert("Bạn đã là thành viên Premium")}
                                 }}
                             >
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-                                    <img
-                                        src="https://www.freepnglogos.com/uploads/diamond-png/diamond-icon-download-icons-3.png"
-                                        alt="Diamond Icon"
-                                        width="60"
-                                        height="60"
-                                    />
-                                    <span style={{ fontSize: "18px", fontWeight: "bold" }}>PREMIUM</span>
-                                    <img
-                                        src="https://www.freepnglogos.com/uploads/diamond-png/diamond-icon-download-icons-3.png"
-                                        alt="Diamond Icon"
-                                        width="60"
-                                        height="60"
-                                    />
-                                </div>
+                                <div className="pricing-card">
+                                    <div style={{ maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px'  }}>
+                                        <img
+                                            src="https://www.freepnglogos.com/uploads/diamond-png/diamond-icon-download-icons-3.png"
+                                            alt="Diamond Icon"
+                                            width="60"
+                                            height="60"
+                                        />
+                                        <h2 className="plan-title">Premium</h2>
+                                        <img
+                                            src="https://www.freepnglogos.com/uploads/diamond-png/diamond-icon-download-icons-3.png"
+                                            alt="Diamond Icon"
+                                            width="60"
+                                            height="60"
+                                        />
+                                    </div>
+                                    <p className="plan-subtitle">Lựa chọn tốt cho người dùng sử dụng vì mục đích tìm kiếm người yêu</p>
 
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-                                    <img
-                                        src="https://static.vecteezy.com/system/resources/previews/019/006/277/original/money-cash-icon-png.png"
-                                        alt="Money Icon"
-                                        width="60"
-                                        height="60"
-                                    />
-                                    <span style={{ fontSize: "16px", fontWeight: "bold" }}>25.000 đồng/tháng</span>
+                                    <div className="plan-price">
+                                        VND 25.000 <small> người dùng / tháng</small>
+                                    </div>
+                                    <div className="users-limit">Quyền lợi: </div>
+                                    <ul className="features-list">
+                                        <li>Ưu tiên trong việc được gợi ý để ghép đôi</li>
+                                        <li>Tăng thêm 20% số điểm khi đối tượng hẹn hò sử dụng chức năng gợi ý ghép đôi và tìm kiếm</li>
+                                    </ul>
                                 </div>
+                            </Button>
+                            <Button
+                                autoFocus
+                                style={{
+                                    border: "1px solid #000",
+                                    width: "50%",
+                                    borderRadius: "20px",
+                                    padding: "15px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    textAlign: "center",
+                                    gap: "10px",
+                                }}
+                            >
+                                <div className="pricing-card" style={{gap: "10px"}}>
+                                    <div style={{ maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px'  }}>
+                                        <img
+                                            src="https://png.pngtree.com/png-clipart/20230116/original/pngtree-gold-king-crown-transparent-vector-design-free-download-png-image_8915239.png"
+                                            alt="Royal Icon"
+                                            width="60"
+                                            height="60"
+                                        />
+                                        <h2 className="plan-title">Royal</h2>
+                                        <img
+                                            src="https://png.pngtree.com/png-clipart/20230116/original/pngtree-gold-king-crown-transparent-vector-design-free-download-png-image_8915239.png"
+                                            alt="Royal Icon"
+                                            width="60"
+                                            height="60"
+                                        />
+                                    </div>
+                                    <p className="plan-subtitle">Lựa chọn hoàn hảo cho mục đích ghép đôi nhanh với đối tượng hẹn hò mong muôn</p>
 
-                                <div style={{ textAlign: "center", fontSize: "14px", maxWidth: "90%", color:"black", textTransform: "none"}}>
-                                    Nâng cấp này sẽ cung cấp cho bạn thêm 20% khả năng gợi ý ghép đôi khi đối tượng hẹn hò tìm kiếm
+                                    <div className="plan-price">
+                                        VND 250.000 <small> người dùng / tháng</small>
+                                    </div>
+                                    <div className="users-limit">Quyền lợi: </div>
+                                    <ul className="features-list">
+                                        <li>Ưu tiên trong việc được gợi ý để ghép đôi</li>
+                                        <li>Tăng thêm 40% số điểm khi đối tượng hẹn hò sử dụng chức năng gợi ý ghép đôi và tìm kiếm</li>
+                                    </ul>
                                 </div>
                             </Button>
                         </DialogActions>
                     </Dialog>
                 ) : null
-             )}
+            )}
         </div>
     );
 };

@@ -2,8 +2,6 @@
     width: fit-content;
     display: flex;
     justify-content: center;
-    padding-top: 16px; /* Assuming theme.spacing(2) is 16px */
-    padding-bottom: 16px; /* Assuming theme.spacing(2) is 16px */
-    margin-bottom: 32px; /* Assuming theme.spacing(4) is 32px */
+    padding-top: 16px;
     font-size: 500px;
 }

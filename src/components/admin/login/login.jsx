@@ -46,7 +46,7 @@ export default function AdminLogin(){
     }
     return (
         <Container component="main">
-            <div className="paperlogin">
+            <div className="paperloginadmin">
                 <Avatar className="avatarlogin">
                     <LockIcon/>
                 </Avatar>

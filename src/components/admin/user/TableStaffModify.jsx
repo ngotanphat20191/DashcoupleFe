@@ -450,8 +450,8 @@ export default function TableStaffModify(props) {
                                             <Autocomplete
                                                 className="slidersearch"
                                                 multiple
-                                                options={props.interestData}
-                                                getOptionLabel={(option) => option.name}
+                                                options={Array.isArray(props.interestData) ? props.interestData : []}
+                                                getOptionLabel={(option) => option?.name || ''}
                                                 sx={{
                                                     width: '100%',
                                                     backgroundColor: 'white',
@@ -468,9 +468,21 @@ export default function TableStaffModify(props) {
                                                         padding: '4px'
                                                     }
                                                 }}
-                                                value={props.interestData.filter(interest =>
-                                                    currentStaffData?.interests.includes(Number(interest.InterestID)) // Convert to number for matching
-                                                )}
+                                                value={(() => {
+                                                    // Ensure interestData is an array
+                                                    const interestDataArray = Array.isArray(props.interestData) 
+                                                        ? props.interestData 
+                                                        : [];
+                                                    
+                                                    // Ensure interests is an array
+                                                    const interests = Array.isArray(currentStaffData?.interests) 
+                                                        ? currentStaffData.interests 
+                                                        : [];
+                                                    
+                                                    return interestDataArray.filter(interest => 
+                                                        interest && interests.includes(Number(interest.InterestID))
+                                                    );
+                                                })()}
                                                 onChange={(event, newValue) => {
                                                     const selectedIds = newValue.map(interest => Number(interest.InterestID)); // Store as integer
                                                     setCurrentStaffData({ ...currentStaffData, interests: selectedIds });
@@ -487,11 +499,21 @@ export default function TableStaffModify(props) {
                                         ) : (
                                             <p className="personal-details-item-content">
                                                 {(() => {
-                                                    const selectedInterests = currentStaffData?.interests.map(Number) || [];
-                                                    const interestNames = props.interestData
-                                                        .filter(interest => selectedInterests.includes(Number(interest.InterestID)))
+                                                    const selectedInterests = currentStaffData?.interests?.map(Number) || [];
+                                                    if (!selectedInterests.length) return "Không có sở thích được chọn";
+                                                    
+                                                    // Ensure interestData is an array
+                                                    const interestDataArray = Array.isArray(props.interestData) 
+                                                        ? props.interestData 
+                                                        : (props.interestData?.interests || []);
+                                                    
+                                                    if (!interestDataArray.length) return "Không có sở thích được chọn";
+                                                    
+                                                    const interestNames = interestDataArray
+                                                        .filter(interest => interest && selectedInterests.includes(Number(interest.InterestID)))
                                                         .map(interest => interest.name)
                                                         .join(", ");
+                                                    
                                                     return interestNames || "Không có sở thích được chọn";
                                                 })()}
                                             </p>

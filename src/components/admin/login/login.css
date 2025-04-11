@@ -17,10 +17,22 @@ body {
     transform: translateX(62%);
 
 }
+.paperloginadmin {
+    margin-top: 64px; /* Assuming theme.spacing(8) is 64px */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    background-color: rgb(240,244,252);
+    border-radius: 20px;
+    padding: 20px 50px;
+    max-width: 45%;
+    transform: translateX(62%);
 
+}
 .avatarlogin {
     margin: 8px; /* Assuming theme.spacing(1) is 8px */
-    background-color: #f50057; /* Assuming theme.palette.secondary.main is #f50057 */
+    background-color: blue; /* Assuming theme.palette.secondary.main is #f50057 */
 }
 
 .formlogin {

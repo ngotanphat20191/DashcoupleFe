@@ -67,25 +67,14 @@ function Login(){
             }, {
                 cancelToken: cancelTokenSource.token
             });
-            
-            // Store token in localStorage
             localStorage.setItem('token', response.data);
-            
-            // Show success message
             setSnackbarMessage('Đăng nhập thành công! Đang chuyển hướng...');
             setSnackbarSeverity('success');
             setShowSnackbar(true);
-            
-            // Reset loading state
             setAwaitResponse(false);
-            
-            // Redirect after delay
             setTimeout(() => window.location.href = '/', 2000);
         } catch (err) {
-            // Reset loading state
             setAwaitResponse(false);
-            
-            // Handle errors
             if (err.response?.status === 400) {
                 setError(err.response.data);
                 setSnackbarMessage(err.response.data);

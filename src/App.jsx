@@ -70,7 +70,11 @@ function AppRoutes() {
         const root = document.getElementById("root");
         if (hideNavRoutes.includes(location.pathname)) {
             root.style.background = 'url("/stardot.jpg")';
-        } else {
+        }
+        else if(location.pathname === "/login/admin"){
+            root.style.background = 'rgb(64,60,84)';
+        }
+        else {
             root.style.background = 'url("/sakura.jpg") no-repeat center center / cover';
         }
     }, [location.pathname, hideNavRoutes]);
@@ -166,11 +170,6 @@ function AppRoutes() {
                             <Signup />
                         </Suspense>
                     } />
-                    <Route path="/login/admin" element={
-                        <Suspense fallback={<LoadingFallback />}>
-                            <AdminLogin />
-                        </Suspense>
-                    } />
                     <Route path="/login" element={
                         <Suspense fallback={<LoadingFallback />}>
                             <Login />
@@ -228,6 +227,11 @@ function AppRoutes() {
                         <OtherLayout />
                     </Suspense>
                 }>
+                    <Route path="/login/admin" element={
+                        <Suspense fallback={<LoadingFallback />}>
+                            <AdminLogin />
+                        </Suspense>
+                    } />
                     <Route path="/payment/success" element={
                         <Suspense fallback={<LoadingFallback />}>
                             <PaymentSuccess />

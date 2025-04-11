@@ -99,21 +99,18 @@ const ChatImageUploader = ({ onImageUploaded, disabled }) => {
                 onChange={handleFileSelect}
             />
 
-            <IconButton
+            <Button
+                variant="contained"
                 color="primary"
                 onClick={handleUploadClick}
                 disabled={disabled || isUploading}
                 sx={{
-                    color: '#fc6ae7',
-                    '&:hover': {
-                        backgroundColor: 'rgba(252, 106, 231, 0.08)'
-                    }
+                    color: 'white',
                 }}
             >
                 {isUploading ? <CircularProgress size={24}/> : <ImageIcon/>}
-            </IconButton>
+            </Button>
 
-            {/* Preview Dialog */}
             <Dialog open={showPreview} onClose={handleCancelUpload} maxWidth="sm" fullWidth>
                 <DialogTitle>
                     Gửi ảnh này?

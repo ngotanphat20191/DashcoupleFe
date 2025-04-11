@@ -19,7 +19,6 @@ const Nav = () => {
         const fetchData = async () => {
             try {
                 await fetchNotifications();
-                await fetchTotalNotifications();
                 await fetchTotalMessages();
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -32,6 +31,7 @@ const Nav = () => {
         }).then((res) => {
             console.log(res.data)
             setNotifications(res.data)
+            fetchTotalNotifications();
         }).catch(err => {
             if(err.status === 400){
                 alert(err.response.data)
@@ -39,12 +39,12 @@ const Nav = () => {
         })
     };
     const fetchTotalMessages = async () => {
-        setTotalMessages(3);
+        setTotalMessages(0);
     };
     const fetchTotalNotifications = async () => {
         let unreadCount = 0;
         notifications.forEach(notification => {
-            if (notification.is_read !== 1) {
+            if (notification.is_read == 0) {
                 unreadCount++;
             }
         });

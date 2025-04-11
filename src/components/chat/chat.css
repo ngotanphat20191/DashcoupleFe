@@ -16,3 +16,45 @@
 .emptyChatTitle{
     margin: 8px;
 }
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.ellipsis-button {
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.ellipsis-button:hover {
+    background-color: #ddd;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0;
+    width: 150px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background-color: #f9f9f9;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}

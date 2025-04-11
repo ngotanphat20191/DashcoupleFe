@@ -23,7 +23,7 @@ const AreaPaymentCard = ({date, setDate, statisticData}) => {
                 colors={["#e4e8ef", "#4ce13f"]}
                 cardInfo={{
                     title: "Tổng số lợi nhuận",
-                    value: getTotalAmount(statisticData)+" VNĐ",
+                    value: getTotalAmount(statisticData).toLocaleString('vi-VN')+" VNĐ",
                     text: "Đây là toàn bộ lợi nhuận có được từ nâng cấp tài khoản",
                 }}
             />

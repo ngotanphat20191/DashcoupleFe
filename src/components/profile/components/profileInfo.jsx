@@ -66,10 +66,9 @@ const ProfileInfo = ({ interests, formData, setFormData }) => {
             interests: formData.interest,
         }).then((res) => {
             console.log(res.data)
-            alert(res.data)
+            setViewStatus(1);
         }).catch(err => {
             console.log(err)
-            alert(err.response.data)
         })
     }
     return (

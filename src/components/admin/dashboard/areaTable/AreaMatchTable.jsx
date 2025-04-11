@@ -1,5 +1,6 @@
 import AreaTableAction from "./AreaTableAction.jsx";
 import "./AreaTable.scss";
+import { useMemo } from "react";
 
 const TABLE_HEADS = [
   "Mã cặp đôi",
@@ -10,10 +11,25 @@ const TABLE_HEADS = [
 ];
 
 const AreaMatchTable = ({date, setDate, statisticData}) => {
+  // Get the 10 most recent matches based on MATCH_ID
+  const recentMatches = useMemo(() => {
+    if (!statisticData.matchList || !Array.isArray(statisticData.matchList)) {
+      return [];
+    }
+    
+    // Sort by MATCH_ID in descending order (assuming higher ID means more recent)
+    const sortedMatches = [...statisticData.matchList].sort((a, b) => 
+      parseInt(b.MATCH_ID) - parseInt(a.MATCH_ID)
+    );
+    
+    // Take only the first 10 items
+    return sortedMatches.slice(0, 10);
+  }, [statisticData.matchList]);
+
   return (
     <section className="content-area-table" style={{marginTop: "30px"}}>
       <div className="data-table-info">
-        <h4 className="data-table-title">Danh sách ghép đôi</h4>
+        <h4 className="data-table-title">Danh sách ghép đôi (10 cặp ghép đôi gần đây nhất)</h4>
       </div>
       <div className="data-table-diagram">
         <table>
@@ -25,7 +41,7 @@ const AreaMatchTable = ({date, setDate, statisticData}) => {
             </tr>
           </thead>
           <tbody>
-          {statisticData.matchList?.map((dataItem) => (
+          {recentMatches.map((dataItem) => (
               <tr key={dataItem.MATCH_ID}>
                 <td>{dataItem.MATCH_ID}</td>
                 <td>{dataItem.USERS[0].NAME || "N/A"}</td>

@@ -1,4 +1,5 @@
 import "./user.css";
+import "./AreaTable.scss";
 import {
     Button,
     Stack,
@@ -146,9 +147,13 @@ export default function User() {
     function handleInterest() {
         adminAxios.get(`/profiles/interest`)
             .then(r => {
-                setInterestData(r.data);
+                // Ensure we're setting an array
+                setInterestData(Array.isArray(r.data) ? r.data : []);
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                setInterestData([]); // Set empty array on error
+            });
     }
 
     useEffect(() => {
@@ -167,32 +172,31 @@ export default function User() {
     }, [searchData]);
 
     return (
-        interestData ? (
-            <div className="user-management-container">
-                <section className="user-table-container">
-                    <Stack marginBlock={1} alignItems="center" direction="row" justifyContent="space-between"
-                           className="table-filters">
-                        <Stack direction="row" columnGap={1}>
-                            <Input
-                                autoFocus
-                                placeholder="Search by name..."
-                                sx={{ minWidth: '25rem' }}
-                                value={searchData.name || ""}
-                                onChange={handleQueryChange}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        fetchStaffData();
-                                    }
-                                }}
-                            />
-                        </Stack>
-                        <Button variant="contained" onClick={fetchStaffData} style={{ marginRight: "260px" }}>
-                            FIND
-                        </Button>
-                        <Button variant="contained" startIcon={<FilterAltIcon/>} onClick={() => setShowFilters(prev => !prev)}>
-                            Sort & Filter
-                        </Button>
+        <div className="user-management-container">
+            <section className="user-table-container">
+                <Stack marginBlock={1} alignItems="center" direction="row" justifyContent="space-between"
+                       className="table-filters">
+                    <Stack direction="row" columnGap={1}>
+                        <Input
+                            autoFocus
+                            placeholder="Search by name..."
+                            sx={{ minWidth: '25rem' }}
+                            value={searchData.name || ""}
+                            onChange={handleQueryChange}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    fetchStaffData();
+                                }
+                            }}
+                        />
                     </Stack>
+                    <Button variant="contained" onClick={fetchStaffData} style={{ marginRight: "260px" }}>
+                        FIND
+                    </Button>
+                    <Button variant="contained" startIcon={<FilterAltIcon/>} onClick={() => setShowFilters(prev => !prev)}>
+                        Sort & Filter
+                    </Button>
+                </Stack>
                     {showFilters && (
                         <Stack>
                             <Stack rowGap={2} className="sort-filter-panel">
@@ -312,27 +316,24 @@ export default function User() {
                             </Stack>
                         </Stack>
                     )}
-                    <section className="user-table-wrapper">
-                        <TableUser
-                            data={sortedStaffData !== null ? sortedStaffData : searchDataAfter}
-                            header={tableHeader}
-                            isPagination={true}
-                            currentValues={searchData}
-                            setCurrentValues={setSearchData}
-                            allowCheckbox={true}
-                            handleDelete={deleteStaff}
-                            isMutable={true}
-                            allowDelete={true}
-                            allowModify={true}
-                            handleModify={handleModify}
-                            ModifyTemplate={TableStaffModify}
-                            currentModifyData={currentModifyData}
-                            setCurrentModifyData={setCurrentModifyData}
-                            interestData={interestData}
-                        />
-                    </section>
+                    <TableUser
+                        data={sortedStaffData !== null ? sortedStaffData : searchDataAfter}
+                        header={tableHeader}
+                        isPagination={true}
+                        currentValues={searchData}
+                        setCurrentValues={setSearchData}
+                        allowCheckbox={true}
+                        handleDelete={deleteStaff}
+                        isMutable={true}
+                        allowDelete={true}
+                        allowModify={true}
+                        handleModify={handleModify}
+                        ModifyTemplate={TableStaffModify}
+                        currentModifyData={currentModifyData}
+                        setCurrentModifyData={setCurrentModifyData}
+                        interestData={interestData || {}}
+                    />
                 </section>
             </div>
-        ) : null
     );
 }

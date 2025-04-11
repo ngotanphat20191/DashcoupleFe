@@ -5,62 +5,92 @@ import { useEffect, useState } from "react";
 import Input from "@mui/joy/Input";
 import { adminAxios } from "../../../config/axiosConfig.jsx";
 import TableInterestQuestionAdd from "./TableInterestQuestionAdd.jsx";
+import TableInterestQuestionModify from "./TableInterestQuestionModify.jsx";
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
 export default function InterestQuestion() {
     const [isLoading, setIsLoading] = useState(false);
     const [staffData, setStaffData] = useState([]); // Full data from API
     const [filteredData, setFilteredData] = useState([]); // Filtered data for display
-    const tableHeader = ['ID', 'Câu hỏi', 'Lựa chọn 1', 'Lựa chọn 2', 'Lựa chọn 3', 'Lựa chọn 4', 'Hành động'];
+    const tableHeader = ['ID', 'Câu hỏi', 'Lựa chọn 1', 'Lựa chọn 2', 'Lựa chọn 3', 'Lựa chọn 4'];
     const [currentModifyData, setCurrentModifyData] = useState([]);
     const [searchData, setSearchData] = useState([]);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showFilters, setShowFilters] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         fetchStaffData();
-        console.log(filteredData)
     }, []);
+    
+    // Update filtered data when staffData changes
     useEffect(() => {
-        if (searchData && Object.keys(searchData).length > 0) {
-            updateStaffDataFromSearch();
+        if (searchQuery) {
+            handleQueryChange({ target: { value: searchQuery } });
+        } else {
+            setFilteredData(staffData);
         }
-    }, [searchData]);
+    }, [staffData]);
 
-    function updateStaffDataFromSearch() {
-        const newStaffData = Object.values(searchData).map(item => ({
-            QUESTION_ID: item.QUESTION_ID || item.question_ID,
-            QUESTION: item.QUESTION || item.question,
-            OPTION_1: item.OPTION_1 || item.option_1,
-            OPTION_2: item.OPTION_2 || item.option_2,
-            OPTION_3: item.OPTION_3 || item.option_3,
-            OPTION_4: item.OPTION_4 || item.option_4,
-        }));
-        setFilteredData(newStaffData);
-    }
     function fetchStaffData() {
         setIsLoading(true);
         adminAxios.get('/interestsQuestion')
             .then((res) => {
-                setSearchData(res.data);
+                setStaffData(res.data);
                 setFilteredData(res.data);
                 setIsLoading(false);
+            })
+            .catch(err => {
+                console.log(err.response?.data || err);
+                setIsLoading(false);
+            });
+    }
+
+    function handleQueryChange(e) {
+        const { value } = e.target;
+        setSearchQuery(value);
+        
+        if (!value.trim()) {
+            setFilteredData(staffData);
+            return;
+        }
+
+        const query = value.toLowerCase();
+        const newFilteredData = staffData.filter(item =>
+            (item.QUESTION && item.QUESTION.toLowerCase().includes(query)) ||
+            (item.OPTION_1 && item.OPTION_1.toLowerCase().includes(query)) ||
+            (item.OPTION_2 && item.OPTION_2.toLowerCase().includes(query)) ||
+            (item.OPTION_3 && item.OPTION_3.toLowerCase().includes(query)) ||
+            (item.OPTION_4 && item.OPTION_4.toLowerCase().includes(query))
+        );
+        setFilteredData(newFilteredData);
+    }
+    
+    function clearFilters() {
+        setSearchQuery("");
+        setFilteredData(staffData);
+    }
+    
+    function handleDeleteQuestion(id) {
+        if (!id) return;
+        
+        setIsLoading(true);
+        adminAxios.post('/interestsQuestion/delete',{
+            QUESTION_ID: id,
+            })
+            .then((res) => {
+                setFilteredData(prevProfile => prevProfile.filter(profile => profile.QUESTION_ID !== id));
+                setStaffData(prevProfile => prevProfile.filter(profile => profile.QUESTION_ID !== id));
             })
             .catch(err => {
                 console.log(err.response.data);
                 setIsLoading(false);
             });
     }
-
-    function handleQueryChange(e, field) {
-        const { value } = e.target;
-        setSearchData(prev => ({ ...prev, [field]: value }));
-
-        const newFilteredData = staffData.filter(item =>
-            item.QUESTION.toLowerCase().includes(searchData.question.toLowerCase()) &&
-            item.OPTION_1.toLowerCase().includes(searchData.option1.toLowerCase()) &&
-            item.OPTION_2.toLowerCase().includes(searchData.option2.toLowerCase()) &&
-            item.OPTION_3.toLowerCase().includes(searchData.option3.toLowerCase()) &&
-            item.OPTION_4.toLowerCase().includes(searchData.option4.toLowerCase())
-        );
-        setFilteredData(newFilteredData);
+    
+    function handleModifyQuestion(item) {
+        console.log("Modifying question:", item);
+        setCurrentModifyData(item);
     }
 
     return (
@@ -69,25 +99,71 @@ export default function InterestQuestion() {
                 <Stack marginBlock={1} alignItems={'center'} direction={'row'} justifyContent={'space-between'}
                        className={'table-filters'}>
                     <Stack direction={'row'} columnGap={1}>
-                        <Input placeholder={'Search by question'} sx={{ minWidth: '15rem' }} value={searchData.question}
-                               onChange={(e) => handleQueryChange(e, 'question')} />
-                        <Input placeholder={'Option 1'} sx={{ minWidth: '10rem' }} value={searchData.option1}
-                               onChange={(e) => handleQueryChange(e, 'option1')} />
-                        <Input placeholder={'Option 2'} sx={{ minWidth: '10rem' }} value={searchData.option2}
-                               onChange={(e) => handleQueryChange(e, 'option2')} />
-                        <Input placeholder={'Option 3'} sx={{ minWidth: '10rem' }} value={searchData.option3}
-                               onChange={(e) => handleQueryChange(e, 'option3')} />
-                        <Input placeholder={'Option 4'} sx={{ minWidth: '10rem' }} value={searchData.option4}
-                               onChange={(e) => handleQueryChange(e, 'option4')} />
-                        <Button variant={'contained'} onClick={fetchStaffData}>Refresh</Button>
+                        <Input 
+                            autoFocus
+                            placeholder={'Tìm kiếm câu hỏi hoặc lựa chọn...'} 
+                            sx={{ minWidth: '25rem' }} 
+                            value={searchQuery}
+                            onChange={handleQueryChange}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    // Optional: add specific action on Enter
+                                }
+                            }}
+                        />
+                    </Stack>
+                    <Stack direction="row" spacing={2}>
+                        <Button 
+                            variant={'contained'} 
+                            color="success" 
+                            onClick={() => setShowAddModal(true)}
+                        >
+                            Thêm câu hỏi mới
+                        </Button>
                     </Stack>
                 </Stack>
-                <section className={'user-table-wrapper'}>
-                    <TableInterestQuestion data={filteredData} header={tableHeader} isPagination={true}
-                                           allowCheckbox={true} allowDelete={true} allowModify={true}
-                                           ModifyTemplate={TableInterestQuestionAdd} currentModifyData={currentModifyData}
-                                           setCurrentModifyData={setCurrentModifyData} isMutable={true}/>
-                </section>
+                
+                {showFilters && (
+                    <Stack>
+                        <Stack rowGap={2} className="sort-filter-panel">
+                            <Button variant="contained" className="clear-filter-btn" onClick={clearFilters}>
+                                XÓA BỘ LỌC
+                            </Button>
+                            <Stack direction="row" flexWrap="wrap" columnGap={3}>
+                                {/* Add filter options here if needed */}
+                            </Stack>
+                        </Stack>
+                    </Stack>
+                )}
+                <TableInterestQuestion 
+                    data={filteredData} 
+                    header={tableHeader} 
+                    isPagination={true}
+                    allowCheckbox={true} 
+                    allowDelete={true} 
+                    allowModify={true}
+                    ModifyTemplate={(props) => (
+                        <TableInterestQuestionModify 
+                            {...props} 
+                            handleRefresh={() => fetchStaffData()}
+                        />
+                    )}
+                    currentModifyData={currentModifyData}
+                    setCurrentModifyData={setCurrentModifyData} 
+                    isMutable={true}
+                    handleDelete={(id) => handleDeleteQuestion(id)}
+                    handleModify={(item) => handleModifyQuestion(item)}
+                    handleRefresh={() => fetchStaffData()}
+                />
+                
+                {/* Add Question Modal */}
+                {showAddModal && (
+                    <TableInterestQuestionAdd 
+                        showModifyPanel={showAddModal} 
+                        setShowModify={setShowAddModal} 
+                        handleRefresh={() => fetchStaffData()}
+                    />
+                )}
             </section>
         </div>
     );

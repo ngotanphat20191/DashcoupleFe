@@ -49,7 +49,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                 <strong>Số người thanh toán:</strong> {paymentCount}
             </p>
             <p style={{ margin: 0 }}>
-                <strong>Tổng số tiền:</strong> {totalAmount}
+                <strong>Tổng số tiền:</strong> {totalAmount.toLocaleString('vi-VN')} VND
             </p>
         </div>
     );
@@ -60,59 +60,100 @@ const ComposedPaymentChart = ({ date, setDate, statisticData }) => {
 
     // Helper function to aggregate payments by month, ensuring every month in the range is included.
     const aggregatePaymentsByMonth = (data) => {
+        // Handle empty or invalid data
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            // Return default data for the current year
+            const currentYear = moment().year();
+            const months = [];
+            for (let i = 0; i < 12; i++) {
+                const monthKey = `${currentYear}-${(i + 1).toString().padStart(2, '0')}`;
+                months.push({
+                    name: monthKey,
+                    paymentCount: 0,
+                    totalAmount: 0
+                });
+            }
+            return months;
+        }
+
         const monthlyData = {};
 
-        let minDate, maxDate;
-        if (data.length > 0) {
-            minDate = moment
-                .min(data.map((payment) => moment(payment.PAYMENT_DATE)))
-                .startOf("month");
-            maxDate = moment
-                .max(data.map((payment) => moment(payment.PAYMENT_DATE)))
-                .startOf("month");
-        } else {
-            minDate = moment().startOf("year");
-            maxDate = moment().endOf("year");
-        }
-
-        // If there's only one month in the data, extend to the full year.
-        if (minDate.isSame(maxDate, "month")) {
-            minDate = minDate.clone().startOf("year");
-            maxDate = minDate.clone().endOf("year");
-        }
-
-        // Aggregate payment data by month.
-        data.forEach((payment) => {
-            const paymentMonth = moment(payment.PAYMENT_DATE).format("YYYY-MM");
-            const amount = payment.AMOUNT;
-            if (!monthlyData[paymentMonth]) {
-                monthlyData[paymentMonth] = { paymentCount: 0, totalAmount: 0 };
+        try {
+            // Find min and max dates safely
+            let validDates = data
+                .filter(payment => payment && payment.PAYMENT_DATE)
+                .map(payment => moment(payment.PAYMENT_DATE));
+            
+            let minDate, maxDate;
+            
+            // Always show a full year of data
+            if (validDates.length > 0) {
+                // Find the latest date in the data
+                maxDate = moment.max(validDates).startOf("month");
+                
+                // Set minDate to be 11 months before maxDate to get a full year
+                minDate = maxDate.clone().subtract(11, 'months').startOf("month");
+                
+                // Alternative approach: center the year around the data
+                // const midDate = moment.min(validDates).add(moment.max(validDates).diff(moment.min(validDates)) / 2);
+                // minDate = midDate.clone().subtract(6, 'months').startOf("month");
+                // maxDate = midDate.clone().add(5, 'months').startOf("month");
+            } else {
+                // If no valid dates, show the current year
+                minDate = moment().startOf("year");
+                maxDate = moment().endOf("year").startOf("month");
             }
-            monthlyData[paymentMonth].paymentCount += 1;
-            monthlyData[paymentMonth].totalAmount += amount;
-        });
 
-        // Generate a complete list of months between minDate and maxDate.
-        const monthsInRange = [];
-        let currentMonth = minDate.clone();
-        while (
-            currentMonth.isBefore(maxDate) ||
-            currentMonth.isSame(maxDate, "month")
-            ) {
-            const monthKey = currentMonth.format("YYYY-MM");
-            if (!monthlyData[monthKey]) {
-                monthlyData[monthKey] = { paymentCount: 0, totalAmount: 0 };
+            // Aggregate payment data by month.
+            data.forEach((payment) => {
+                if (!payment || !payment.PAYMENT_DATE) return;
+                
+                try {
+                    const paymentDate = moment(payment.PAYMENT_DATE);
+                    // Skip if payment date is outside our range
+                    if (paymentDate.isBefore(minDate) || paymentDate.isAfter(maxDate)) return;
+                    
+                    const paymentMonth = paymentDate.format("YYYY-MM");
+                    const amount = payment.AMOUNT || 0;
+                    
+                    if (!monthlyData[paymentMonth]) {
+                        monthlyData[paymentMonth] = { paymentCount: 0, totalAmount: 0 };
+                    }
+                    monthlyData[paymentMonth].paymentCount += 1;
+                    monthlyData[paymentMonth].totalAmount += amount;
+                } catch (err) {
+                    console.error("Error processing payment:", err);
+                }
+            });
+
+            // Generate a complete list of months between minDate and maxDate.
+            const monthsInRange = [];
+            let currentMonth = minDate.clone();
+            while (
+                currentMonth.isBefore(maxDate) ||
+                currentMonth.isSame(maxDate, "month")
+                ) {
+                const monthKey = currentMonth.format("YYYY-MM");
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { paymentCount: 0, totalAmount: 0 };
+                }
+                monthsInRange.push(monthKey);
+                currentMonth.add(1, "month");
             }
-            monthsInRange.push(monthKey);
-            currentMonth.add(1, "month");
-        }
 
-        // Convert to an array suitable for Recharts.
-        return monthsInRange.map((month) => ({
-            name: month,
-            paymentCount: monthlyData[month].paymentCount,
-            totalAmount: monthlyData[month].totalAmount
-        }));
+            // Convert to an array suitable for Recharts.
+            // Sort the months to ensure they're in chronological order
+            monthsInRange.sort((a, b) => moment(a, "YYYY-MM").diff(moment(b, "YYYY-MM")));
+            
+            return monthsInRange.map((month) => ({
+                name: month,
+                paymentCount: monthlyData[month].paymentCount,
+                totalAmount: monthlyData[month].totalAmount
+            }));
+        } catch (err) {
+            console.error("Error aggregating payment data:", err);
+            return [];
+        }
     };
 
     const data = aggregatePaymentsByMonth(statisticData.paymentList || []);
@@ -173,9 +214,11 @@ const ComposedPaymentChart = ({ date, setDate, statisticData }) => {
                             <YAxis
                                 yAxisId="right"
                                 orientation="right"
-                                domain={[0, "dataMax"]}
+                                domain={[0, "auto"]}
+                                allowDataOverflow={false}
+                                tickFormatter={(value) => value / 1000}
                                 label={{
-                                    value: "Tổng số tiền (VNĐ)",
+                                    value: "Tổng số tiền (nghìn VNĐ)",
                                     angle: -90,
                                     position: "insideRight",
                                     dx: 15,
@@ -191,6 +234,7 @@ const ComposedPaymentChart = ({ date, setDate, statisticData }) => {
                                 name="Tổng số tiền"
                                 fill="#8884d8"
                                 stroke="#8884d8"
+                                isAnimationActive={false}
                             />
                             <Line
                                 yAxisId="left"
@@ -200,6 +244,7 @@ const ComposedPaymentChart = ({ date, setDate, statisticData }) => {
                                 stroke="#ff7300"
                                 dot={{ r: 3 }}
                                 activeDot={{ r: 5 }}
+                                isAnimationActive={false}
                             />
                         </ComposedChart>
                     </ResponsiveContainer>

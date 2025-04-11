@@ -2,12 +2,6 @@ import {
     Pagination,
     Button as MuiButton,
     Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
 } from "@mui/material";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
@@ -20,9 +14,10 @@ import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import AdminUserContextMenu from "../shared/ContextMenu.jsx";
+import "./AreaTable.scss";
 
 export default function TableInterestQuestion({header, data, isPagination, handleClick, currentValues, setCurrentValues, allowCheckbox, handleDelete,
-                                          handleModify, allowModify, allowDelete, isMutable, ModifyTemplate, currentModifyData, clickable
+                                          handleModify, allowModify, allowDelete, isMutable, ModifyTemplate, currentModifyData, clickable, handleRefresh
                                       }){
     const [selectAll, setSelectAll] = useState(false)
     const [checkboxes, setCheckboxes] = useState(new Array(data.length).fill(false))
@@ -70,81 +65,88 @@ export default function TableInterestQuestion({header, data, isPagination, handl
 
     return (
         <>
-            <TableContainer onContextMenu={(event) => {
-                event.preventDefault()
-                setCoords({ x: event.pageX, y: event.pageY })
-                setClicked(true)
-            }}>
-                <Table>
-                    <TableHead>
-                        <TableRow sx={{backgroundColor: '#36007B'}}>
-                            {allowCheckbox &&
-                                <TableCell sx={{color: 'white', userSelect: 'none'}}>
-                                    <Checkbox onClick={handleSelectAll} checked={selectAll}/>
-                                </TableCell>
+            <section className="content-area-table">
+                <div className="data-table-info">
+                    <h4 className="data-table-title">Danh sách câu hỏi sở thích</h4>
+                </div>
+                <div className="data-table-diagram" onContextMenu={(event) => {
+                    event.preventDefault()
+                    setCoords({ x: event.pageX, y: event.pageY })
+                    setClicked(true)
+                }}>
+                    <table>
+                        <thead>
+                            <tr>
+                                {allowCheckbox &&
+                                    <th>
+                                        <Checkbox onClick={handleSelectAll} checked={selectAll}/>
+                                    </th>
+                                }
+                                {header.map((item, index) =>
+                                    <th key={index}>{item}</th>)}
+                                {isMutable &&
+                                    <th>
+                                        Hành động
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                data.map((item, index) => (
+                                    <tr key={index} onClick={() => {
+                                        if(clickable)
+                                            handleClick(index)
+                                    }}>
+                                        {allowCheckbox &&
+                                            <td onClick={(event) => {
+                                                event.stopPropagation()
+                                            }}>
+                                                <Checkbox onClick={() => handleCheckboxChange(index)} checked={checkboxes[index]}/>
+                                            </td>
+                                        }
+                                        {item && (
+                                            <>
+                                                <td>{item.QUESTION_ID}</td>
+                                                <td>{item.QUESTION}</td>
+                                                <td>{item.OPTION_1}</td>
+                                                <td>{item.OPTION_2}</td>
+                                                <td>{item.OPTION_3}</td>
+                                                <td>{item.OPTION_4}</td>
+                                            </>
+                                        )}
+                                        {allowCheckbox &&
+                                            <td className="dt-cell-action" onClick={(event) => {
+                                                event.stopPropagation()
+                                            }}>
+                                                {isMutable &&
+                                                    <Stack rowGap={0.5}>
+                                                        {allowModify &&
+                                                            <MuiButton sx={{fontSize: '0.75rem', padding: 0}} variant={'contained'} color={'info'}
+                                                                    onClick={() => {
+                                                                        _handleModify(item)
+                                                                    }}
+                                                            >MODIFY</MuiButton>
+                                                        }
+                                                        {allowDelete &&
+                                                            <MuiButton sx={{fontSize: '0.75rem', padding: 0}} variant={'contained'} color={'error'}
+                                                                    onClick={() => {
+                                                                        setIndex(index)
+                                                                        setShowDeleteModal(true)
+                                                                    }}
+                                                            >DELETE</MuiButton>
+                                                        }
+                                                    </Stack>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                ))
                             }
-                            {header.map((item, index) =>
-                                <TableCell sx={{color: 'white', userSelect: 'none'}} key={index}>{item}</TableCell>)}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {
-                            data.map((item, index) => (
-                                <TableRow key={index} sx={{
-                                    '&:nth-of-type(odd)': {backgroundColor: '#c0d6f3',},
-                                    '&:nth-of-type(even)': {backgroundColor: '#E2EFFF',},
-                                }} onClick={() => {
-                                    if(clickable)
-                                        handleClick(index)
-                                }}>
-                                    {allowCheckbox &&
-                                        <TableCell onClick={(event) => {
-                                            event.stopPropagation()
-                                        }}>
-                                            <Checkbox onClick={() => handleCheckboxChange(index)} checked={checkboxes[index]}/>
-                                        </TableCell>
-                                    }
-                                    {item &&
-                                        Object.keys(item).map((key, index) => (
-                                            <TableCell key={index}>{item[key]}</TableCell>
-                                        ))
-                                    }
-                                    {allowCheckbox &&
-                                        <TableCell sx={{display: 'flex'}} onClick={(event) => {
-                                            event.stopPropagation()
-                                        }}>
-                                            {isMutable &&
-                                                <Stack rowGap={0.5}>
-                                                    {allowModify &&
-                                                        <MuiButton sx={{fontSize: '0.75rem', padding: 0}} variant={'contained'} color={'info'}
-                                                                   onClick={() => {
-                                                                       _handleModify(item)
-                                                                   }}
-                                                        >MODIFY</MuiButton>
-                                                    }
-                                                    {allowDelete &&
-                                                        <MuiButton sx={{fontSize: '0.75rem', padding: 0}} variant={'contained'} color={'error'}
-                                                                   onClick={() => {
-                                                                       if(data[index][9] === 'Inactive'){
-                                                                           alert('This staff already inactive')
-                                                                       }
-                                                                       else{
-                                                                           setIndex(index)
-                                                                           setShowDeleteModal(true)
-                                                                       }
-                                                                   }}
-                                                        >DELETE</MuiButton>
-                                                    }
-                                                </Stack>
-                                            }
-                                        </TableCell>
-                                    }
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
             {showDeleteModal &&
                 <Modal open={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
                     <ModalDialog variant="outlined" role="alertdialog" sx={{backgroundColor: 'black', color: 'white'}}>
@@ -157,7 +159,10 @@ export default function TableInterestQuestion({header, data, isPagination, handl
                            Bạn có chắc muốn xóa câu hỏi này ?
                         </DialogContent>
                         <DialogActions>
-                            <Button variant="solid" color="danger" onClick={() => handleDelete(index)}>
+                            <Button variant="solid" color="danger" onClick={() => {
+                                handleDelete(data[index].QUESTION_ID);
+                                setShowDeleteModal(false);
+                            }}>
                                 Xóa
                             </Button>
                             <Button variant="plain" color="primary" onClick={() => setShowDeleteModal(false)}>
@@ -168,13 +173,23 @@ export default function TableInterestQuestion({header, data, isPagination, handl
                 </Modal>
             }
             {isPagination &&
-                <div style={{
-                    alignSelf: 'center',
-                    display: 'flex',
-                    width: '100%',
-                    justifyContent: 'center',
-                    position: 'relative'
-                }}>
+                <div className="pagination-container">
+                    <Pagination 
+                        page={1} 
+                        showFirstButton 
+                        showLastButton 
+                        size={'large'} 
+                        count={10} 
+                        color="primary"
+                    />
+                    <Stack direction={'row'} spacing={1} alignItems={'center'}>
+                        <p>Row per page</p>
+                        <Select defaultValue={10}>
+                            <Option value={10}>10</Option>
+                            <Option value={20}>20</Option>
+                            <Option value={30}>30</Option>
+                        </Select>
+                    </Stack>
                 </div>
             }
             {clicked && (
@@ -183,7 +198,7 @@ export default function TableInterestQuestion({header, data, isPagination, handl
                 })}/>
             )}
             {ModifyTemplate &&
-                <ModifyTemplate data={currentModifyData} setShowModify={setShowModifyPanel} showModifyPanel={showModifyPanel} handleDelete={handleDelete}/>
+                <ModifyTemplate data={currentModifyData} setShowModify={setShowModifyPanel} showModifyPanel={showModifyPanel} handleDelete={handleDelete} handleRefresh={handleRefresh}/>
             }
         </>
     )

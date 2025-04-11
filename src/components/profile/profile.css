@@ -474,3 +474,62 @@ body {
     color: #555;
     text-transform: none;
 }
+.pricing-card {
+    width: 300px;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    text-transform: none;
+
+}
+
+.plan-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+.plan-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.plan-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.plan-price small {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #444;
+}
+
+.users-limit {
+    font-size: 0.85rem;
+    color: #444;
+    margin-bottom: 1rem;
+}
+.features-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin-top: 1rem;
+}
+
+.features-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.features-list li::before {
+    content: "✓";
+    margin-right: 0.5rem;
+    color: #007aff;
+    font-weight: bold;
+}
