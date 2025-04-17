@@ -27,16 +27,16 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: [
-            'react', 
-            'react-dom', 
+            'react',
+            'react-dom',
             'react-router-dom',
             '@mui/material',
             '@mui/icons-material',
-            'axios'
+            'axios',
+            '@emotion/react',
+            '@emotion/styled'
           ],
           ui: [
-            '@emotion/react',
-            '@emotion/styled',
             'framer-motion',
             'react-icons'
           ]
