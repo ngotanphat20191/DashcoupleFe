@@ -1,0 +1,13 @@
+#root{
+    width:100%;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100dvh;
+    overflow: auto;
+}
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}

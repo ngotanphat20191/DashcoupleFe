@@ -20,7 +20,7 @@ body {
 
 .avatarlogin {
     margin: 8px; /* Assuming theme.spacing(1) is 8px */
-    background-color: #f50057; /* Assuming theme.palette.secondary.main is #f50057 */
+    background-color: #f851e0; /* Assuming theme.palette.secondary.main is #f50057 */
 }
 
 .formlogin {

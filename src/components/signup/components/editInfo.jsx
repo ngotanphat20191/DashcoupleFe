@@ -30,7 +30,9 @@ const EditInfo = ({ formData, setFormData }) => {
                 fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
                     .then((response) => response.json())
                     .then((data) => {
-                        setFormData({ ...formData, city: data.address.city });
+                        if (data.address && data.address.city && !formData.city) {
+                            setFormData(prevData => ({ ...prevData, city: data.address.city }));
+                        }
                     })
                     .catch((error) => console.error("Error fetching location data:", error));
             },
@@ -38,7 +40,7 @@ const EditInfo = ({ formData, setFormData }) => {
                 console.error("Error getting location:", error);
             }
         );
-    }, [setFormData, formData]);
+    }, [setFormData]);
 
     const tongiao = ['Phật giáo', 'Thiên chúa giáo', 'Kito giáo', 'Hindu giáo', 'Hồi giáo'];
     const gioitinh = ['Nam', 'Nữ', 'Chuyển giới nam', 'Chuyển giới nữ', 'Song tính'];
@@ -86,10 +88,10 @@ const EditInfo = ({ formData, setFormData }) => {
             <FormControl fullWidth>
                 <Autocomplete
                     options={Array.from({ length: 150 }, (_, i) => i + 100)}
-                    getOptionLabel={(option) => String(option + ' cm')}
+                    getOptionLabel={(option) => String(option) + ' cm'}
                     value={formData.height || null}
                     onChange={(event, newValue) => {
-                        setFormData({ ...formData, height: newValue });
+                        setFormData(prevData => ({ ...prevData, height: newValue }));
                     }}
                     renderInput={(params) => (
                         <TextField {...params} label="Chọn chiều cao" variant="outlined" />
@@ -112,7 +114,7 @@ const EditInfo = ({ formData, setFormData }) => {
                     getOptionLabel={(option) => String(option)}
                     value={formData.city || null}
                     onChange={(event, newValue) => {
-                        setFormData({ ...formData, city: newValue });
+                        setFormData(prevData => ({ ...prevData, city: newValue }));
                     }}
                     renderInput={(params) => (
                         <TextField {...params} label="Chọn thành phố" variant="outlined" />
@@ -121,6 +123,71 @@ const EditInfo = ({ formData, setFormData }) => {
             </FormControl>
         </Box>
     );
+    
+    const listEducation = (anchor) => (
+        <Sheet sx={{ width: 400, p: 2, borderRadius: 'sm' }}>
+            <div role="group" aria-labelledby="rank">
+                <Typography sx={{ fontWeight: "bold", fontSize: "18px", marginTop: "5px", marginBottom: "5px", textAlign: "center" }}>
+                    <FaUserGraduate style={{ color: "rgb(24,135,145)", fontSize: "25px", marginRight: '5px' }} />
+                    Trình độ học vấn hiện tại của bạn
+                </Typography>
+                <List
+                    orientation="horizontal"
+                    wrap
+                    sx={{
+                        '--List-gap': '5px',
+                        '--ListItem-radius': '20px',
+                        '--ListItem-minHeight': '40px',
+                        '--ListItem-gap': '8px',
+                    }}
+                >
+                    {trinhdohocvan.map(
+                        (item) => (
+                            <ListItem key={item}>
+                                {formData.Education === item && (
+                                    <Done
+                                        fontSize="20"
+                                        color="primary"
+                                        sx={{ ml: -0.5, zIndex: 2, pointerEvents: 'none' }}
+                                    />
+                                )}
+                                <Checkbox
+                                    size="md"
+                                    disableIcon
+                                    overlay
+                                    value={item}
+                                    label={item}
+                                    checked={formData.Education === item}
+                                    variant={formData.Education === item ? 'soft' : 'outlined'}
+                                    onChange={(event) => {
+                                        if (event.target.checked) {
+                                            setFormData({ ...formData, Education: item });
+                                        } else {
+                                            setFormData({ ...formData, Education: "" });
+                                        }
+                                    }}
+                                    slotProps={{
+                                        action: ({ checked }) => ({
+                                            sx: checked
+                                                ? {
+                                                    border: '1px solid',
+                                                    borderColor: 'primary.500',
+                                                }
+                                                : {
+                                                    border: '1px solid',
+                                                    borderColor: 'rgb(165,164,164)',
+                                                },
+                                        }),
+                                    }}
+                                />
+                            </ListItem>
+                        ),
+                    )}
+                </List>
+            </div>
+        </Sheet>
+    );
+
     const listReligion = (anchor) => (
         <Box
             sx={{ width: anchor.replace("Religion", "") === 'bottom' ? 'auto' : 500 }}
@@ -129,14 +196,8 @@ const EditInfo = ({ formData, setFormData }) => {
             onKeyDown={toggleDrawer(anchor, false)}
         >
             <div className="settings-container" >
-                <Typography sx={{
-                    fontStyle: "italic",
-                    textAlign: "center",
-                    lineHeight: "2rem",
-                    fontSize: "15px",
-                    paddingBottom: "10px"
-                }}>Hãy chọn tôn giáo của bạn</Typography>
-                <Sheet variant="outlined" sx={{ width: 290, p: 2, borderRadius: 'sm' }}>
+                <Typography sx={{fontWeight: "bold", fontSize: "18px", marginTop: "5px", marginBottom: "5px", textAlign: "center"}}>Hãy chọn tôn giáo của bạn</Typography>
+                <Sheet variant="outlined" sx={{ width: 290, p: 2, borderRadius: 'sm', marginLeft: '45px' }}>
                     <div role="group" aria-labelledby="rank">
                         <List
                             orientation="horizontal"
@@ -166,9 +227,9 @@ const EditInfo = ({ formData, setFormData }) => {
                                         variant={formData.religion === item ? 'soft' : 'outlined'}
                                         onChange={(event) => {
                                             if (event.target.checked) {
-                                                setFormData({ ...formData, religion: item });
+                                                setFormData(prevData => ({ ...prevData, religion: item }));
                                             } else {
-                                                setFormData({ ...formData, religion: "" });
+                                                setFormData(prevData => ({ ...prevData, religion: "" }));
                                             }
                                         }}
                                         slotProps={{
@@ -205,11 +266,11 @@ const EditInfo = ({ formData, setFormData }) => {
             }}>Hãy cung cấp thông tin cần thiết nhằm tạo hoàn thiện thông tin để thực hiện ghép đôi phù hợp
             </Typography>
             <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginTop: "-5px", marginBottom: "5px" }}>Họ tên</Typography>
-            <Textarea value={formData.name || ""} onChange={(e) => setFormData({ ...formData, name: e.target.value })} minRows={1.2} style={{ color: "black", fontSize: '16px', marginBottom: '5%', marginLeft: '-5%', marginRight: '-5%', outline: 'none', borderLeft: '2px solid black', borderRadius: '0px', borderRight: '2px solid black', borderTop: '2px solid white' }} />
+            <Textarea value={formData.name || ""} onChange={(e) => setFormData(prevData => ({ ...prevData, name: e.target.value }))} minRows={1.2} style={{ color: "black", fontSize: '16px', marginBottom: '5%', marginLeft: '-5%', marginRight: '-5%', outline: 'none', borderLeft: '2px solid black', borderRadius: '0px', borderRight: '2px solid black', borderTop: '2px solid white' }} />
             <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginTop: "-5px", marginBottom: "5px" }}>Ngày sinh</Typography>
             <EditBirthday formData={formData} setFormData={setFormData}></EditBirthday>
             <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginTop: "-5px", marginBottom: "5px" }}>Lời giới thiệu</Typography>
-            <Textarea value={formData.about || ""} onChange={(e) => setFormData({ ...formData, about: e.target.value })} minRows={2.5} style={{ color: "black", fontSize: '15px', marginLeft: '-5%', marginRight: '-5%', outline: 'none', borderLeft: '2px solid black', borderRadius: '0px', borderRight: '2px solid black', borderTop: '2px solid white' }} />
+            <Textarea value={formData.about || ""} onChange={(e) => setFormData(prevData => ({ ...prevData, about: e.target.value }))} minRows={2.5} style={{ color: "black", fontSize: '15px', marginLeft: '-5%', marginRight: '-5%', outline: 'none', borderLeft: '2px solid black', borderRadius: '0px', borderRight: '2px solid black', borderTop: '2px solid white' }} />
             <Typography sx={{ fontWeight: "bold", fontSize: "14px", margin: "5px 0px" }}>Giới tính</Typography>
             <Sheet variant="outlined" sx={{ width: 360, p: 2, borderRadius: 'sm' }}>
                 <div role="group" aria-labelledby="rank">
@@ -243,9 +304,11 @@ const EditInfo = ({ formData, setFormData }) => {
                                         variant={formData.gender === item ? 'soft' : 'outlined'}
                                         onChange={(event) => {
                                             if (event.target.checked) {
-                                                setFormData({ ...formData, gender: item });
+                                                setValue([item]);
+                                                setFormData(prevData => ({ ...prevData, gender: item }));
                                             } else {
-                                                setFormData({ ...formData, gender: "" });
+                                                setValue([]);
+                                                setFormData(prevData => ({ ...prevData, gender: "" }));
                                             }
                                         }}
                                         slotProps={{
@@ -272,10 +335,34 @@ const EditInfo = ({ formData, setFormData }) => {
                 <Typography sx={{ fontWeight: "bold", fontSize: "14px", margin: "5px 0px" }}>Chiều cao</Typography>
                 {['bottomHeight'].map((anchor) => (
                     <React.Fragment key={anchor}>
-                        <Button style={{ backgroundColor: 'white', color: "rgb(124,124,124)", fontWeight: "bold", marginLeft: '-5%', marginRight: '-10%', outline: 'none', paddingLeft: "5px", borderBottom: "2px solid rgb(229,232,235)", paddingTop: "10px", borderTop: "2px solid rgb(229,232,235)" }} onClick={toggleDrawer(anchor, true)}>
-                            <FcRuler style={{ fontSize: '24px' }}></FcRuler >
-                            <Typography sx={{ fontWeight: "bold", fontSize: "14px", paddingLeft: "2px" }}>{formData?.height ? formData.height + ' cm' : 'Thêm chiều cao'}</Typography>
-                            <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginLeft: formData?.height ? "303px" : "230px" }}> <ArrowForward className="settings-icon" /> </Typography>
+                        <Button 
+                            fullWidth
+                            style={{
+                                backgroundColor: 'white',
+                                color: "rgb(124,124,124)", 
+                                fontWeight: "bold",
+                                marginLeft: '-5%',
+                                marginRight: '-5%',
+                                width: "110%",
+                                outline: 'none',
+                                paddingLeft: "5px",
+                                borderBottom: "2px solid rgb(229,232,235)",
+                                paddingTop: "10px", 
+                                borderTop: "2px solid rgb(229,232,235)",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                textAlign: "left",
+                                textTransform: "none"
+                            }} 
+                            onClick={toggleDrawer(anchor, true)}
+                        >
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <FcRuler style={{ fontSize: '24px' }} />
+                                <Typography sx={{ fontWeight: "bold", fontSize: "16px", paddingLeft: "2px" }}>
+                                    {formData?.height ? formData.height + ' cm' : 'Thêm chiều cao'}
+                                </Typography>
+                            </div>
+                            <ArrowForward className="settings-icon" />
                         </Button>
                         <SwipeableDrawer
                             anchor={anchor.replace("Height", "")}
@@ -300,31 +387,38 @@ const EditInfo = ({ formData, setFormData }) => {
             </div>
             <EditRelationship formData={formData} setFormData={setFormData}></EditRelationship>
             <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginTop: "5px", marginBottom: "5px" }}>Công việc</Typography>
-            <Textarea value={formData.Job || ""} onChange={(e) => setFormData({ ...formData, Job: e.target.value })} minRows={1} style={{ fontSize: '15px', marginLeft: '-5%', marginRight: '-5%', outline: 'none', borderLeft: '2px solid black', borderRadius: '0px', borderRight: '2px solid black', borderTop: '2px solid white' }} />
+            <Textarea value={formData.Job || ""} onChange={(e) => setFormData(prevData => ({ ...prevData, Job: e.target.value }))} minRows={1} style={{ fontSize: '15px', marginLeft: '-5%', marginRight: '-5%', outline: 'none', borderLeft: '2px solid black', borderRadius: '0px', borderRight: '2px solid black', borderTop: '2px solid white' }} />
             <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginTop: "5px", marginBottom: "5px" }}>Trình độ học vấn</Typography>
             {["bottomEducation"].map((anchor) => (
                 <React.Fragment key={anchor}>
                     <Button
+                        fullWidth
                         style={{
                             backgroundColor: "white",
                             color: "rgb(124,124,124)",
                             fontWeight: "bold",
                             marginLeft: "-5%",
-                            marginRight: "-10%",
+                            marginRight: "-5%",
+                            width: "110%",
                             outline: "none",
                             paddingLeft: "5px",
                             borderBottom: "2px solid rgb(229,232,235)",
                             paddingTop: "10px",
                             borderTop: "2px solid rgb(229,232,235)",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            textAlign: "left",
+                            textTransform: "none"
                         }}
                         onClick={toggleDrawer(anchor, true)}
                     >
-                        <FaUserGraduate style={{ color: "rgb(24,135,145)", fontSize: "25px" }} />
-                        <Typography sx={{ fontWeight: "bold", fontSize: "14px", paddingLeft: "5px" }}>{formData?.Education ? formData.Education : 'Thêm trình độ học vấn'}
-                        </Typography>
-                        <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginLeft: "168px" }}>
-                            &gt;
-                        </Typography>
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <FaUserGraduate style={{ color: "rgb(24,135,145)", fontSize: "25px" }} />
+                            <Typography sx={{ fontWeight: "bold", fontSize: "16px", paddingLeft: "5px" }}>
+                                {formData?.Education ? formData.Education : 'Thêm trình độ học vấn'}
+                            </Typography>
+                        </div>
+                        <ArrowForward className="settings-icon" />
                     </Button>
                     <SwipeableDrawer
                         anchor={anchor.replace("Education", "")}
@@ -410,10 +504,34 @@ const EditInfo = ({ formData, setFormData }) => {
                 <Typography sx={{ fontWeight: "bold", fontSize: "14px", margin: "5px 0px" }}>Thành phố</Typography>
                 {['bottomCity'].map((anchor) => (
                     <React.Fragment key={anchor}>
-                        <Button style={{ backgroundColor: 'white', color: "rgb(124,124,124)", fontWeight: "bold", marginLeft: '-5%', marginRight: '-10%', outline: 'none', paddingLeft: "5px", borderBottom: "2px solid rgb(229,232,235)", paddingTop: "10px", borderTop: "2px solid rgb(229,232,235)" }} onClick={toggleDrawer(anchor, true)}>
-                            <FaCity style={{ color: 'rgb(24,135,145)', fontSize: '25px' }}></FaCity>
-                            <Typography sx={{ fontWeight: "bold", fontSize: "14px", paddingLeft: "5px" }}>{formData?.city ? formData.city : 'Thêm thành phố'}</Typography>
-                            <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginLeft: formData?.city ? "285px" : "230px" }}> <ArrowForward className="settings-icon" /> </Typography>
+                        <Button 
+                            fullWidth
+                            style={{
+                                backgroundColor: 'white',
+                                color: "rgb(124,124,124)", 
+                                fontWeight: "bold",
+                                marginLeft: '-5%',
+                                marginRight: '-5%',
+                                width: "110%",
+                                outline: 'none',
+                                paddingLeft: "5px",
+                                borderBottom: "2px solid rgb(229,232,235)",
+                                paddingTop: "10px", 
+                                borderTop: "2px solid rgb(229,232,235)",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                textAlign: "left",
+                                textTransform: "none"
+                            }} 
+                            onClick={toggleDrawer(anchor, true)}
+                        >
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <FaCity style={{ color: 'rgb(24,135,145)', fontSize: '25px' }} />
+                                <Typography sx={{ fontWeight: "bold", fontSize: "16px", paddingLeft: "5px" }}>
+                                    {formData?.city ? formData.city : 'Thêm thành phố'}
+                                </Typography>
+                            </div>
+                            <ArrowForward className="settings-icon" />
                         </Button>
                         <SwipeableDrawer
                             anchor={anchor.replace("City", "")}
@@ -440,10 +558,34 @@ const EditInfo = ({ formData, setFormData }) => {
                 <Typography sx={{ fontWeight: "bold", fontSize: "14px", margin: "5px 0px" }}>Tôn giáo</Typography>
                 {['bottomReligion'].map((anchor) => (
                     <React.Fragment key={anchor}>
-                        <Button style={{ backgroundColor: 'white', color: "rgb(124,124,124)", fontWeight: "bold", marginLeft: '-5%', marginRight: '-10%', outline: 'none', paddingLeft: "5px", borderBottom: "2px solid rgb(229,232,235)", paddingTop: "10px", borderTop: "2px solid rgb(229,232,235)" }} onClick={toggleDrawer(anchor, true)}>
-                            <FaCity style={{ color: 'rgb(24,135,145)', fontSize: '25px' }}></FaCity>
-                            <Typography sx={{ fontWeight: "bold", fontSize: "14px", paddingLeft: "5px" }}>{formData?.religion ? formData.religion : 'Thêm tôn giáo'}</Typography>
-                            <Typography sx={{ fontWeight: "bold", fontSize: "14px", marginLeft: formData?.religion ? "285px" : "230px" }}> <ArrowForward className="settings-icon" /> </Typography>
+                        <Button 
+                            fullWidth
+                            style={{
+                                backgroundColor: 'white',
+                                color: "rgb(124,124,124)", 
+                                fontWeight: "bold",
+                                marginLeft: '-5%',
+                                marginRight: '-5%',
+                                width: "110%",
+                                outline: 'none',
+                                paddingLeft: "5px",
+                                borderBottom: "2px solid rgb(229,232,235)",
+                                paddingTop: "10px", 
+                                borderTop: "2px solid rgb(229,232,235)",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                textAlign: "left",
+                                textTransform: "none"
+                            }} 
+                            onClick={toggleDrawer(anchor, true)}
+                        >
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <FaCity style={{ color: 'rgb(24,135,145)', fontSize: '25px' }} />
+                                <Typography sx={{ fontWeight: "bold", fontSize: "16px", paddingLeft: "5px" }}>
+                                    {formData?.religion ? formData.religion : 'Thêm tôn giáo'}
+                                </Typography>
+                            </div>
+                            <ArrowForward className="settings-icon" />
                         </Button>
                         <SwipeableDrawer
                             anchor={anchor.replace("Religion", "")}

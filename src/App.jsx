@@ -5,6 +5,7 @@ import { ThemeContext, ThemeProvider } from "./context/ThemeContext";
 import { SidebarProvider } from "./context/SidebarContext";
 import { DARK_THEME } from "./constants/themeConstants";
 import { CircularProgress, Box } from "@mui/material";
+import UnauthorizedDialog from "./components/shared/UnauthorizedDialog";
 
 // Lazy load components for better performance
 const Signup = lazy(() => import("./components/signup/signup.jsx"));
@@ -127,6 +128,9 @@ function AppRoutes() {
 
     return (
         <Suspense fallback={<LoadingFallback />}>
+            {/* Add the UnauthorizedDialog component */}
+            <UnauthorizedDialog />
+            
             <Routes>
                 <Route element={
                     <Suspense fallback={<LoadingFallback />}>

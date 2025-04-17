@@ -8,7 +8,7 @@ import Homenav from '../home/homenav.jsx';
 import {religionNames} from '../../datas/template.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
-import {baseAxios, loginSignUpAxios, createCancelToken} from "../../config/axiosConfig.jsx";
+import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 import _ from 'lodash';
 
 // Memoize components that don't need to re-render often
@@ -52,7 +52,7 @@ const Suggestions = () => {
                     loginSignUpAxios.get('/signup/interest', {
                         cancelToken: cancelTokenSource.token
                     }),
-                    baseAxios.get('/suggestion/preference', {
+                    matchesAxios.get('/suggestion/preference', {
                         cancelToken: cancelTokenSource.token
                     })
                 ]);
@@ -128,7 +128,7 @@ const Suggestions = () => {
         try {
             const cancelTokenSource = createCancelToken();
             
-            const response = await baseAxios.post('/suggestion', {
+            const response = await matchesAxios.post('/suggestion', {
                 turn: turn
             }, {
                 cancelToken: cancelTokenSource.token

@@ -89,7 +89,7 @@ export default function EditRelationship({ formData, setFormData }) {
                 <React.Fragment key={anchor}>
                     <Button style={{backgroundColor:'white',color:"rgb(124,124,124)", fontWeight: "bold",marginLeft: '-5%', marginRight: '-10%', outline: 'none', paddingLeft:"5px", borderBottom: "2px solid rgb(229,232,235)", paddingTop:"10px", borderTop: "2px solid rgb(229,232,235)"}} onClick={toggleDrawer(anchor, true)}>
                         <RelationshipIcon formData={formData} />
-                        <Typography sx={{ fontWeight: "bold", fontSize:"14px", paddingLeft: "5px"}}>{formData?.relationship ? formData.relationship : 'Moi quan he'}</Typography>
+                        <Typography sx={{ fontWeight: "bold", fontSize: "14px", paddingLeft: "2px"}}>{formData?.relationship ? formData.relationship : 'Moi quan he'}</Typography>
                         <Typography sx={{ fontWeight: "bold", fontSize:"14px", marginLeft: formData?.relationship ? "285px" : "254px"}}> > </Typography>
                     </Button>
                     <SwipeableDrawer

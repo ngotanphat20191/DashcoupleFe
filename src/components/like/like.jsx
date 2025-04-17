@@ -5,7 +5,7 @@ import {Box, Stack, Typography, Button, Alert} from '@mui/material';
 import Homenav from '../home/homenav.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
-import {baseAxios, loginSignUpAxios, createCancelToken} from "../../config/axiosConfig.jsx";
+import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 
 // Memoize components that don't need to re-render often
 const MemoizedHomenav = memo(Homenav);
@@ -32,7 +32,7 @@ const Like = () => {
                     loginSignUpAxios.get('/signup/interest', {
                         cancelToken: cancelTokenSource.token
                     }),
-                    baseAxios.get('/liked', {
+                    matchesAxios.get('/liked', {
                         cancelToken: cancelTokenSource.token
                     })
                 ]);
@@ -73,7 +73,7 @@ const Like = () => {
         const cancelTokenSource = createCancelToken();
         
         try {
-            const response = await baseAxios.get('/liked', {
+            const response = await matchesAxios.get('/liked', {
                 cancelToken: cancelTokenSource.token
             });
             

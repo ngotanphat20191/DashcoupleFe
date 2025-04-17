@@ -9,7 +9,6 @@ import './home.css'
 import Homenav from './homenav.jsx';
 import {baseAxios, createCancelToken} from "../../config/axiosConfig.jsx";
 
-// Memoize the Homenav component to prevent unnecessary re-renders
 const MemoizedHomenav = memo(Homenav);
 
 const Home = () => {

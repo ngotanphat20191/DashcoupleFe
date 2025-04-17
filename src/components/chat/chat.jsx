@@ -1,4 +1,4 @@
-import React, {Fragment, memo, useCallback, useEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import _ from 'lodash';
 import List from '@mui/material/List';
@@ -29,7 +29,7 @@ import Typography from '@mui/material/Typography';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import Link from '@mui/material/Link';
-import {baseAxios, createCancelToken} from "../../config/axiosConfig.jsx";
+import {baseAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 import VideocamIcon from '@mui/icons-material/Videocam';
 import ChatImageUploader from './components/chatuploadimage.jsx';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -76,7 +76,7 @@ const Chat = () => {
         }
     }, []);
     const deleteMatches = (id) => {
-        baseAxios.post('/matches/delete', {
+        matchesAxios.post('/matches/delete', {
             UserIdTarget: id,
         }).then(res => {
             setProfile(prevProfile => prevProfile.filter(profile => profile.FlowMessageId !== id));
@@ -171,7 +171,7 @@ const Chat = () => {
                 });
                 setHomepageData(homepageResponse.data);
 
-                const chatResponse = await baseAxios.get('/chat/', {
+                const chatResponse = await baseAxios.get('/chatting', {
                     cancelToken: cancelTokenSource.token
                 });
                 setProfile(chatResponse.data);

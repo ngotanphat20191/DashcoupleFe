@@ -4,7 +4,7 @@ import ProfilesGrid from '../shared/profiles-grid.jsx';
 import {Box, Stack, Typography} from '@mui/material';
 import Homenav from '../home/homenav.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
-import {baseAxios, loginSignUpAxios} from "../../config/axiosConfig.jsx";
+import {matchesAxios, loginSignUpAxios} from "../../config/axiosConfig.jsx";
 
 const Visit = () => {
     const [profile, setprofile] = useState(null);
@@ -31,7 +31,7 @@ const Visit = () => {
     }, []);
     async function handleLike() {
         try {
-            const response = await baseAxios.get('/like');
+            const response = await matchesAxios.get('/like');
             setprofile(response.data);
         } catch (err) {
             if (err.response?.status === 400) {

@@ -10,8 +10,8 @@ import { motion } from "framer-motion";
 import Typography from '@mui/material/Typography';
 import {Box, Chip} from "@mui/material";
 import InterestsIcon from '@mui/icons-material/Interests';
-import { ImQuotesLeft } from "react-icons/im";
-import {baseAxios, createCancelToken} from "../../../config/axiosConfig.jsx";
+import { ImQuotesLeft, ImQuotesRight } from "react-icons/im";
+import {baseAxios, createCancelToken, matchesAxios} from "../../../config/axiosConfig.jsx";
 
 
 // Memoize the Chip component for better performance in lists
@@ -135,7 +135,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
             const cancelTokenSource = createCancelToken();
             
             // Make API call
-            const response = await baseAxios.post('/like/add', {
+            const response = await matchesAxios.post('/like/add', {
                 UserIdTarget: userID
             }, {
                 cancelToken: cancelTokenSource.token
@@ -165,7 +165,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
             const cancelTokenSource = createCancelToken();
             
             // Make API call
-            const response = await baseAxios.post('/matches/create', {
+            const response = await matchesAxios.post('/matches/create', {
                 UserIdTarget: userID
             }, {
                 cancelToken: cancelTokenSource.token
@@ -279,7 +279,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                     <div style={{ display: "flex", alignItems: "center" }}>
                                                         <InterestsIcon style={{ color: '#dcdcdc' }} />
                                                         <Typography sx={{ fontWeight: "bold", fontSize: "15px", marginRight: "5px" , marginLeft: '4px'}}>
-                                                            So thich
+                                                            Sở thích
                                                         </Typography>
                                                     </div>
                                                     <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
@@ -356,8 +356,9 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                     </div>
                                                     <div style={{ display: "flex", alignItems: "baseline" }}>
                                                         <ImQuotesLeft style={{ color: "white", fontSize: '15px' }} />
-                                                        <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px'}}>
+                                                        <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px', marginRight: '4px'}}>
                                                             {profiles[currentIndex].userRecord.about}
+                                                            <ImQuotesRight style={{ color: "white", fontSize: '15px' }} />
                                                         </Typography>
                                                     </div>
                                                 </div>
@@ -388,8 +389,8 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                         <img
                                                             src="https://static.thenounproject.com/png/142747-200.png"
                                                             alt="Education Icon"
-                                                            width="40"
-                                                            height="40"
+                                                            width="30"
+                                                            height="30"
                                                             style={{filter: "brightness(0) invert(1)"}}
                                                         />
                                                         <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
@@ -492,7 +493,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                         <div style={{ display: "flex", alignItems: "center" }}>
                                                             <InterestsIcon style={{ color: '#dcdcdc' }} />
                                                             <Typography sx={{ fontWeight: "bold", fontSize: "15px", marginRight: "5px" , marginLeft: '4px'}}>
-                                                                So thich
+                                                                Sở thích
                                                             </Typography>
                                                         </div>
                                                         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
@@ -578,8 +579,9 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                         </div>
                                                         <div style={{ display: "flex", alignItems: "baseline" }}>
                                                             <ImQuotesLeft style={{ color: "white", fontSize: '15px' }} />
-                                                            <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px'}}>
+                                                            <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px', marginRight: '4px'}}>
                                                                 {profiles[currentIndex].userRecord.about}
+                                                                <ImQuotesRight style={{ color: "white", fontSize: '15px' }} />
                                                             </Typography>
                                                         </div>
                                                     </div>
@@ -610,8 +612,8 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                             <img
                                                                 src="https://static.thenounproject.com/png/142747-200.png"
                                                                 alt="Education Icon"
-                                                                width="40"
-                                                                height="40"
+                                                                width="30"
+                                                                height="30"
                                                                 style={{filter: "brightness(0) invert(1)"}}
                                                             />
                                                             <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
@@ -703,7 +705,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                                         WebkitTextStroke: "0.2x black", // Thicker black outline
                                                                         letterSpacing: "0.5px", // Slight spacing for clarity
                                                                         lineHeight: 1.2}}>
-                                                                    {profiles.userRecord.name}
+                                                                    {profiles.userRecord.name.split(' ').pop()}
                                                                 </Typography>
                                                                 <Typography sx={{fontWeight: 900, // Extra bold for thick text
                                                                     fontSize: "32px", // Adjust to match the image size
@@ -717,7 +719,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                             <div style={{ display: "flex", alignItems: "center" }}>
                                                                 <InterestsIcon style={{ color: '#dcdcdc' }} />
                                                                 <Typography sx={{ fontWeight: "bold", fontSize: "15px", marginRight: "5px" , marginLeft: '4px'}}>
-                                                                    So thich
+                                                                    Sở thích
                                                                 </Typography>
                                                             </div>
                                                             <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
@@ -751,7 +753,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                                         WebkitTextStroke: "0.2x black", // Thicker black outline
                                                                         letterSpacing: "0.5px", // Slight spacing for clarity
                                                                         lineHeight: 1.2}}>
-                                                                    {profiles.userRecord.name}
+                                                                    {profiles.userRecord.name.split(' ').pop()}
                                                                 </Typography>
                                                                 <Typography sx={{fontWeight: 900, // Extra bold for thick text
                                                                     fontSize: "32px", // Adjust to match the image size
@@ -780,7 +782,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                                         WebkitTextStroke: "0.2x black", // Thicker black outline
                                                                         letterSpacing: "0.5px", // Slight spacing for clarity
                                                                         lineHeight: 1.2}}>
-                                                                    {profiles.userRecord.name}
+                                                                    {profiles.userRecord.name.split(' ').pop()}
                                                                 </Typography>
                                                                 <Typography sx={{fontWeight: 900, // Extra bold for thick text
                                                                     fontSize: "32px", // Adjust to match the image size
@@ -793,8 +795,9 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                             </div>
                                                             <div style={{ display: "flex", alignItems: "baseline" }}>
                                                                 <ImQuotesLeft style={{ color: "white", fontSize: '15px' }} />
-                                                                <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px'}}>
+                                                                <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px', marginRight: '4px'}}>
                                                                     {profiles.userRecord.about}
+                                                                    <ImQuotesRight style={{ color: "white", fontSize: '15px' }} />
                                                                 </Typography>
                                                             </div>
                                                         </div>
@@ -809,7 +812,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                                     WebkitTextStroke: "0.2px black", // Thicker black outline
                                                                     letterSpacing: "0.5px", // Slight spacing for clarity
                                                                     lineHeight: 1.2,}}>
-                                                                    {profiles.userRecord.name}
+                                                                    {profiles.userRecord.name.split(' ').pop()}
                                                                 </Typography>
                                                                 <Typography sx={{fontWeight: 900, // Extra bold for thick text
                                                                     fontSize: "32px", // Adjust to match the image size
@@ -821,12 +824,13 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                                     {profiles.userRecord.age}
                                                                 </Typography>
                                                             </div>
-                                                            <div style={{ display: "flex", alignItems: "baseline" }}>
+                                                            <div style={{ display: "flex", alignItems: "center" }}>
                                                                 <img
                                                                     src="https://static.thenounproject.com/png/142747-200.png"
                                                                     alt="Education Icon"
-                                                                    width="40"
-                                                                    height="40"
+                                                                    width="30"
+                                                                    height="30"
+                                                                    style={{filter: "brightness(0) invert(1)"}}
                                                                 />
                                                                 <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
                                                                     {profiles.userRecord.height} cm
@@ -921,7 +925,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                     <div style={{ display: "flex", alignItems: "center" }}>
                                                         <InterestsIcon style={{ color: '#dcdcdc' }} />
                                                         <Typography sx={{ fontWeight: "bold", fontSize: "15px", marginRight: "5px" , marginLeft: '4px'}}>
-                                                            So thich
+                                                            Sở thích
                                                         </Typography>
                                                     </div>
                                                     <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
@@ -997,8 +1001,9 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                     </div>
                                                     <div style={{ display: "flex", alignItems: "baseline" }}>
                                                         <ImQuotesLeft style={{ color: "white", fontSize: '15px' }} />
-                                                        <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px'}}>
+                                                        <Typography sx={{ fontSize: "16px", alignItems: "bottom" , marginLeft: '4px', marginRight: '4px'}}>
                                                             {profiles[currentIndex].userRecord.about}
+                                                            <ImQuotesRight style={{ color: "white", fontSize: '15px' }} />
                                                         </Typography>
                                                     </div>
                                                 </div>
@@ -1025,15 +1030,16 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                             {calculateAge(profiles[currentIndex].userRecord.date_of_birth)}
                                                         </Typography>
                                                     </div>
-                                                    <div style={{ display: "flex", alignItems: "baseline" }}>
+                                                    <div style={{ display: "flex", alignItems: "center" }}>
                                                         <img
                                                             src="https://static.thenounproject.com/png/142747-200.png"
                                                             alt="Education Icon"
-                                                            width="40"
-                                                            height="40"
+                                                            width="30"
+                                                            height="30"
+                                                            style={{filter: "brightness(0) invert(1)"}}
                                                         />
                                                         <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
-                                                            {profiles.userRecord.height} cm
+                                                            {profiles[currentIndex].userRecord.height} cm
                                                         </Typography>
                                                     </div>
                                                 </div>
