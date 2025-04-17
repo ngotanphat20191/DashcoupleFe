@@ -8,6 +8,7 @@ export default defineConfig({
     global: "window",
   },
   optimizeDeps: {
+    include: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],
     esbuildOptions: {
       plugins: [
         NodeGlobalsPolyfillPlugin({
