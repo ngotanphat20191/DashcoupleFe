@@ -10,7 +10,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 
-// Memoize components that don't need to re-render often
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
 const Search = () => {
@@ -23,18 +22,14 @@ const Search = () => {
     const [error, setError] = useState(null);
     const [selectedSort, setSelectedSort] = useState('ageAsc');
     
-    // Initialize turn from localStorage with memoization
     const [turn, setturn] = useState(() => {
         try {
             const storedTurn = localStorage.getItem("turn");
             return storedTurn !== null ? parseInt(storedTurn, 10) : 0;
         } catch (e) {
-            console.error("Error reading from localStorage:", e);
             return 0;
         }
     });
-    
-    // Fetch all initial data in parallel for better performance
     useEffect(() => {
         const cancelTokenSource = createCancelToken();
         
@@ -64,7 +59,6 @@ const Search = () => {
                 const profileData = profileResponse.data;
                 
                 if (!profileData || !Array.isArray(profileData)) {
-                    console.error("Invalid profile data structure:", profileData);
                     setError("Dữ liệu không hợp lệ. Vui lòng thử lại sau.");
                     setIsLoading(false);
                     return;
@@ -83,7 +77,6 @@ const Search = () => {
                 
                 setIsLoading(false);
                 setError("Error loading data. Please try again.");
-                console.error("Error fetching data:", err);
             }
         };
         

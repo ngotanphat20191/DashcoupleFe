@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -7,11 +7,9 @@ import Typography from '@mui/material/Typography';
 import MediaCard from './components/media-card.jsx';
 import './profiles-grid.css';
 
-// Memoize the MediaCard component to prevent unnecessary re-renders
 const MemoizedMediaCard = memo(MediaCard);
 
 const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
-    // Handle empty state
     if (_.isEmpty(profiles) && (type === "liking" || type === "like")) {
         return (
             <Box className="emptyPageWrapperProfileGrid">
@@ -22,7 +20,6 @@ const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
         );
     }
     
-    // Memoize the grid content to prevent unnecessary re-renders
     const gridContent = useMemo(() => {
         if (type === "liking" || type === "like" || type === "preview") {
             return (
@@ -63,5 +60,4 @@ const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
     );
 };
 
-// Export memoized component for better performance
 export default memo(ProfilesGrid);

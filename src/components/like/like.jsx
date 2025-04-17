@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback, useMemo, memo} from 'react';
+import {useEffect, useState, useCallback, useMemo, memo} from 'react';
 import Title from '../shared/title.jsx';
 import ProfilesGrid from '../shared/profiles-grid.jsx';
 import {Box, Stack, Typography, Button, Alert} from '@mui/material';
@@ -7,27 +7,23 @@ import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 
-// Memoize components that don't need to re-render often
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
 
 const Like = () => {
-    // State management with proper initialization
     const [profile, setprofile] = useState(null);
     const [interests, setinterests] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch all initial data in parallel for better performance
     useEffect(() => {
         const cancelTokenSource = createCancelToken();
         
         const fetchAllData = async () => {
             setIsLoading(true);
-            setError(null); // Reset any previous errors
+            setError(null);
             
             try {
-                // Fetch data in parallel
                 const [interestsResponse, likedResponse] = await Promise.all([
                     loginSignUpAxios.get('/signup/interest', {
                         cancelToken: cancelTokenSource.token
@@ -37,14 +33,12 @@ const Like = () => {
                     })
                 ]);
                 
-                // Update state with fetched data
                 setinterests(interestsResponse.data);
                 setprofile(likedResponse.data);
                 
                 setIsLoading(false);
             } catch (err) {
                 if (axios.isCancel(err)) {
-                    // Request was cancelled, ignore
                     return;
                 }
                 
@@ -53,7 +47,6 @@ const Like = () => {
                     setError(err.response.data);
                 } else {
                     setError("Error loading data. Please try again.");
-                    console.error("Error fetching data:", err);
                 }
             }
         };
@@ -61,7 +54,6 @@ const Like = () => {
         fetchAllData();
         
         return () => {
-            // Cleanup function to cancel requests if component unmounts
             cancelTokenSource.cancel('Component unmounted');
         };
     }, []);

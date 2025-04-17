@@ -17,7 +17,6 @@ const Home = () => {
     const [error, setError] = useState(null);
     
     useEffect(() => {
-        // Create a cancel token for the request outside the async function
         const cancelTokenSource = createCancelToken();
         
         const fetchHomepageData = async () => {
@@ -42,14 +41,11 @@ const Home = () => {
         
         fetchHomepageData();
         
-        // Cleanup function to cancel request if component unmounts
         return () => {
             cancelTokenSource.cancel('Component unmounted');
         };
     }, []);
-    // Memoize the content to prevent unnecessary re-renders
     const homeContent = useMemo(() => {
-        // Loading state
         if (isLoading) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -59,7 +55,6 @@ const Home = () => {
             );
         }
         
-        // Error state
         if (error) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
@@ -73,7 +68,6 @@ const Home = () => {
             );
         }
         
-        // No data state
         if (!homepageData) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -81,8 +75,6 @@ const Home = () => {
                 </Box>
             );
         }
-        
-        // Main content when data is loaded
         return (
             <Box className="dashboard">
                 <Box className="upDivWrapperHome">

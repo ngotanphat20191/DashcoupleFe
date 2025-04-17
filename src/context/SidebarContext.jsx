@@ -6,7 +6,6 @@ export const SidebarContext = createContext({});
 export const SidebarProvider = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   
-  // Memoize functions to prevent unnecessary re-renders
   const openSidebar = useCallback(() => {
     setSidebarOpen(true);
   }, []);
@@ -14,8 +13,6 @@ export const SidebarProvider = ({ children }) => {
   const closeSidebar = useCallback(() => {
     setSidebarOpen(false);
   }, []);
-
-  // Memoize the context value
   const contextValue = useMemo(() => ({
     isSidebarOpen,
     openSidebar,

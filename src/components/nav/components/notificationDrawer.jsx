@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import {Fragment, useState} from 'react';
 import moment from 'moment';
 import {List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography} from '@mui/material';
 import _ from 'lodash';

@@ -18,15 +18,10 @@ export default defineConfig({
     },
   },
   build: {
-    // Enable minification for production builds
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true
-      }
+    minify: 'esbuild',
+    esbuild: {
+      drop: ['console', 'debugger']
     },
-    // Split chunks for better caching
     rollupOptions: {
       output: {
         manualChunks: {
@@ -47,12 +42,9 @@ export default defineConfig({
         }
       }
     },
-    // Generate source maps for debugging
     sourcemap: false,
-    // Reduce chunk size
     chunkSizeWarningLimit: 1000
   },
-  // Enable CSS code splitting
   css: {
     devSourcemap: true,
     preprocessorOptions: {
@@ -61,7 +53,6 @@ export default defineConfig({
       }
     }
   },
-  // Improve dev server performance
   server: {
     hmr: true,
     host: true

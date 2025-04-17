@@ -54,27 +54,11 @@ export default function User() {
                 status: record[4] === 1 ? "Active" : "Inactive",
             }));
             setSearchDataAfter(transformedData);
-            console.log(transformedData);
         } else {
-            console.log("No records found:", staffData.records ? staffData.records.length : 0);
         }
     }
 
-    // Uncomment and adjust sorting if needed.
-    // useEffect(() => {
-    //     if (staffData) {
-    //         const sortedData = [...staffData];
-    //         let sortIndex = sortOption.orderBy === 'name' ? 0 : sortOption.orderBy === 'city' ? 1 : 2;
-    //         sortedData.sort((a, b) => {
-    //             if (sortOption.order === 'asc') {
-    //                 return a[sortIndex] > b[sortIndex] ? 1 : -1;
-    //             } else {
-    //                 return a[sortIndex] < b[sortIndex] ? 1 : -1;
-    //             }
-    //         });
-    //         setSortedStaffData(sortedData);
-    //     }
-    // }, [sortOption, staffData]);
+
 
     function handleQueryChange(e) {
         const value = e.target.value;
@@ -130,10 +114,9 @@ export default function User() {
     function deleteStaff(id) {
         adminAxios.get('/profiles/delete?id=' + id)
             .then(res => {
-                console.log(res);
                 fetchStaffData();
             })
-            .catch(err => console.log(err));
+            .catch(err => {});
     }
 
     function handleModify(id) {
@@ -141,17 +124,15 @@ export default function User() {
             .then(r => {
                 setCurrentModifyData(r.data);
             })
-            .catch(err => console.log(err));
+            .catch(err => {});
     }
 
     function handleInterest() {
         adminAxios.get(`/profiles/interest`)
             .then(r => {
-                // Ensure we're setting an array
                 setInterestData(Array.isArray(r.data) ? r.data : []);
             })
             .catch(err => {
-                console.log(err);
                 setInterestData([]); // Set empty array on error
             });
     }

@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useMemo, memo} from 'react';
+import {useState, useCallback, useMemo, memo} from 'react';
 import Avatar from '@mui/material/Avatar';
 import LockIcon from '@mui/icons-material/Lock';
 import TextField from '@mui/material/TextField';
@@ -15,7 +15,6 @@ import {IconButton, InputAdornment, Alert, Snackbar} from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 
-// Memoize static components
 const MemoizedAvatar = memo(({ children, className }) => (
   <Avatar className={className}>
     {children}
@@ -24,7 +23,6 @@ const MemoizedAvatar = memo(({ children, className }) => (
 
 
 function Login(){
-    // State management
     const [showPassword, setShowPassword] = useState(false);
     const [disabledSend, setDisabledSend] = useState(false);
     const [awaitResponse, setAwaitResponse] = useState(false);
@@ -32,8 +30,6 @@ function Login(){
     const [showSnackbar, setShowSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    
-    // Memoize validation schema to prevent unnecessary recreations
     const signUpSchema = useMemo(() => Yup.object().shape({
         email: Yup.string()
             .email("Nhập email")
@@ -45,17 +41,13 @@ function Login(){
             .required("Cần nhập mật khẩu"),
     }), []);
     
-    // Toggle password visibility with useCallback
     const togglePasswordVisibility = useCallback(() => {
         setShowPassword(prev => !prev);
     }, []);
     
-    // Handle snackbar close
     const handleSnackbarClose = useCallback(() => {
         setShowSnackbar(false);
     }, []);
-    
-    // Optimize login request with proper error handling
     const sendLoginRequest = useCallback(async (data) => {
         setAwaitResponse(true);
         const cancelTokenSource = createCancelToken();
@@ -88,15 +80,12 @@ function Login(){
             }
         }
     }, []);
-    // Memoize the form submission handler
     const handleFormSubmit = useCallback(async (values) => {
         setAwaitResponse(true);
         await sendLoginRequest(values);
         setDisabledSend(true);
         setTimeout(() => setDisabledSend(false), 5000);
     }, [sendLoginRequest]);
-    
-    // Memoize the form component for better performance
     const loginForm = useMemo(() => (
         <Formik
             initialValues={{ email: '', password: ''}}
@@ -216,17 +205,13 @@ function Login(){
                     Đăng nhập
                 </Typography>
                 
-                {/* Show error message if any */}
                 {error && (
                     <Alert severity="error" sx={{ width: '100%', mt: 2, mb: 2 }}>
                         {error}
                     </Alert>
                 )}
                 
-                {/* Render the memoized form */}
                 {loginForm}
-                
-                {/* Snackbar for notifications */}
                 <Snackbar
                     open={showSnackbar}
                     autoHideDuration={6000}
@@ -245,5 +230,4 @@ function Login(){
     );
 }
 
-// Export memoized component for better performance
 export default memo(Login);

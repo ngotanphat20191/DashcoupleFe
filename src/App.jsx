@@ -7,7 +7,6 @@ import { DARK_THEME } from "./constants/themeConstants";
 import { CircularProgress, Box } from "@mui/material";
 import UnauthorizedDialog from "./components/shared/UnauthorizedDialog";
 
-// Lazy load components for better performance
 const Signup = lazy(() => import("./components/signup/signup.jsx"));
 const Login = lazy(() => import("./components/login/login.jsx"));
 const Profile = lazy(() => import("./components/profile/profile.jsx"));
@@ -30,8 +29,6 @@ const User = lazy(() => import("./components/admin/user/user.jsx"));
 const Interest = lazy(() => import("./components/admin/interest/interest.jsx"));
 const InterestQuestion = lazy(() => import("./components/admin/interestquestion/interestquestion.jsx"));
 const AdminLogin = lazy(() => import("./components/admin/login/login.jsx"));
-
-// Loading component for suspense fallback
 const LoadingFallback = () => (
   <Box 
     sx={{ 
@@ -66,7 +63,6 @@ function AppRoutes() {
     const hideNavRoutes2 = ["/", "/profile", "/chat", "/suggestion", "/visits", "/search", "/likes"];
     const hideNavRoutes3 = ["/admin/questioninterest", "/admin/interest", "/admin/user", "/admin"];
 
-    // Set background based on route
     useEffect(() => {
         const root = document.getElementById("root");
         if (hideNavRoutes.includes(location.pathname)) {
@@ -79,8 +75,6 @@ function AppRoutes() {
             root.style.background = 'url("/sakura.jpg") no-repeat center center / cover';
         }
     }, [location.pathname, hideNavRoutes]);
-
-    // Memoize token check functions to prevent unnecessary recreations
     const checkToken = useCallback(() => {
         baseAxios
             .get("/checkToken")
@@ -91,7 +85,7 @@ function AppRoutes() {
             })
             .catch((err) => {
                 if (err.response?.status === 400) {
-                    console.error("Token check error:", err.response.data);
+
                 }
             });
     }, []);
@@ -106,12 +100,11 @@ function AppRoutes() {
             })
             .catch((err) => {
                 if (err.response?.status === 400) {
-                    console.error("Admin token check error:", err.response.data);
+
                 }
             });
     }, []);
 
-    // Check tokens based on route
     useEffect(() => {
         if (hideNavRoutes2.includes(location.pathname)) {
             checkToken();
@@ -120,15 +113,12 @@ function AppRoutes() {
             checkAdminToken();
         }
     }, [location.pathname, hideNavRoutes2, hideNavRoutes3, checkToken, checkAdminToken]);
-
-    // Toggle dark mode
     useEffect(() => {
         document.body.classList.toggle("dark-mode", theme === DARK_THEME);
     }, [theme]);
 
     return (
         <Suspense fallback={<LoadingFallback />}>
-            {/* Add the UnauthorizedDialog component */}
             <UnauthorizedDialog />
             
             <Routes>

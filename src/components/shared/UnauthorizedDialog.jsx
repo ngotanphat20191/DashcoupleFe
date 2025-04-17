@@ -11,7 +11,6 @@ import {
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 
-// Public routes that don't require authentication
 const PUBLIC_ROUTES = [
   '/login', 
   '/signup', 
@@ -26,7 +25,7 @@ export default function UnauthorizedDialog() {
   const location = useLocation();
   
   useEffect(() => {
-    // Check if the current route is protected and user doesn't have a token
+
     const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
     const hasToken = !!localStorage.getItem('token');
     

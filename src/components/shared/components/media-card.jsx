@@ -2,7 +2,7 @@ import './media-card.css';
 
 import '../profiles-grid.css';
 import '../title.css';
-import React, {useEffect, useState, useCallback, useMemo, memo} from "react";
+import {useEffect, useState, useCallback, useMemo, memo} from "react";
 import TinderCard from "react-tinder-card";
 import {FaHeart, FaTimes, FaStar, FaArrowRight, FaArrowLeft, FaCity} from "react-icons/fa";
 import { GrNext, GrPrevious } from "react-icons/gr";
@@ -14,17 +14,14 @@ import { ImQuotesLeft, ImQuotesRight } from "react-icons/im";
 import {baseAxios, createCancelToken, matchesAxios} from "../../../config/axiosConfig.jsx";
 
 
-// Memoize the Chip component for better performance in lists
 const MemoizedChip = memo(Chip);
 
 function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) {
-    // State management with proper initialization
     const [currentIndex, setCurrentIndex] = useState(0);
     const [swipeEffect, setSwipeEffect] = useState(null);
     const [imageIndex, setImageIndex] = useState(() => Array(Array.isArray(profiles) ? profiles.length : 1).fill(0));
     const [imagePreviewIndex, setImagePreviewIndex] = useState(0);
     const [error, setError] = useState(null);
-    // Memoize the age calculation function for better performance
     const calculateAge = useCallback((dob) => {
         if (!dob) return 0;
         

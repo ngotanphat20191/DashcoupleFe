@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {AppBar, Toolbar, IconButton, Typography, Button, SwipeableDrawer, Badge, Link} from '@mui/material';
 import NotificationDrawer from './components/notificationDrawer.jsx';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
@@ -12,7 +12,7 @@ const Nav = () => {
     const [notifications, setNotifications] = useState([]);
     const [totalNotifications, setTotalNotifications] = useState(1);
     const [totalMessages, setTotalMessages] = useState(1);
-    const [notifMenu, setNotifMenu] = React.useState({
+    const [notifMenu, setNotifMenu] = useState({
         right: false,
     });
     useEffect(() => {
@@ -29,7 +29,6 @@ const Nav = () => {
     const fetchNotifications = async () => {
         baseAxios.get('/notification', {
         }).then((res) => {
-            console.log(res.data)
             setNotifications(res.data)
             fetchTotalNotifications();
         }).catch(err => {
@@ -58,7 +57,6 @@ const Nav = () => {
                 baseAxios.post('/notification/check', {
                     notificationIdList: notificationIdList,
                 }).then((res) => {
-                    console.log(res.data)
                 }).catch(err => {
                     if (err.status === 400) {
                         alert(err.response.data)

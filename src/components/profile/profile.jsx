@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback, useMemo, memo} from 'react';
+import {useEffect, useState, useCallback, useMemo, memo} from 'react';
 import './profile.css';
 import Settings from './components/Setting.jsx'
 import ProfileInfo from './components/profileInfo.jsx'
@@ -6,17 +6,14 @@ import axios from 'axios';
 import {loginSignUpAxios, baseAxios, createCancelToken} from "../../config/axiosConfig.jsx";
 import {Box, CircularProgress, Typography, Button, Alert} from "@mui/material";
 
-// Memoize components that don't need to re-render often
 const MemoizedSettings = memo(Settings);
 const MemoizedProfileInfo = memo(ProfileInfo);
 
 const Profile = () => {
-    // State management with proper initialization
     const [interests, setinterests] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     
-    // Initialize form data with default values
     const [formData, setFormData] = useState({
         email: "",
         matkhau: "",
@@ -49,7 +46,6 @@ const Profile = () => {
         },
         preferenceInterest: [],
     });
-    // Memoize the age calculation function for better performance
     const calculateAge = useCallback((dob) => {
         if (!dob) return 0;
         
@@ -66,22 +62,17 @@ const Profile = () => {
     
             return age;
         } catch (error) {
-            console.error("Error calculating age:", error);
             return 0;
         }
     }, []);
     
-    // Fetch all initial data in parallel for better performance
     useEffect(() => {
-        // Create the cancel token source outside the fetchAllData function
-        // so it's accessible in the cleanup function
         const cancelTokenSource = createCancelToken();
         
         const fetchAllData = async () => {
             setIsLoading(true);
             
             try {
-                // Fetch data in parallel
                 const [profileResponse, interestsResponse] = await Promise.all([
                     baseAxios.get('/profile', {
                         cancelToken: cancelTokenSource.token
@@ -96,15 +87,12 @@ const Profile = () => {
                 const images = profileData.images || [];
                 
                 // Create imagesList with the same URLs as images
-                // This ensures the images are displayed in the edit view
                 const imagesList = Array(6).fill(null);
                 images.forEach((imageUrl, index) => {
                     if (index < 6) {
                         imagesList[index] = imageUrl;
                     }
                 });
-                
-                // Update form data with fetched profile
                 setFormData(prevState => ({
                     ...prevState,
                     ...profileData,
@@ -120,10 +108,8 @@ const Profile = () => {
                     interest: profileData.interest || [],
                     images: profileData.images || [],
                     preferenceInterest: profileData.preferenceInterest || [],
-                    imagesList: imagesList, // Use our properly constructed imagesList
+                    imagesList: imagesList,
                 }));
-                
-                // Update interests
                 setinterests(interestsResponse.data);
                 
                 setIsLoading(false);
@@ -135,20 +121,16 @@ const Profile = () => {
                 
                 setIsLoading(false);
                 setError("Error loading profile data. Please try again.");
-                console.error("Error fetching profile data:", err);
             }
         };
         
         fetchAllData();
         
         return () => {
-            // Cleanup function to cancel requests if component unmounts
             cancelTokenSource.cancel('Component unmounted');
         };
     }, [calculateAge]);
-    // Memoize the content to prevent unnecessary re-renders
     const profileContent = useMemo(() => {
-        // Show loading state
         if (isLoading) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -157,8 +139,6 @@ const Profile = () => {
                 </Box>
             );
         }
-        
-        // Show error state
         if (error) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>

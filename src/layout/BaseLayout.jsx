@@ -15,10 +15,7 @@ const BaseLayout = () => {
             document.body.classList.remove("dark-mode");
         }
     }, [theme]);
-    useEffect(() => {
-        console.log(theme);
 
-    }, [theme]);
     return (
     <main className="page-wrapper">
       <Sidebar />

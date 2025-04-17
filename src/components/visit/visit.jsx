@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import Title from '../shared/title.jsx';
 import ProfilesGrid from '../shared/profiles-grid.jsx';
 import {Box, Stack, Typography} from '@mui/material';
@@ -8,7 +8,7 @@ import {matchesAxios, loginSignUpAxios} from "../../config/axiosConfig.jsx";
 
 const Visit = () => {
     const [profile, setprofile] = useState(null);
-    const [interests, setinterests] = React.useState(null);
+    const [interests, setinterests] = useState(null);
 
     useEffect(() => {
         const fetchInterests = async () => {
@@ -16,14 +16,12 @@ const Visit = () => {
                 const res = await loginSignUpAxios.get('/signup/interest');
                 setinterests(res.data);
             } catch (err) {
-                console.error(err);
             }
         };
         const fetchData = async () => {
             try {
                await handleLike();
             } catch (error) {
-                console.error("Error fetching data:", error);
             }
         };
         fetchData();
@@ -35,14 +33,10 @@ const Visit = () => {
             setprofile(response.data);
         } catch (err) {
             if (err.response?.status === 400) {
-                console.error(err.response.data);
-            } else {
-                console.error("Error fetching like data:", err);
             }
         }
     }
 
-    // Determine if data is still loading or if there's truly no data
     const isLoading = profile === null || interests === null;
     const hasNoData = profile !== null && profile.length === 0;
 

@@ -51,7 +51,6 @@ const addAuthToken = (config) => {
     return config;
 };
 
-// Common response interceptor for error handling
 const handleResponseError = (error) => {
     if (error.response && error.response.status === 401) {
         clearTokenCache();

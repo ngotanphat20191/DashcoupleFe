@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback, useMemo, memo} from 'react';
+import {useEffect, useState, useCallback, useMemo, memo} from 'react';
 import SuggestionsFilters from './components/suggestions-filters.jsx';
 import ProfilesGrid from '../shared/profiles-grid.jsx';
 import Title from '../shared/title.jsx';
@@ -11,11 +11,9 @@ import axios from 'axios';
 import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 import _ from 'lodash';
 
-// Memoize components that don't need to re-render often
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
 const Suggestions = () => {
-    // State management with proper initialization
     const [profile, setprofile] = useState(null);
     const [filteredProfiles, setFilteredProfiles] = useState(null);
     const [preference, setpreference] = useState(null);
@@ -24,14 +22,11 @@ const Suggestions = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedSort, setSelectedSort] = useState('ageAsc');
-    
-    // Initialize turn from localStorage with proper error handling
     const [turn, setturn] = useState(() => {
         try {
             const storedTurn = localStorage.getItem("turn");
             return storedTurn !== null ? parseInt(storedTurn, 10) : 0;
         } catch (e) {
-            console.error("Error reading from localStorage:", e);
             return 0;
         }
     });
@@ -67,20 +62,17 @@ const Suggestions = () => {
                 setIsLoading(false);
             } catch (err) {
                 if (axios.isCancel(err)) {
-                    // Request was cancelled, ignore
                     return;
                 }
                 
                 setIsLoading(false);
                 setError("Error loading data. Please try again.");
-                console.error("Error fetching data:", err);
             }
         };
         
         fetchAllData();
         
         return () => {
-            // Cleanup function to cancel requests if component unmounts
             cancelTokenSource.cancel('Component unmounted');
         };
     }, []);
@@ -100,10 +92,8 @@ const Suggestions = () => {
         setindexskip(prev => [...prev, data.id]);
     }, []);
     
-    // Initialize parameters from localStorage
     const initParemeter = useCallback(() => {
         try {
-            // Initialize localStorage if needed
             if (localStorage.getItem("indexSuggestionSkip") === null) {
                 localStorage.setItem("indexSuggestionSkip", JSON.stringify([]));
             }
@@ -111,19 +101,14 @@ const Suggestions = () => {
                 localStorage.setItem("turn", '0');
             }
             
-            // Get values from localStorage
             setturn(parseInt(localStorage.getItem("turn") || "0", 10));
             const storedIndexes = JSON.parse(localStorage.getItem("indexSuggestionSkip")) || [];
             setindexskip(storedIndexes);
         } catch (e) {
-            console.error("Error initializing parameters:", e);
-            // Set defaults if localStorage fails
             setturn(0);
             setindexskip([]);
         }
     }, []);
-    
-    // Fetch suggestions with proper error handling
     const handleSuggestion = useCallback(async () => {
         try {
             const cancelTokenSource = createCancelToken();
@@ -136,9 +121,7 @@ const Suggestions = () => {
             
             const profileData = response.data;
             
-            // Check if we have valid data
             if (!profileData || !profileData.userProfileMatchesEntityList || !Array.isArray(profileData.userProfileMatchesEntityList)) {
-                console.error("Invalid profile data structure:", profileData);
                 setError("Dữ liệu không hợp lệ. Vui lòng thử lại sau.");
                 setIsLoading(false);
                 return;
@@ -154,14 +137,12 @@ const Suggestions = () => {
             }
         } catch (err) {
             if (axios.isCancel(err)) {
-                // Request was cancelled, ignore
                 return;
             }
             
             if (err.response?.status === 400) {
                 setError(err.response.data);
             } else {
-                console.error("Error fetching suggestions:", err);
                 setError("Failed to load suggestions");
             }
         }

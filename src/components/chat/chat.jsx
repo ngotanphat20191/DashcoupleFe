@@ -82,7 +82,6 @@ const Chat = () => {
             setProfile(prevProfile => prevProfile.filter(profile => profile.FlowMessageId !== id));
             alert(res.data)
         }).catch(err => {
-            console.log(err.response.data)
         })
     };
     useEffect(() => {
@@ -90,10 +89,9 @@ const Chat = () => {
         const client = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,
-            debug: (str) => console.log(str),
+            debug: (str) => {},
             onConnect: () => {
                 setIsSocketConnected(true);
-                console.log("WebSocket connected");
 
                 client.subscribe(`/topic/message/${homepageData.userid}`, (res) => {
                     try {
@@ -105,7 +103,6 @@ const Chat = () => {
                             setVideoCallInfo(receivedMessage);
                         }
                     } catch (error) {
-                        console.error("Error parsing message:", error);
                     }
                 });
 
@@ -122,7 +119,6 @@ const Chat = () => {
                 };
             },
             onStompError: (frame) => {
-                console.error('STOMP error', frame);
                 setError('Connection error. Please try again.');
             },
         });
