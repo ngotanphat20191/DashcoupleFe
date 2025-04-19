@@ -6,14 +6,14 @@ axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true';
 let cachedToken = null;
 
 const getAuthToken = () => {
-  if (!cachedToken) {
-    cachedToken = localStorage.getItem("token");
-  }
-  return cachedToken;
+    if (!cachedToken) {
+        cachedToken = localStorage.getItem("token");
+    }
+    return cachedToken;
 };
 
 export const clearTokenCache = () => {
-  cachedToken = null;
+    cachedToken = null;
 };
 
 const API_BASE = 'https://present-ghastly-puma.ngrok-free.app/api';
@@ -41,9 +41,11 @@ export const adminAxios = axios.create({
 export const paymentAxios = axios.create({
     baseURL: PAYMENT_API,
 });
+
 export const matchesAxios = axios.create({
     baseURL: MATCHES_API,
 });
+
 const addAuthToken = (config) => {
     const token = getAuthToken();
     if (token) {
