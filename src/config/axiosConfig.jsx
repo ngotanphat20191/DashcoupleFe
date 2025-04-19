@@ -1,6 +1,7 @@
 import axios from "axios";
 
 axios.defaults.headers.common['Content-Type'] = 'application/json';
+axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true';
 
 let cachedToken = null;
 
