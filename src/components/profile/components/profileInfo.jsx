@@ -49,6 +49,7 @@ const ProfileInfo = ({ interests, formData, setFormData }) => {
         }
     }
     function sendEditProfileRequest() {
+        console.log(formData);
         baseAxios.post('/profile', {
             token: localStorage.getItem('token'),
             about: formData.userRecord.about,
@@ -58,6 +59,7 @@ const ProfileInfo = ({ interests, formData, setFormData }) => {
             height: formData.userRecord.height,
             city: formData.userRecord.city,
             Job: formData.userRecord.Job,
+            religion: formData.userRecord.religion,
             Haveson: "",
             phonenumber: "",
             Education: formData.userRecord.Education,

@@ -150,10 +150,10 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                                     }
                                 }}
                                 value={interestNames?.filter(interest =>
-                                    preference?.preferenceInterest?.includes(interest.InterestID)
+                                    preference?.preferenceInterest?.includes(parseInt(interest.InterestID, 10))
                                 ) || []}
                                 onChange={(event, newValue) => {
-                                    const selectedIds = newValue.map(interest => interest.InterestID);
+                                    const selectedIds = newValue.map(interest => parseInt(interest.InterestID, 10));
                                     setpreference({ ...preference, preferenceInterest: selectedIds });
                                 }}
                                 renderInput={(params) => (

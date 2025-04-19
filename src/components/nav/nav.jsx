@@ -10,8 +10,8 @@ import {baseAxios} from "../../config/axiosConfig.jsx";
 const Nav = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(true);
     const [notifications, setNotifications] = useState([]);
-    const [totalNotifications, setTotalNotifications] = useState(1);
-    const [totalMessages, setTotalMessages] = useState(1);
+    const [totalNotifications, setTotalNotifications] = useState(0);
+    const [totalMessages, setTotalMessages] = useState(0);
     const [notifMenu, setNotifMenu] = useState({
         right: false,
     });
