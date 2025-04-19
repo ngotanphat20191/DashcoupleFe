@@ -85,7 +85,7 @@ const Chat = () => {
         })
     };
     useEffect(() => {
-        const socket = new SockJS("https://present-ghastly-puma.ngrok-free.app/api/user/ws");
+        const socket = new SockJS('https://present-ghastly-puma.ngrok-free.app/api/user/websocket');
         const client = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,
