@@ -85,12 +85,30 @@ const Chat = () => {
         })
     };
     useEffect(() => {
-        const socket = new SockJS('https://present-ghastly-puma.ngrok-free.app/api/websocket');
+        // Configure SockJS to use a longer timeout
+        const sockjsOptions = {
+            transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
+            timeout: 30000 // 30 seconds timeout
+        };
+
+        // Create SockJS connection with options
+        const socket = new SockJS('https://present-ghastly-puma.ngrok-free.app/api/websocket', null, sockjsOptions);
+
+        // Configure STOMP client
         const client = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,
-            debug: (str) => {},
+            heartbeatIncoming: 0,  // Disable heartbeat to avoid disconnections through ngrok
+            heartbeatOutgoing: 0,  // Disable heartbeat to avoid disconnections through ngrok
+            connectHeaders: {
+                'X-Forwarded-Proto': 'https',
+                'X-Forwarded-Port': '443'
+            },
+            debug: (str) => {
+                console.log("STOMP Debug:", str);
+            },
             onConnect: () => {
+                console.log("WebSocket connected successfully!");
                 setIsSocketConnected(true);
 
                 client.subscribe(`/topic/message/${homepageData.userid}`, (res) => {
@@ -103,36 +121,56 @@ const Chat = () => {
                             setVideoCallInfo(receivedMessage);
                         }
                     } catch (error) {
+                        console.error("Error parsing message:", error);
                     }
                 });
 
+                // Send a test ping message
+                client.publish({
+                    destination: "/app/ping",
+                    body: JSON.stringify({ signal: "Initial connection test" }),
+                });
+
+                // Set up a ping interval to keep the connection alive
                 const pingInterval = setInterval(() => {
-                    client.publish({
-                        destination: "/app/ping", // Send ping signal to server
-                        body: JSON.stringify({ signal: "ping" }),
-                    });
+                    if (client.connected) {
+                        client.publish({
+                            destination: "/app/ping",
+                            body: JSON.stringify({ signal: "ping" }),
+                        });
+                    }
                 }, 10000); // 10 seconds
 
                 client.onDisconnect = () => {
+                    console.log("WebSocket disconnected");
                     setIsSocketConnected(false);
                     clearInterval(pingInterval);
                 };
             },
             onStompError: (frame) => {
+                console.error("STOMP Error:", frame);
                 setError('Connection error. Please try again.');
             },
+            onWebSocketClose: (event) => {
+                console.log("WebSocket closed:", event);
+            },
+            onWebSocketError: (event) => {
+                console.error("WebSocket error:", event);
+            }
         });
 
+        // Activate the client
         client.activate();
-
         clientRef.current = client;
 
+        // Cleanup function
         return () => {
             if (clientRef.current && clientRef.current.active) {
                 clientRef.current.deactivate();
             }
         };
     }, [homepageData]);
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
