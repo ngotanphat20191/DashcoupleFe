@@ -23,7 +23,6 @@ export default function TableInterest({header, data, isPagination, handleClick, 
     const [checkboxes, setCheckboxes] = useState(new Array(data.length).fill(false))
     const {clicked, setClicked, coords, setCoords } = useContextMenu()
     const [showDeleteModal, setShowDeleteModal] = useState(false)
-    const [showModifyPanel, setShowModifyPanel] = useState(false)
     const [index, setIndex] = useState(null)
 
     function setCurrentPageSize(_, size){
@@ -31,10 +30,6 @@ export default function TableInterest({header, data, isPagination, handleClick, 
         setCheckboxes(new Array(size).fill(false))
     }
 
-    async function _handleModify(id){
-        handleModify(id)
-        setShowModifyPanel(true)
-    }
 
     function handleSelectAll(){
         setSelectAll(prev => !prev)

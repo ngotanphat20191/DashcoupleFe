@@ -24,8 +24,6 @@ const QuizInterest = () => {
     const [selectedQuestions, setSelectedQuestions] = useState([]);
     const [selectedAnswers, setSelectedAnswers] = useState([]);
     const [processing, setProcessing] = useState(false);
-    const [resultText, setResultText] = useState("");
-
     const defaultQuestions = [
         {
             question_id: 39,
@@ -88,7 +86,6 @@ const QuizInterest = () => {
             .then((res) => {
                 console.log("Backend response:", res.data);
                 setProcessing(false);
-                setResultText("Thực hiện bài test thành công");
                 setResult(res.data);
             })
             .catch((err) => {
@@ -164,8 +161,9 @@ const QuizInterest = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column',alignItems: 'center', marginTop:"10px"}}>
-                                <div style={{ maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px'  }}>
+                            result.checkpercentage == true ? (
+                            <div style={{display: 'flex', flexDirection: 'column',alignItems: 'center', marginTop:"10px"}}>
+                                <div style={{maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px'}}>
                                     <img
                                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Flat_tick_icon.svg/2048px-Flat_tick_icon.svg.png"
                                         alt="Yes Icon"
@@ -173,20 +171,73 @@ const QuizInterest = () => {
                                         height="50"
                                     /> Hoàn thành bài test
                                 </div>
-                                <div style={{ width: "100%", display: 'flex', alignItems: 'center', gap: '10px'  }}>
+                                <div style={{width: "100%", display: 'flex', alignItems: 'center', gap: '10px'}}>
                                     <img
                                         src="https://th.bing.com/th/id/OIP._diciUJVjavNBdxBe8Ix5QHaHa?rs=1&pid=ImgDetMain"
                                         alt="Thank you Icon"
                                     />
                                 </div>
-                                <div style={{ width: "100%", alignItems: 'center', textAlign: 'center', fontWeight: "bold", marginTop: "5px"}}>
+                                <div style={{
+                                    width: "100%",
+                                    alignItems: 'center',
+                                    textAlign: 'center',
+                                    fontWeight: "bold",
+                                    marginTop: "5px"
+                                }}>
                                     Phần trăm sở thích gợi ý phù hợp: {result.percentage}
                                 </div>
-                                <div style={{ width: "100%", alignItems: 'center', textAlign: 'center', fontWeight: "bold" , marginTop: "5px"}}>
+                                <div style={{
+                                    width: "100%",
+                                    alignItems: 'center',
+                                    textAlign: 'center',
+                                    fontWeight: "bold",
+                                    marginTop: "5px"
+                                }}>
                                     Sở thích: {result.interestNameList?.join(', ')}
                                 </div>
-                                <div style={{ width: "100%", alignItems: 'center', textAlign: 'center',marginTop: "5px"}}>Dữ liệu sở thích gợi ý sẽ được lưu danh sách sở thích của bạn</div>
+                                <div style={{width: "100%", alignItems: 'center', textAlign: 'center', marginTop: "5px"}}>Dữ liệu sở
+                                    thích gợi ý sẽ được lưu danh sách sở thích của bạn
+                                </div>
                             </div>
+                                ): (
+                                    <div style={{display: 'flex', flexDirection: 'column',alignItems: 'center', marginTop:"10px"}}>
+                                        <div style={{maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                            <img
+                                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Flat_tick_icon.svg/2048px-Flat_tick_icon.svg.png"
+                                                alt="Yes Icon"
+                                                width="50"
+                                                height="50"
+                                            /> Hoàn thành bài test
+                                        </div>
+                                        <div style={{width: "100%", display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                            <img
+                                                src="https://cdn-icons-png.freepik.com/256/5969/5969619.png?semt=ais_hybrid"
+                                                alt="Sorry Icon"
+                                            />
+                                        </div>
+                                        <div style={{
+                                            width: "100%",
+                                            alignItems: 'center',
+                                            textAlign: 'center',
+                                            fontWeight: "bold",
+                                            marginTop: "5px"
+                                        }}>
+                                            Phần trăm sở thích gợi ý phù hợp: {result.percentage}
+                                        </div>
+                                        <div style={{
+                                            width: "100%",
+                                            alignItems: 'center',
+                                            textAlign: 'center',
+                                            fontWeight: "bold",
+                                            marginTop: "5px"
+                                        }}>
+                                            Sở thích: {result.interestNameList?.join(', ')}
+                                        </div>
+                                        <div style={{width: "100%", alignItems: 'center', textAlign: 'center', marginTop: "5px"}}>
+                                            Do tỷ lệ khớp sở thích không vượt qua 70% nên không thể lưu lại thông tin sở thích trên. Hãy thử lại lần sau nha !
+                                        </div>
+                                    </div>
+                                )
                         )}
                     </>
                 )}

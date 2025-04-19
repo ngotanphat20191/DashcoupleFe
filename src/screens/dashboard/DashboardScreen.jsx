@@ -18,11 +18,9 @@ const Dashboard = () => {
     ])
     useEffect(() => {
         getStatisticData();
-        console.log(statisticData);
     }, [])
     useEffect(() => {
         getStatisticDataWithParameter();
-        console.log(statisticData);
     }, [date])
     const getStatisticData = () => {
         adminAxios.get('/statistic')

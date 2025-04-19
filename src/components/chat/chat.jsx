@@ -451,7 +451,7 @@ const Chat = () => {
                             autoFocus
                             style={{ border: "1px solid #000", padding: "6px 12px", marginTop: "-20px", borderRadius: "20px", color: "white", backgroundColor: "#2f7cd3" }}
                             onClick={() => {
-                                window.open(`https://localhost:8443?id=${videoCallInfo?.targetid}&idtarget=${videoCallInfo?.userid}`, "_blank");
+                                window.open(`https://present-ghastly-puma.ngrok-free.app/?id=${videoCallInfo?.targetid}&idtarget=${videoCallInfo?.userid}`, "_blank");
                                 setVideoCallInfo(null);
                             }}
                         >
@@ -639,7 +639,7 @@ const Chat = () => {
                                             variant="contained"
                                             style={{ marginTop: 5 }}
                                             onClick={() => {
-                                                window.open(`https://localhost:8443?id=${homepageData.userid}`, "_blank");
+                                                window.open(`https://present-ghastly-puma.ngrok-free.app/?id=${homepageData.userid}`, "_blank");
                                                 sendVideoCallInfo(homepageData.userid, messages.UserIdTarget, homepageData.name, homepageData.images[0]);
                                             }}
                                         >

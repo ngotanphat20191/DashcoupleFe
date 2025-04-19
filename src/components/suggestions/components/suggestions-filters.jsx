@@ -43,7 +43,6 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
         }
     }, [ageRange]);
 
-    // Update religion in preference when it changes
     useEffect(() => {
         if (preference && selectedReligion !== undefined) {
             const updatedPreference = {
@@ -65,7 +64,6 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
         const newValue = event.target.value;
         setSelectedSort(newValue);
         
-        // Call the parent component's sort handler if provided
         if (onSortChange) {
             onSortChange(newValue);
         }

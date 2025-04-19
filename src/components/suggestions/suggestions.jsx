@@ -181,30 +181,23 @@ const Suggestions = () => {
             return 0;
         }
     }, []);
-    // Filter and sort profiles based on preference
     useEffect(() => {
         if (!profile || !preference) return;
 
-        console.log("Profile data:", profile);
-        console.log("Preference data:", preference);
 
-        // Check if profile has the expected structure
         if (!profile.userProfileMatchesEntityList || !Array.isArray(profile.userProfileMatchesEntityList)) {
             console.error("Profile data doesn't have valid userProfileMatchesEntityList property:", profile);
             return;
         }
 
-        // If the list is empty, don't proceed with filtering
         if (profile.userProfileMatchesEntityList.length === 0) {
             console.log("No profiles to filter - empty list");
             return;
         }
 
-        // Create a copy of the original profiles
         let filteredList = [...profile.userProfileMatchesEntityList];
         console.log("Initial filtered list:", filteredList);
 
-        // Filter by age range if preference is available
         if (preference.preferenceRecord) {
             const minAge = preference.preferenceRecord.preferenceAgeMin || 18;
             const maxAge = preference.preferenceRecord.preferenceAgeMax || 60;
@@ -216,21 +209,17 @@ const Suggestions = () => {
             console.log("After age filter:", filteredList);
         }
 
-        // Filter by interests if preference interests are selected
         if (preference.preferenceInterest && preference.preferenceInterest.length > 0) {
             filteredList = filteredList.filter(item => {
-                // If the profile has no interests, filter it out when interests are selected
                 if (!item.interest || item.interest.length === 0) return false;
                 
-                // Check if any of the profile's interests match the selected interests
-                return item.interest.some(interestId => 
+                return item.interest.some(interestId =>
                     preference.preferenceInterest.includes(interestId)
                 );
             });
             console.log("After interest filter:", filteredList);
         }
 
-        // Filter by religion if selected
         if (preference.preferenceRecord && preference.preferenceRecord.preferenceLocation) {
             const selectedReligion = preference.preferenceRecord.preferenceLocation;
             if (selectedReligion) {
@@ -241,7 +230,6 @@ const Suggestions = () => {
             }
         }
 
-        // Sort profiles based on selected sort option
         if (selectedSort) {
             switch (selectedSort) {
                 case 'ageAsc':
@@ -260,13 +248,11 @@ const Suggestions = () => {
                     );
                     break;
                 default:
-                    // Default sorting (no sorting)
                     break;
             }
             console.log("After sorting:", filteredList);
         }
 
-        // Update filtered profiles
         setFilteredProfiles({...profile, userProfileMatchesEntityList: filteredList});
         console.log("Updated filtered profiles:", {...profile, userProfileMatchesEntityList: filteredList});
     }, [profile, preference, selectedSort, calculateAge]);
@@ -276,9 +262,7 @@ const Suggestions = () => {
         setSelectedSort(sortValue);
     }, []);
     
-    // Memoize the content to prevent unnecessary re-renders
     const suggestionsContent = useMemo(() => {
-        // Show loading state
         if (isLoading) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -288,7 +272,6 @@ const Suggestions = () => {
             );
         }
         
-        // Show error state
         if (error) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
@@ -302,7 +285,6 @@ const Suggestions = () => {
             );
         }
         
-        // Main content when data is loaded
         return (
             <Stack style={{
                 alignItems: "center", 

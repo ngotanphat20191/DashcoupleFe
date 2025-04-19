@@ -124,7 +124,9 @@ export default function User() {
             .then(r => {
                 setCurrentModifyData(r.data);
             })
-            .catch(err => {});
+            .catch(err => {
+                console(err.response.data)
+            });
     }
 
     function handleInterest() {
@@ -133,7 +135,7 @@ export default function User() {
                 setInterestData(Array.isArray(r.data) ? r.data : []);
             })
             .catch(err => {
-                setInterestData([]); // Set empty array on error
+                setInterestData([]);
             });
     }
 

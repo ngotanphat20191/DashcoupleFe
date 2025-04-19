@@ -21,7 +21,6 @@ export default function Interest() {
         fetchInterestData();
     }, []);
     
-    // Update filtered data when interestData changes
     useEffect(() => {
         if (searchQuery) {
             handleQueryChange({ target: { value: searchQuery } });
@@ -104,7 +103,6 @@ export default function Interest() {
                             onChange={handleQueryChange}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    // Optional: add specific action on Enter
                                 }
                             }}
                         />
@@ -139,12 +137,7 @@ export default function Interest() {
                     allowCheckbox={true} 
                     allowDelete={true} 
                     allowModify={true}
-                    ModifyTemplate={(props) => (
-                        <TableInterestModify 
-                            {...props} 
-                            handleRefresh={() => fetchInterestData()}
-                        />
-                    )}
+                    ModifyTemplate={null}
                     currentModifyData={currentModifyData}
                     setCurrentModifyData={setCurrentModifyData} 
                     isMutable={true}
@@ -152,7 +145,6 @@ export default function Interest() {
                     handleModify={(item) => handleModifyInterest(item)}
                 />
                 
-                {/* Add Interest Modal */}
                 {showAddModal && (
                     <TableInterestAdd 
                         showModifyPanel={showAddModal} 

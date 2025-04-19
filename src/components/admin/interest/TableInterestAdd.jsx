@@ -35,11 +35,8 @@ export default function TableInterestAdd(props) {
                 setIsConfirm(false);
                 console.log(r);
                 alert('Thêm sở thích thành công');
-                // Reset form
                 setInterestName('');
-                // Close modal
                 props.setShowModify(false);
-                // Refresh data if handler provided
                 if (props.handleRefresh) {
                     props.handleRefresh();
                 }

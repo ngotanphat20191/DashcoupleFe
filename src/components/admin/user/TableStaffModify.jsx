@@ -67,10 +67,6 @@ export default function TableStaffModify(props) {
             });
         }
     }, [props.data]);
-
-    useEffect(() => {
-        console.log(props.data)
-    }, []);
     function handleChange(e, key) {
         setCurrentStaffData(prev => ({
             ...prev,
@@ -469,13 +465,11 @@ export default function TableStaffModify(props) {
                                                     }
                                                 }}
                                                 value={(() => {
-                                                    // Ensure interestData is an array
-                                                    const interestDataArray = Array.isArray(props.interestData) 
+                                                    const interestDataArray = Array.isArray(props.interestData)
                                                         ? props.interestData 
                                                         : [];
                                                     
-                                                    // Ensure interests is an array
-                                                    const interests = Array.isArray(currentStaffData?.interests) 
+                                                    const interests = Array.isArray(currentStaffData?.interests)
                                                         ? currentStaffData.interests 
                                                         : [];
                                                     
@@ -502,8 +496,7 @@ export default function TableStaffModify(props) {
                                                     const selectedInterests = currentStaffData?.interests?.map(Number) || [];
                                                     if (!selectedInterests.length) return "Không có sở thích được chọn";
                                                     
-                                                    // Ensure interestData is an array
-                                                    const interestDataArray = Array.isArray(props.interestData) 
+                                                    const interestDataArray = Array.isArray(props.interestData)
                                                         ? props.interestData 
                                                         : (props.interestData?.interests || []);
                                                     

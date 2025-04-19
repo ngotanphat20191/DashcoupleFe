@@ -15,11 +15,11 @@ export const clearTokenCache = () => {
   cachedToken = null;
 };
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = 'https://present-ghastly-puma.ngrok-free.app/api';
 const USER_API = `${API_BASE}/user`;
-const ADMIN_API = `http://localhost:8082/api/admin`;
-const PAYMENT_API = 'http://localhost:10000/api/payment';
-const MATCHES_API = 'http://localhost:8083/api/user';
+const ADMIN_API = `${API_BASE}/admin`;
+const PAYMENT_API = `${API_BASE}/payment`;
+const MATCHES_API = `${API_BASE}/matches`;
 
 export const loginSignUpAxios = axios.create({
     baseURL: API_BASE,

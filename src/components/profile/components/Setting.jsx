@@ -114,9 +114,7 @@ const Settings = ({interests ,formData, setFormData}) => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };
     }, [ageRange, formData])
-    useEffect(() => {
-        console.log(formData)
-    }, [])
+
     return (
         <div>
             <SettingHeader formData={formData} setFormData={setFormData}></SettingHeader>

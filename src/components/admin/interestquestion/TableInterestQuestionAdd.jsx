@@ -65,9 +65,7 @@ export default function TableInterestQuestionAdd(props) {
                     OPTION_3: '',
                     OPTION_4: ''
                 });
-                // Close modal
                 props.setShowModify(false);
-                // Refresh data if handler provided
                 if (props.handleRefresh) {
                     props.handleRefresh();
                 }
