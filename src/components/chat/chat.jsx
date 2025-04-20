@@ -489,7 +489,7 @@ const Chat = () => {
                             autoFocus
                             style={{ border: "1px solid #000", padding: "6px 12px", marginTop: "-20px", borderRadius: "20px", color: "white", backgroundColor: "#2f7cd3" }}
                             onClick={() => {
-                                window.open(`https://present-ghastly-puma.ngrok-free.app/?id=${videoCallInfo?.targetid}&idtarget=${videoCallInfo?.userid}`, "_blank");
+                                window.open(`https://present-ghastly-puma.ngrok-free.app/api/videocall/?id=${videoCallInfo?.targetid}&idtarget=${videoCallInfo?.userid}`, "_blank");
                                 setVideoCallInfo(null);
                             }}
                         >
