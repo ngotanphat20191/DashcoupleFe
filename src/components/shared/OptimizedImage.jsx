@@ -3,133 +3,134 @@ import { Skeleton } from '@mui/material';
 
 /**
  * OptimizedImage component for faster image loading
- * 
- * Features:
- * - Lazy loading (only loads when in viewport)
- * - Progressive loading (shows placeholder while loading)
- * - Error handling (shows fallback on error)
- * - Caching support
- * - Optimized for performance
+ *
+ * Supports:
+ * - URL string or local File object as src
+ * - Lazy loading with IntersectionObserver
+ * - Progressive loading with Skeleton
+ * - Error fallback image
+ * - Memoized for performance
  */
-const OptimizedImage = ({ 
-  src, 
-  alt, 
-  className, 
-  width, 
-  height, 
-  placeholderColor = "#f0f0f0",
-  fallbackSrc = "https://via.placeholder.com/150?text=Image+Not+Found",
-  lazyLoad = true,
-  ...props 
+const OptimizedImage = ({src, alt, className, width, height, placeholderColor = "#f0f0f0", fallbackSrc = "https://via.placeholder.com/150?text=Image+Not+Found", lazyLoad = true, ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
-  // If src is a URL that starts with http, use it immediately to prevent flickering
-  const isExternalUrl = src && typeof src === 'string' && (src.startsWith('http') || src.startsWith('blob:'));
-  const [imageSrc, setImageSrc] = useState(lazyLoad && !isExternalUrl ? '' : src);
+  const [imageSrc, setImageSrc] = useState('');
+  const [objectUrl, setObjectUrl] = useState(null); // for local file cleanup
 
-  // Update image source when src prop changes
+  // Generate a unique ID for the image container
+  const imageId = `image-${alt?.replace(/\s+/g, '-')}-${typeof src === 'string' ? src?.substring(0, 20)?.replace(/[^a-zA-Z0-9]/g, '') : 'local-file'}`;
+
+  // Handle src updates
   useEffect(() => {
-    // If it's an external URL, update the image source immediately
-    if (isExternalUrl) {
+    if (!src) return;
+
+    // File object (e.g., from input)
+    if (src instanceof File) {
+      const url = URL.createObjectURL(src);
+      setImageSrc(url);
+      setObjectUrl(url);
+      return;
+    }
+
+    // External URL or blob
+    if (typeof src === 'string' && (src.startsWith('http') || src.startsWith('blob:'))) {
       setImageSrc(src);
       return;
     }
-  }, [src, isExternalUrl]);
 
-  // Set up intersection observer for lazy loading
+    setImageSrc('');
+  }, [src]);
+
+  // Cleanup created object URL
   useEffect(() => {
-    if (!lazyLoad || isExternalUrl) return;
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [objectUrl]);
 
-    let observer;
-    let imgElement;
+  // Lazy load logic with IntersectionObserver
+  useEffect(() => {
+    if (!lazyLoad || imageSrc || (typeof src === 'string' && (src.startsWith('http') || src.startsWith('blob:')))) return;
 
-    // Create an observer instance
-    observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        // If element is in viewport
-        if (entry.isIntersecting) {
-          // Set the image source
-          setImageSrc(src);
-          // Stop observing once loaded
-          observer.unobserve(entry.target);
+    const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (src instanceof File) {
+                const url = URL.createObjectURL(src);
+                setImageSrc(url);
+                setObjectUrl(url);
+              } else {
+                setImageSrc(src);
+              }
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          rootMargin: '100px',
+          threshold: 0.1,
         }
-      });
-    }, {
-      rootMargin: '100px', // Load images 100px before they appear in viewport
-      threshold: 0.1 // Trigger when at least 10% of the element is visible
-    });
+    );
 
-    // Generate a stable ID for the image element
-    const imageId = `image-${alt?.replace(/\s+/g, '-')}-${src?.substring(0, 20)?.replace(/[^a-zA-Z0-9]/g, '')}`;
-    
-    // Start observing the placeholder
-    imgElement = document.getElementById(imageId);
+    const imgElement = document.getElementById(imageId);
     if (imgElement) {
       observer.observe(imgElement);
     }
 
     return () => {
-      if (imgElement && observer) {
-        observer.unobserve(imgElement);
-      }
+      if (imgElement) observer.unobserve(imgElement);
     };
-  }, [src, alt, lazyLoad, isExternalUrl]);
+  }, [src, imageSrc, lazyLoad, imageId]);
 
-  // Handle image load success
-  const handleLoad = () => {
-    setIsLoaded(true);
-  };
-
-  // Handle image load error
+  const handleLoad = () => setIsLoaded(true);
   const handleError = () => {
     setError(true);
     setIsLoaded(true);
   };
 
-  // Generate a stable ID for the image element
-  const imageId = `image-${alt?.replace(/\s+/g, '-')}-${src?.substring(0, 20)?.replace(/[^a-zA-Z0-9]/g, '')}`;
-
   return (
-    <div 
-      style={{ 
-        position: 'relative',
-        width: width || '100%',
-        height: height || 'auto',
-        backgroundColor: placeholderColor,
-        overflow: 'hidden'
-      }}
-      id={imageId}
-    >
-      {!isLoaded && (
-        <Skeleton 
-          variant="rectangular" 
-          width="100%" 
-          height={height || '100%'} 
-          animation="wave"
+      <div
+          style={{
+            position: 'relative',
+            width: width || '100%',
+            height: height || 'auto',
+            backgroundColor: placeholderColor,
+            overflow: 'hidden',
+          }}
+          id={imageId}
+      >
+        {!isLoaded && (
+            <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={height || '100%'}
+                animation="wave"
+            />
+        )}
+
+        <img
+            src={error ? fallbackSrc : imageSrc}
+            alt={alt || 'Image'}
+            className={className}
+            onLoad={handleLoad}
+            onError={handleError}
+            style={{
+              display: isLoaded ? 'block' : 'none',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transition: 'opacity 0.3s ease-in-out',
+              opacity: isLoaded ? 1 : 0,
+            }}
+            loading="lazy"
+            {...props}
         />
-      )}
-      
-      <img
-        src={error ? fallbackSrc : imageSrc}
-        alt={alt || "Image"}
-        className={className}
-        onLoad={handleLoad}
-        onError={handleError}
-        style={{
-          display: isLoaded ? 'block' : 'none',
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          transition: 'opacity 0.3s ease-in-out',
-          opacity: isLoaded ? 1 : 0,
-        }}
-        loading="lazy" // Native lazy loading as fallback
-        {...props}
-      />
-    </div>
+      </div>
   );
 };
 
-// Memoize the component to prevent unnecessary re-renders
 export default memo(OptimizedImage);
