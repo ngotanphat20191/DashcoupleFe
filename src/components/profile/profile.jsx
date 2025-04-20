@@ -29,7 +29,7 @@ const Profile = () => {
             city: "",
             Job: "",
             religion: "",
-            Education: "",
+            education: "",
             relationship: "",
         },
         interest: [],

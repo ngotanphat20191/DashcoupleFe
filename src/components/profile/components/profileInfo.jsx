@@ -62,7 +62,7 @@ const ProfileInfo = ({ interests, formData, setFormData }) => {
             religion: formData.userRecord.religion,
             Haveson: "",
             phonenumber: "",
-            Education: formData.userRecord.Education,
+            Education: formData.userRecord.education,
             relationship: formData.userRecord.relationship,
             images: formData.images,
             interests: formData.interest,

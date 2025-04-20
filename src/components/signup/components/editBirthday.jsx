@@ -28,7 +28,8 @@ const EditBirthday = ({ formData, setFormData }) => {
         useEffect(() => {
             if (birthday.day && birthday.month && birthday.year) {
                 setFormData({
-                    ...formData, birthday: `${birthday.day}/${birthday.month}/${birthday.year}`,
+                    ...formData,
+                    birthday: `${birthday.year}-${formattedMonth}-${formattedDay}`,
                 });
             }
         }, [birthday, setFormData]);
