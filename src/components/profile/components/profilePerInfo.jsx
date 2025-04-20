@@ -399,7 +399,7 @@ const ProfilePerInfo = ({ containerRef, formData, setFormData }) => {
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <FaUserGraduate style={{ color: "rgb(24,135,145)", fontSize: "25px" }} />
                             <Typography sx={{ fontWeight: "bold", fontSize: "14px", paddingLeft: "5px" }}>
-                                {formData.userRecord?.Education ? formData.userRecord.Education : "Thêm trình độ học vấn"}
+                                {formData.userRecord?.education ? formData.userRecord.education : "Thêm trình độ học vấn"}
                             </Typography>
                         </div>
                         <ArrowForward className="settings-icon-profile" />
@@ -451,10 +451,10 @@ const ProfilePerInfo = ({ containerRef, formData, setFormData }) => {
                                                     size="md"
                                                     disableIcon
                                                     overlay
-                                                    value={formData.userRecord.Education || ""}
+                                                    value={formData.userRecord.education || ""}
                                                     label={item}
-                                                    checked={formData.userRecord.Education.includes(item)}
-                                                    variant={formData.userRecord.Education.includes(item) ? 'soft' : 'outlined'}
+                                                    checked={formData.userRecord.education.includes(item)}
+                                                    variant={formData.userRecord.education.includes(item) ? 'soft' : 'outlined'}
                                                     onChange={(event) => {
                                                         if (event.target.checked) {
                                                             setValue([item]);
@@ -462,7 +462,7 @@ const ProfilePerInfo = ({ containerRef, formData, setFormData }) => {
                                                                 ...prevState,
                                                                 userRecord: {
                                                                     ...prevState.userRecord,
-                                                                    Education: item
+                                                                    education: item
                                                                 }
                                                             }))
                                                         } else {
@@ -471,7 +471,7 @@ const ProfilePerInfo = ({ containerRef, formData, setFormData }) => {
                                                                 ...prevState,
                                                                 userRecord: {
                                                                     ...prevState.userRecord,
-                                                                    Education: ""
+                                                                    education: ""
                                                                 }
                                                             }))
                                                         }
