@@ -677,7 +677,7 @@ const Chat = () => {
                                             variant="contained"
                                             style={{ marginTop: 5 }}
                                             onClick={() => {
-                                                window.open(`https://present-ghastly-puma.ngrok-free.app/?id=${homepageData.userid}`, "_blank");
+                                                window.open(`https://present-ghastly-puma.ngrok-free.app/api/videocall/?id=${homepageData.userid}`, "_blank");
                                                 sendVideoCallInfo(homepageData.userid, messages.UserIdTarget, homepageData.name, homepageData.images[0]);
                                             }}
                                         >
