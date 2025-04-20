@@ -55,6 +55,7 @@ export default function User() {
             }));
             setSearchDataAfter(transformedData);
         } else {
+            setSearchDataAfter([]);
         }
     }
 
@@ -76,13 +77,17 @@ export default function User() {
                 subParams[key] = searchData[key];
             }
         }
+        setIsLoading(true);
         adminAxios.post('/profiles', subParams)
             .then((res) => {
                 console.log(res.data);
                 setStaffData(res.data);
             }).catch(err => {
-            console.log(err.response.data);
-        });
+                console.log(err.response?.data || err);
+                setStaffData({ records: [] });
+            }).finally(() => {
+                setIsLoading(false);
+            });
     }
 
     function handleSelectChange(type, value) {

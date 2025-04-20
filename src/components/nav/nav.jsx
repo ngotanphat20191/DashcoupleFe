@@ -43,7 +43,7 @@ const Nav = () => {
     const fetchTotalNotifications = async () => {
         let unreadCount = 0;
         notifications.forEach(notification => {
-            if (notification.is_read == 0) {
+            if (notification.is_read === 0) {
                 unreadCount++;
             }
         });

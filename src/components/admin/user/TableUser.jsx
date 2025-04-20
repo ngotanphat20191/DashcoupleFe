@@ -97,7 +97,7 @@ export default function TableUser({header, data, isPagination, handleClick, curr
                             </tr>
                         </thead>
                         <tbody>
-                            {
+                            {data && data.length > 0 ? (
                                 data.map((item, index) => (
                                     <tr key={index} onClick={() => {
                                         if(clickable)
@@ -147,7 +147,13 @@ export default function TableUser({header, data, isPagination, handleClick, curr
                                         }
                                     </tr>
                                 ))
-                            }
+                            ) : (
+                                <tr>
+                                    <td colSpan={header.length + (allowCheckbox ? 2 : 0)} style={{textAlign: 'center', padding: '20px'}}>
+                                        Không tìm thấy kết quả
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
