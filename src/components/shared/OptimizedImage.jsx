@@ -9,23 +9,38 @@ import { Skeleton } from '@mui/material';
  * - Lazy loading with IntersectionObserver
  * - Progressive loading with Skeleton
  * - Error fallback image
+ * - External URL “hot path” optimization to prevent flicker
  * - Memoized for performance
  */
-const OptimizedImage = ({src, alt, className, width, height, placeholderColor = "#f0f0f0", fallbackSrc = "https://via.placeholder.com/150?text=Image+Not+Found", lazyLoad = true, ...props
-}) => {
+const OptimizedImage = ({
+                          src,
+                          alt,
+                          className,
+                          width,
+                          height,
+                          placeholderColor = "#f0f0f0",
+                          fallbackSrc = "https://via.placeholder.com/150?text=Image+Not+Found",
+                          lazyLoad = true,
+                          ...props
+                        }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [imageSrc, setImageSrc] = useState('');
-  const [objectUrl, setObjectUrl] = useState(null); // for local file cleanup
+  const [objectUrl, setObjectUrl] = useState(null);
 
-  // Generate a unique ID for the image container
-  const imageId = `image-${alt?.replace(/\s+/g, '-')}-${typeof src === 'string' ? src?.substring(0, 20)?.replace(/[^a-zA-Z0-9]/g, '') : 'local-file'}`;
+  // Detect if incoming src is an “external” URL string
+  const isExternalUrl = typeof src === 'string' && (src.startsWith('http') || src.startsWith('blob:'));
 
-  // Handle src updates
+  // Unique container ID for IntersectionObserver
+  const imageId = `img-${alt?.replace(/\s+/g, '-')}-${typeof src === 'string'
+      ? src.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '')
+      : 'local-file'}`;
+
+  // 1️⃣ Initialize imageSrc based on File vs external URL
   useEffect(() => {
     if (!src) return;
 
-    // File object (e.g., from input)
+    // Local File → create blob URL
     if (src instanceof File) {
       const url = URL.createObjectURL(src);
       setImageSrc(url);
@@ -33,16 +48,17 @@ const OptimizedImage = ({src, alt, className, width, height, placeholderColor = 
       return;
     }
 
-    // External URL or blob
-    if (typeof src === 'string' && (src.startsWith('http') || src.startsWith('blob:'))) {
+    // External URL or already‑created blob
+    if (isExternalUrl) {
       setImageSrc(src);
       return;
     }
 
+    // Otherwise clear
     setImageSrc('');
-  }, [src]);
+  }, [src, isExternalUrl]);
 
-  // Cleanup created object URL
+  // 2️⃣ Cleanup blob URL when done
   useEffect(() => {
     return () => {
       if (objectUrl) {
@@ -51,14 +67,19 @@ const OptimizedImage = ({src, alt, className, width, height, placeholderColor = 
     };
   }, [objectUrl]);
 
-  // Lazy load logic with IntersectionObserver
+  // 3️⃣ Lazy‑loading for non‑external, non‑loaded src
   useEffect(() => {
-    if (!lazyLoad || imageSrc || (typeof src === 'string' && (src.startsWith('http') || src.startsWith('blob:')))) return;
+    if (
+        !lazyLoad ||
+        imageSrc ||
+        isExternalUrl
+    ) return;
 
     const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
+              // Once visible, do the same logic as above
               if (src instanceof File) {
                 const url = URL.createObjectURL(src);
                 setImageSrc(url);
@@ -70,21 +91,16 @@ const OptimizedImage = ({src, alt, className, width, height, placeholderColor = 
             }
           });
         },
-        {
-          rootMargin: '100px',
-          threshold: 0.1,
-        }
+        { rootMargin: '100px', threshold: 0.1 }
     );
 
-    const imgElement = document.getElementById(imageId);
-    if (imgElement) {
-      observer.observe(imgElement);
-    }
+    const el = document.getElementById(imageId);
+    if (el) observer.observe(el);
 
     return () => {
-      if (imgElement) observer.unobserve(imgElement);
+      if (el) observer.unobserve(el);
     };
-  }, [src, imageSrc, lazyLoad, imageId]);
+  }, [src, imageSrc, lazyLoad, isExternalUrl, imageId]);
 
   const handleLoad = () => setIsLoaded(true);
   const handleError = () => {
@@ -94,6 +110,7 @@ const OptimizedImage = ({src, alt, className, width, height, placeholderColor = 
 
   return (
       <div
+          id={imageId}
           style={{
             position: 'relative',
             width: width || '100%',
@@ -101,7 +118,6 @@ const OptimizedImage = ({src, alt, className, width, height, placeholderColor = 
             backgroundColor: placeholderColor,
             overflow: 'hidden',
           }}
-          id={imageId}
       >
         {!isLoaded && (
             <Skeleton

@@ -29,7 +29,7 @@ const EditBirthday = ({ formData, setFormData }) => {
             if (birthday.day && birthday.month && birthday.year) {
                 setFormData({
                     ...formData,
-                    birthday: `${birthday.year}-${birthday.month}-${birthday.year}`,
+                    birthday: `${birthday.year}-${birthday.month}-${birthday.day}`,
                 });
             }
         }, [birthday, setFormData]);
