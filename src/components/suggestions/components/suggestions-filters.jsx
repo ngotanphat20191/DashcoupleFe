@@ -149,9 +149,13 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                                         padding: '4px'
                                     }
                                 }}
-                                value={interestNames?.filter(interest =>
-                                    preference?.preferenceInterest?.includes(parseInt(interest.InterestID, 10))
-                                ) || []}
+                                value={
+                                    interestNames?.filter(interest =>
+                                        preference?.preferenceInterest?.some(
+                                            id => parseInt(id, 10) === parseInt(interest.InterestID, 10)
+                                        )
+                                    ) || []
+                                }
                                 onChange={(event, newValue) => {
                                     const selectedIds = newValue.map(interest => parseInt(interest.InterestID, 10));
                                     setpreference({ ...preference, preferenceInterest: selectedIds });
