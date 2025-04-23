@@ -85,7 +85,7 @@ function AppRoutes() {
             })
             .catch((err) => {
                 if (err.response?.status === 400) {
-
+                    console.log(err.respone.data);
                 }
             });
     }, []);
@@ -100,7 +100,7 @@ function AppRoutes() {
             })
             .catch((err) => {
                 if (err.response?.status === 400) {
-
+                    console.log(err.respone.data);
                 }
             });
     }, []);

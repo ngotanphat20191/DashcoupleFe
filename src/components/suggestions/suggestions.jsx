@@ -8,8 +8,7 @@ import Homenav from '../home/homenav.jsx';
 import {religionNames} from '../../datas/template.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
-import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
-import _ from 'lodash';
+import {loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
@@ -22,12 +21,17 @@ const Suggestions = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedSort, setSelectedSort] = useState('ageAsc');
-    const [turn, setturn] = useState(() => {
+    const [turn, setTurn] = useState(() => {
         try {
             const storedTurn = localStorage.getItem("turn");
-            return storedTurn !== null ? parseInt(storedTurn, 10) : 0;
+            if (storedTurn === null) {
+                return 1;
+            }
+            const parsedTurn = parseInt(storedTurn, 10);
+            return isNaN(parsedTurn) ? 1 : parsedTurn;
         } catch (e) {
-            return 0;
+            console.error("Error reading from localStorage:", e);
+            return 1;
         }
     });
     
@@ -36,13 +40,11 @@ const Suggestions = () => {
         const cancelTokenSource = createCancelToken();
         const fetchAllData = async () => {
             setIsLoading(true);
-            setError(null); // Reset any previous errors
+            setError(null);
             
             try {
-                // Initialize parameters first
                 await initParemeter();
                 
-                // Fetch data in parallel
                 const [interestsResponse, preferenceResponse] = await Promise.all([
                     loginSignUpAxios.get('/signup/interest', {
                         cancelToken: cancelTokenSource.token
@@ -52,11 +54,9 @@ const Suggestions = () => {
                     })
                 ]);
                 
-                // Update state with fetched data
                 setinterests(interestsResponse.data);
                 setpreference(preferenceResponse.data);
                 
-                // Fetch suggestions after getting interests and preferences
                 await handleSuggestion();
                 
                 setIsLoading(false);
@@ -98,14 +98,14 @@ const Suggestions = () => {
                 localStorage.setItem("indexSuggestionSkip", JSON.stringify([]));
             }
             if (localStorage.getItem("turn") === null) {
-                localStorage.setItem("turn", '0');
+                localStorage.setItem("turn", '1');
             }
             
-            setturn(parseInt(localStorage.getItem("turn") || "0", 10));
+            setTurn(parseInt(localStorage.getItem("turn") || "1", 10));
             const storedIndexes = JSON.parse(localStorage.getItem("indexSuggestionSkip")) || [];
             setindexskip(storedIndexes);
-        } catch (e) {
-            setturn(0);
+        } catch (err) {
+            setTurn(1);
             setindexskip([]);
         }
     }, []);
@@ -130,10 +130,9 @@ const Suggestions = () => {
             setprofile(profileData);
             setFilteredProfiles(profileData);
             
-            // Check if we need to reset indexskip and turn
             if (checkTime(profileData.listCreateTime)) {
                 setindexskip([]);
-                setturn(0);
+                setTurn(1);
             }
         } catch (err) {
             if (axios.isCancel(err)) {
@@ -257,7 +256,6 @@ const Suggestions = () => {
         console.log("Updated filtered profiles:", {...profile, userProfileMatchesEntityList: filteredList});
     }, [profile, preference, selectedSort, calculateAge]);
 
-    // Handle sort change from SuggestionsFilters
     const handleSortChange = useCallback((sortValue) => {
         setSelectedSort(sortValue);
     }, []);
