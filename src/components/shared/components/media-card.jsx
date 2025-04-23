@@ -1109,4 +1109,4 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
 }
 
 // Export the component as default
-export default Fmemo(MediaCard);
+export default memo(MediaCard);
