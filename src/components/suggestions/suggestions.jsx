@@ -118,10 +118,13 @@ const Suggestions = () => {
             }, {
                 cancelToken: cancelTokenSource.token
             });
+            if (!response || typeof response.data === 'undefined') {
+                throw new Error("Không nhận được dữ liệu từ server.");
+            }
 
             const profileData = response.data;
 
-            if (!profileData || !profileData.userProfileMatchesEntityList || !Array.isArray(profileData.userProfileMatchesEntityList)) {
+            if (!profileData.userProfileMatchesEntityList || !Array.isArray(profileData.userProfileMatchesEntityList)) {
                 setError("Dữ liệu không hợp lệ. Vui lòng thử lại sau.");
                 setIsLoading(false);
                 return;
@@ -341,7 +344,7 @@ const Suggestions = () => {
                                         ? "Không có gợi ý nào phù hợp với bộ lọc"
                                         : "Không có gợi ý nào. Vui lòng thử lại sau."}
                                 </Typography>
-                                A                            </Box>
+                            </Box>
                         );
                     }
                     return (

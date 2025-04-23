@@ -201,7 +201,7 @@ const QuizInterest = () => {
                             </div>
                                 ): (
                                     <div style={{display: 'flex', flexDirection: 'column',alignItems: 'center', marginTop:"10px"}}>
-                                        <div style={{maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                        <div style={{maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px', marginLeft: "100px"}}>
                                             <img
                                                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Flat_tick_icon.svg/2048px-Flat_tick_icon.svg.png"
                                                 alt="Yes Icon"
