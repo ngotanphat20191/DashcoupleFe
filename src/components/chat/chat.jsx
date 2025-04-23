@@ -24,7 +24,6 @@ import Homenav from '../home/homenav.jsx';
 import {Stack} from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
-import '../chatroom/chatroom.css';
 import Typography from '@mui/material/Typography';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
