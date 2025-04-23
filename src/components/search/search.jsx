@@ -339,7 +339,7 @@ const Search = () => {
                                         ? "Không có gợi ý nào phù hợp với bộ lọc"
                                         : "Không có gợi ý nào. Vui lòng thử lại sau."}
                                 </Typography>
-                            </Box>
+A                            </Box>
                         );
                     }
                     return (

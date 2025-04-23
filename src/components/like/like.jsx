@@ -74,12 +74,10 @@ const Like = () => {
             });
             
             setprofile(response.data);
-            // Check if there are no profiles
             setHasNoData(response.data.length === 0);
             setIsLoading(false);
         } catch (err) {
             if (axios.isCancel(err)) {
-                // Request was cancelled, ignore
                 return;
             }
             

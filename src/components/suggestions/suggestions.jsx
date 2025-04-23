@@ -1,5 +1,5 @@
 import {useEffect, useState, useCallback, useMemo, memo} from 'react';
-import SuggestionsFilters from './components/suggestions-filters.jsx';
+import SuggestionsFilters from '../suggestions/components/suggestions-filters.jsx';
 import ProfilesGrid from '../shared/profiles-grid.jsx';
 import Title from '../shared/title.jsx';
 import Divider from '@mui/material/Divider';
@@ -12,6 +12,7 @@ import {loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/ax
 
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
+
 const Suggestions = () => {
     const [profile, setprofile] = useState(null);
     const [filteredProfiles, setFilteredProfiles] = useState(null);
@@ -21,8 +22,6 @@ const Suggestions = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedSort, setSelectedSort] = useState('ageAsc');
-    const [retryCount, setRetryCount] = useState(0);
-    const [isFirstRender, setIsFirstRender] = useState(true);
     const [turn, setTurn] = useState(() => {
         try {
             const storedTurn = localStorage.getItem("turn");
@@ -38,17 +37,15 @@ const Suggestions = () => {
     });
 
     useEffect(() => {
-        console.log("Initial useEffect running");
+
         const cancelTokenSource = createCancelToken();
         const fetchAllData = async () => {
             setIsLoading(true);
             setError(null);
 
             try {
-                console.log("Initializing parameters");
                 await initParemeter();
 
-                console.log("Fetching interests and preferences");
                 const [interestsResponse, preferenceResponse] = await Promise.all([
                     loginSignUpAxios.get('/signup/interest', {
                         cancelToken: cancelTokenSource.token
@@ -58,28 +55,19 @@ const Suggestions = () => {
                     })
                 ]);
 
-                console.log("Setting interests and preferences");
                 setinterests(interestsResponse.data);
                 setpreference(preferenceResponse.data);
 
-                console.log("Calling handleSuggestion");
                 await handleSuggestion();
 
-                if (!isFirstRender) {
-                    setIsLoading(false);
-                }
+                setIsLoading(false);
             } catch (err) {
                 if (axios.isCancel(err)) {
-                    console.log("Request was cancelled during initial load");
                     return;
                 }
 
-                console.error("Error in fetchAllData:", err);
-                
-                if (!isFirstRender || retryCount >= 2) {
-                    setIsLoading(false);
-                    setError("Error loading data. Please try again.");
-                }
+                setIsLoading(false);
+                setError("Error loading data. Please try again.");
             }
         };
 
@@ -88,7 +76,7 @@ const Suggestions = () => {
         return () => {
             cancelTokenSource.cancel('Component unmounted');
         };
-    }, [handleSuggestion, initParemeter, isFirstRender, retryCount]);
+    }, []);
     useEffect(() => {
         const handleBeforeUnload = () => {
             localStorage.setItem("indexSuggestionSkip", JSON.stringify(indexskip));
@@ -121,23 +109,8 @@ const Suggestions = () => {
             setindexskip([]);
         }
     }, []);
-    
-    // Define checkTime function before it's used in handleSuggestion
-    const checkTime = useCallback((data) => {
-        const listCreateTime = new Date(data);
-        const now = new Date();
-        const diffMs = now - listCreateTime;
-        const diffMinutes = diffMs / (1000 * 60);
-        if (diffMinutes >= 0 && diffMinutes <= 1) {
-            return true;
-        } else {
-            return false;
-        }
-    }, []);
-    
     const handleSuggestion = useCallback(async () => {
         try {
-            console.log("handleSuggestion called, isFirstRender:", isFirstRender, "retryCount:", retryCount);
             const cancelTokenSource = createCancelToken();
 
             const response = await matchesAxios.post('/suggestion', {
@@ -147,28 +120,13 @@ const Suggestions = () => {
             });
 
             const profileData = response.data;
-            console.log("Response data received:", profileData);
 
             if (!profileData || !profileData.userProfileMatchesEntityList || !Array.isArray(profileData.userProfileMatchesEntityList)) {
-                console.error("Invalid data structure received:", profileData);
-                
-                if (isFirstRender && retryCount < 2) {
-                    console.log(`First render retry ${retryCount + 1}`);
-                    setRetryCount(prev => prev + 1);
-                    
-                    setTimeout(() => {
-                        handleSuggestion();
-                    }, 1500);
-                    return;
-                }
-                
                 setError("Dữ liệu không hợp lệ. Vui lòng thử lại sau.");
                 setIsLoading(false);
                 return;
             }
 
-            // If we get here, we have valid data
-            setIsFirstRender(false);
             setprofile(profileData);
             setFilteredProfiles(profileData);
 
@@ -178,21 +136,6 @@ const Suggestions = () => {
             }
         } catch (err) {
             if (axios.isCancel(err)) {
-                console.log("Request was cancelled");
-                return;
-            }
-
-            console.error("Error in handleSuggestion:", err);
-            
-            // If this is the first render, retry automatically after a delay
-            if (isFirstRender && retryCount < 2) {
-                console.log(`First render retry ${retryCount + 1} after error`);
-                setRetryCount(prev => prev + 1);
-                
-                // Wait a moment before retrying
-                setTimeout(() => {
-                    handleSuggestion();
-                }, 1500);
                 return;
             }
 
@@ -201,9 +144,20 @@ const Suggestions = () => {
             } else {
                 setError("Failed to load suggestions");
             }
-            setIsLoading(false);
         }
-    }, [turn, isFirstRender, retryCount, checkTime]);
+    }, [turn]);
+
+    function checkTime(data) {
+        const listCreateTime = new Date(data);
+        const now = new Date();
+        const diffMs = now - listCreateTime;
+        const diffMinutes = diffMs / (1000 * 60);
+        if (diffMinutes >= 0 && diffMinutes <= 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     // Calculate age from date of birth
     const calculateAge = useCallback((dob) => {
@@ -318,19 +272,6 @@ const Suggestions = () => {
     const handleSortChange = useCallback((sortValue) => {
         setSelectedSort(sortValue);
     }, []);
-    
-    const handleRetry = useCallback(() => {
-        console.log("Manual retry initiated");
-        setIsLoading(true);
-        setError(null);
-        setRetryCount(0);
-        setIsFirstRender(false); // Don't treat this as first render anymore
-        
-        // Small delay before retrying
-        setTimeout(() => {
-            handleSuggestion();
-        }, 500);
-    }, [handleSuggestion]);
 
     const suggestionsContent = useMemo(() => {
         if (isLoading) {
@@ -348,20 +289,9 @@ const Suggestions = () => {
                     <Alert severity="error" sx={{ mb: 2 }}>
                         {error}
                     </Alert>
-                    <Stack direction="row" spacing={2}>
-                        <Button 
-                            variant="contained" 
-                            onClick={handleRetry}
-                        >
-                            Thử lại
-                        </Button>
-                        <Button 
-                            variant="outlined" 
-                            onClick={() => window.location.reload()}
-                        >
-                            Tải lại trang
-                        </Button>
-                    </Stack>
+                    <Button variant="contained" onClick={() => window.location.reload()}>
+                        Thử lại
+                    </Button>
                 </Box>
             );
         }
@@ -407,11 +337,11 @@ const Suggestions = () => {
                             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh", flexDirection: "column" }}>
                                 <Typography variant="h6" color="#555" sx={{ mb: 2 }}>
                                     {filteredProfiles && filteredProfiles.userProfileMatchesEntityList &&
-                                     filteredProfiles.userProfileMatchesEntityList.length === 0
+                                    filteredProfiles.userProfileMatchesEntityList.length === 0
                                         ? "Không có gợi ý nào phù hợp với bộ lọc"
                                         : "Không có gợi ý nào. Vui lòng thử lại sau."}
                                 </Typography>
-                            </Box>
+                                A                            </Box>
                         );
                     }
                     return (
@@ -433,10 +363,8 @@ const Suggestions = () => {
                 })()}
             </Stack>
         );
-    }, [isLoading, error, filteredProfiles, profile, preference, interests, indexskip, setindexskip, handleSuggestion, handleSortChange, handleRetry]);
+    }, [isLoading, error, filteredProfiles, profile, preference, interests, indexskip, setindexskip, handleSuggestion, handleSortChange]);
 
     return suggestionsContent;
 };
-
-// Export memoized component for better performance
 export default memo(Suggestions);
