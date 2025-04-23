@@ -14,7 +14,7 @@ const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
         return (
             <Box className="emptyPageWrapperProfileGrid">
                 <Typography className="emptyPageTextProfileGrid" variant="h3">
-                    Sorry, there is nothing to display yet <span role="img" aria-label="sad emoji">😢</span>. But don't worry, it's coming !
+                    Xin lỗi, hiên tại không có dữ liệu <span role="img" aria-label="sad emoji">😢</span>. Nhưng không sao, hãy chờ đợi nha !
                 </Typography>
             </Box>
         );

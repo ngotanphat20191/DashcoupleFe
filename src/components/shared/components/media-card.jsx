@@ -113,10 +113,13 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
     }, [handlePreviewNextImage]);
     // Optimize suggestion handlers with useCallback
     const handleSkipSuggestion = useCallback((currentIndex) => {
-        if (setindexskip) {
-            setindexskip(prev => [...prev, currentIndex]);
+        if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
+            const userId = profiles[currentIndex].userRecord.User_ID;
+            if (userId) {
+                setindexskip(prev => [...prev, userId]);
+            }
         }
-    }, [setindexskip]);
+    }, [setindexskip, profiles]);
     
     // Optimize API calls with proper error handling and loading states
     const handleLikeSuggestion = useCallback(async (currentIndex, userID) => {
@@ -125,7 +128,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         try {
             // Optimistically update UI
             if (setindexskip) {
-                setindexskip(prev => [...prev, currentIndex]);
+                setindexskip(prev => [...prev, userID]);
             }
             
             // Create cancel token for request
@@ -142,7 +145,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         } catch (err) {
             // Revert optimistic update on error
             if (setindexskip) {
-                setindexskip(prev => prev.filter(id => id !== currentIndex));
+                setindexskip(prev => prev.filter(id => id !== userID));
             }
             
             // Error handling
@@ -186,16 +189,33 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         setCurrentIndex((prevIndex) => prevIndex + 1);
     };
     useEffect(() => {
-        // if (indexSkip.includes(currentIndex)) {
-        //     let nextIndex = currentIndex + 1;
-        //     while (indexSkip.includes(nextIndex) && nextIndex < profiles.length) {
-        //         nextIndex++;
-        //     }
-        //     if (nextIndex < profiles.length) {
-        //         setCurrentIndex(nextIndex);
-        //     }
-        // }
-        console.log(indexSkip)
+        if (!profiles || !Array.isArray(profiles) || profiles.length === 0 || !indexSkip || !Array.isArray(indexSkip)) {
+            return;
+        }
+        
+        // Check if current profile should be skipped
+        if (profiles[currentIndex] && profiles[currentIndex].userRecord && 
+            indexSkip.includes(profiles[currentIndex].userRecord.User_ID)) {
+            
+            // Find next valid index
+            let nextIndex = currentIndex + 1;
+            let foundValidProfile = false;
+            
+            while (nextIndex < profiles.length) {
+                if (profiles[nextIndex] && profiles[nextIndex].userRecord && 
+                    !indexSkip.includes(profiles[nextIndex].userRecord.User_ID)) {
+                    foundValidProfile = true;
+                    break;
+                }
+                nextIndex++;
+            }
+            
+            if (foundValidProfile) {
+                setCurrentIndex(nextIndex);
+            }
+        }
+        
+        console.log("Current index skip list:", indexSkip);
     }, [currentIndex, indexSkip, profiles]);
     return (
         (type === 'liking') ? (
@@ -326,7 +346,15 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                         <Typography sx={{ fontSize: "16px", alignItems: "bottom", marginLeft: '4px' }}>
                                                             Sống tại {profiles[currentIndex].userRecord.city}
                                                         </Typography>
-
+                                                        <img
+                                                            src="https://cdn-icons-png.flaticon.com/512/3199/3199999.png"
+                                                            alt="Education Icon"
+                                                            width="40"
+                                                            height="40"
+                                                        />
+                                                        <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
+                                                            Đang tìm kiếm {profiles[currentIndex].userRecord.relationship}
+                                                        </Typography>
                                                     </div>
                                                 </div>
                                             )}
@@ -549,7 +577,6 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                             <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
                                                                 Đang tìm kiếm {profiles[currentIndex].userRecord.relationship}
                                                             </Typography>
-
                                                         </div>
                                                     </div>
                                                 )}
@@ -766,6 +793,15 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                                 <Typography sx={{ fontSize: "16px", alignItems: "bottom", marginLeft: '4px' }}>
                                                                     Sống tại {profiles.userRecord.city}
                                                                 </Typography>
+                                                                <img
+                                                                    src="https://cdn-icons-png.flaticon.com/512/3199/3199999.png"
+                                                                    alt="Education Icon"
+                                                                    width="40"
+                                                                    height="40"
+                                                                />
+                                                                <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
+                                                                    Đang tìm kiếm {profiles.userRecord.relationship}
+                                                                </Typography>
                                                             </div>
                                                         </div>
                                                     )}
@@ -853,7 +889,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                 preventSwipe={["up", "down"]}
                                 onSwipe={onSwipe}
                             >
-                                {!indexSkip.includes(currentIndex) && (
+                                {profiles[currentIndex].userRecord && !indexSkip.includes(profiles[currentIndex].userRecord.User_ID) && (
                                 <motion.div
                                     className="card"
                                     style={{
@@ -971,6 +1007,15 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                         <FaCity style={{ color: 'white', fontSize: '20px', marginRight: '5px' }} />
                                                         <Typography sx={{ fontSize: "16px", alignItems: "bottom", marginLeft: '4px' }}>
                                                             Sống tại {profiles[currentIndex].userRecord.city}
+                                                        </Typography>
+                                                        <img
+                                                            src="https://cdn-icons-png.flaticon.com/512/3199/3199999.png"
+                                                            alt="Education Icon"
+                                                            width="40"
+                                                            height="40"
+                                                        />
+                                                        <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
+                                                            Đang tìm kiếm {profiles[currentIndex].userRecord.relationship}
                                                         </Typography>
                                                     </div>
                                                 </div>

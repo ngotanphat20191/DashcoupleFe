@@ -85,8 +85,7 @@ const Suggestions = () => {
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };
-    }, [])
-    // Memoize handlers to prevent unnecessary recreations
+    }, [indexskip, turn])
     const handleSkip = useCallback((data) => {
         if (!data || !data.id) return;
         setindexskip(prev => [...prev, data.id]);
@@ -152,7 +151,7 @@ const Suggestions = () => {
         const now = new Date();
         const diffMs = now - listCreateTime;
         const diffMinutes = diffMs / (1000 * 60);
-        if (diffMinutes >= 0 && diffMinutes <= 5) {
+        if (diffMinutes >= 0 && diffMinutes <= 1) {
             return true;
         } else {
             return false;
@@ -194,8 +193,11 @@ const Suggestions = () => {
             return;
         }
 
-        let filteredList = [...profile.userProfileMatchesEntityList];
-        console.log("Initial filtered list:", filteredList);
+        // First filter out profiles that are in the indexskip array
+        let filteredList = [...profile.userProfileMatchesEntityList].filter(item => 
+            !indexskip.includes(item.userRecord.User_ID)
+        );
+        console.log("After skipping disliked profiles:", filteredList);
 
         if (preference.preferenceRecord) {
             const minAge = preference.preferenceRecord.preferenceAgeMin || 18;
@@ -254,7 +256,7 @@ const Suggestions = () => {
 
         setFilteredProfiles({...profile, userProfileMatchesEntityList: filteredList});
         console.log("Updated filtered profiles:", {...profile, userProfileMatchesEntityList: filteredList});
-    }, [profile, preference, selectedSort, calculateAge]);
+    }, [profile, preference, selectedSort, calculateAge, indexskip]);
 
     const handleSortChange = useCallback((sortValue) => {
         setSelectedSort(sortValue);
