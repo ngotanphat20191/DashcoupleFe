@@ -1,10 +1,13 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, memo} from 'react';
 import Title from '../shared/title.jsx';
 import ProfilesGrid from '../shared/profiles-grid.jsx';
 import {Box, Stack, Typography} from '@mui/material';
 import Homenav from '../home/homenav.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import {matchesAxios, loginSignUpAxios} from "../../config/axiosConfig.jsx";
+
+const MemoizedHomenav = memo(Homenav);
+const MemoizedTitle = memo(Title);
 
 const Visit = () => {
     const [profile, setprofile] = useState(null);
@@ -47,8 +50,8 @@ const Visit = () => {
 
     return (
             <Stack style={{alignItems: "center", height: "100%", border: "2px solid #fc6ae7", width:"80%", marginLeft: "200px", marginRight:"100px", marginTop:"50px", borderRadius:"20px", backgroundColor:"#ffe8fd"}}>
-                <Homenav></Homenav>
-                <Title textTitle="Lịch sử thích" />
+                <MemoizedHomenav />
+                <MemoizedTitle textTitle="Lịch sử thích" />
                 {isLoading ? (
                     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
                         <CircularProgress sx={{ color: "#fc6ae7" }} />
@@ -110,4 +113,4 @@ const Visit = () => {
             </Stack>
     );
 };
-export default Visit;
+export default memo(Visit);
