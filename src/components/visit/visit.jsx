@@ -57,7 +57,7 @@ const Visit = () => {
                         <CircularProgress sx={{ color: "#fc6ae7" }} />
                         <Typography sx={{ ml: 2, color: "#555" }}>Đang tải dữ liệu...</Typography>
                     </Box>
-                ) : profile && Array.isArray(profile) && profile.length > 0 ? (
+                ) : profile && Array.isArray(profile) && profile.length > 0 && (
                     <ProfilesGrid
                         profiles={profile}
                         type="liking"

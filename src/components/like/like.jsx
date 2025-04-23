@@ -92,9 +92,7 @@ const Like = () => {
             }
         }
     }, []);
-    // Memoize the content to prevent unnecessary re-renders
     const likeContent = useMemo(() => {
-        // Show loading state
         if (isLoading) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -118,7 +116,6 @@ const Like = () => {
             );
         }
         
-        // Main content when data is loaded
         return (
             <Stack style={{
                 alignItems: "center", 
@@ -134,7 +131,7 @@ const Like = () => {
                 <MemoizedTitle textTitle="Cơ hội ghép đôi" />
                 <MemoizedHomenav />
                 
-                {profile && Array.isArray(profile) && profile.length > 0 ? (
+                {profile && Array.isArray(profile) && profile.length > 0 && (
                     <ProfilesGrid
                         profiles={profile}
                         type="like"
