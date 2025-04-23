@@ -121,6 +121,20 @@ const Suggestions = () => {
             setindexskip([]);
         }
     }, []);
+    
+    // Define checkTime function before it's used in handleSuggestion
+    const checkTime = useCallback((data) => {
+        const listCreateTime = new Date(data);
+        const now = new Date();
+        const diffMs = now - listCreateTime;
+        const diffMinutes = diffMs / (1000 * 60);
+        if (diffMinutes >= 0 && diffMinutes <= 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }, []);
+    
     const handleSuggestion = useCallback(async () => {
         try {
             console.log("handleSuggestion called, isFirstRender:", isFirstRender, "retryCount:", retryCount);
@@ -190,18 +204,6 @@ const Suggestions = () => {
             setIsLoading(false);
         }
     }, [turn, isFirstRender, retryCount, checkTime]);
-
-    function checkTime(data) {
-        const listCreateTime = new Date(data);
-        const now = new Date();
-        const diffMs = now - listCreateTime;
-        const diffMinutes = diffMs / (1000 * 60);
-        if (diffMinutes >= 0 && diffMinutes <= 1) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     // Calculate age from date of birth
     const calculateAge = useCallback((dob) => {
@@ -409,50 +411,6 @@ const Suggestions = () => {
                                         ? "Không có gợi ý nào phù hợp với bộ lọc"
                                         : "Không có gợi ý nào. Vui lòng thử lại sau."}
                                 </Typography>
-                                {filteredProfiles && filteredProfiles.userProfileMatchesEntityList &&
-                                 filteredProfiles.userProfileMatchesEntityList.length === 0 ? (
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => {
-                                            // Reset filters to default
-                                            if (preference) {
-                                                const resetPreference = {
-                                                    ...preference,
-                                                    preferenceInterest: [],
-                                                    preferenceRecord: {
-                                                        ...preference.preferenceRecord,
-                                                        preferenceAgeMin: 18,
-                                                        preferenceAgeMax: 60,
-                                                        preferenceLocation: null,
-                                                        preferenceCity: null
-                                                    }
-                                                };
-                                                setpreference(resetPreference);
-                                            }
-                                        }}
-                                        sx={{
-                                            backgroundColor: '#fc6ae7',
-                                            '&:hover': {
-                                                backgroundColor: '#d44bbe',
-                                            }
-                                        }}
-                                    >
-                                        Xóa bộ lọc
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleSuggestion}
-                                        sx={{
-                                            backgroundColor: '#fc6ae7',
-                                            '&:hover': {
-                                                backgroundColor: '#d44bbe',
-                                            }
-                                        }}
-                                    >
-                                        Tải lại gợi ý
-                                    </Button>
-                                )}
                             </Box>
                         );
                     }

@@ -38,7 +38,8 @@ const Like = () => {
                 setprofile(likedResponse.data);
                 
                 // Check if there are no profiles
-                setHasNoData(likedResponse.data.length === 0);
+                setHasNoData(!likedResponse.data || likedResponse.data.length === 0 || !Array.isArray(likedResponse.data));
+                console.log("Like data loaded:", likedResponse.data);
                 setIsLoading(false);
             } catch (err) {
                 if (axios.isCancel(err)) {
@@ -133,66 +134,7 @@ const Like = () => {
                 <MemoizedTitle textTitle="Cơ hội ghép đôi" />
                 <MemoizedHomenav />
                 
-                {hasNoData ? (
-                    <Box sx={{ 
-                        display: "flex", 
-                        flexDirection: "column",
-                        justifyContent: "center", 
-                        alignItems: "center", 
-                        height: "50vh",
-                        width: "80%",
-                        padding: "20px",
-                        margin: "20px",
-                        backgroundColor: "#fff5fd",
-                        borderRadius: "15px",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
-                        border: "1px solid #ffcef2"
-                    }}>
-                        <img 
-                            src="https://media3.giphy.com/media/IuWKl0QnlgO4SkXt7b/200w.gif?cid=6c09b952xaa9j1juxa6skj0mnpavod5ctyj59unaw4lpxhlw&ep=v1_gifs_search&rid=200w.gif&ct=g"
-                            alt="Empty heart" 
-                            style={{ 
-                                width: "100px", 
-                                height: "100px", 
-                                marginBottom: "20px",
-                                opacity: "0.7"
-                            }} 
-                        />
-                        <Typography 
-                            sx={{ 
-                                fontSize: "1.2rem", 
-                                fontWeight: "bold", 
-                                color: "#ff66c4",
-                                textAlign: "center",
-                                mb: 1
-                            }}
-                        >
-                            Hiện tại không có đối tượng nào
-                        </Typography>
-                        <Typography 
-                            sx={{ 
-                                fontSize: "1rem", 
-                                color: "#666",
-                                textAlign: "center",
-                                mb: 2
-                            }}
-                        >
-                            Hãy cố gắng tìm kiếm thêm để có cơ hội ghép đôi!
-                        </Typography>
-                        <Button 
-                            variant="contained" 
-                            onClick={handleLiked}
-                            sx={{
-                                backgroundColor: "#fc6ae7",
-                                '&:hover': {
-                                    backgroundColor: "#e056c5",
-                                }
-                            }}
-                        >
-                            Tải lại
-                        </Button>
-                    </Box>
-                ) : (
+                {profile && Array.isArray(profile) && profile.length > 0 ? (
                     <ProfilesGrid
                         profiles={profile}
                         type="like"

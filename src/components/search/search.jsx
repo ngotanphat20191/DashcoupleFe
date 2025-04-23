@@ -339,50 +339,6 @@ const Search = () => {
                                         ? "Không có gợi ý nào phù hợp với bộ lọc"
                                         : "Không có gợi ý nào. Vui lòng thử lại sau."}
                                 </Typography>
-                                {filteredProfiles && filteredProfiles.userProfileMatchesEntityList &&
-                                filteredProfiles.userProfileMatchesEntityList.length === 0 ? (
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => {
-                                            // Reset filters to default
-                                            if (preference) {
-                                                const resetPreference = {
-                                                    ...preference,
-                                                    preferenceInterest: [],
-                                                    preferenceRecord: {
-                                                        ...preference.preferenceRecord,
-                                                        preferenceAgeMin: 18,
-                                                        preferenceAgeMax: 60,
-                                                        preferenceLocation: null,
-                                                        preferenceCity: null
-                                                    }
-                                                };
-                                                setpreference(resetPreference);
-                                            }
-                                        }}
-                                        sx={{
-                                            backgroundColor: '#fc6ae7',
-                                            '&:hover': {
-                                                backgroundColor: '#d44bbe',
-                                            }
-                                        }}
-                                    >
-                                        Xóa bộ lọc
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleSuggestion}
-                                        sx={{
-                                            backgroundColor: '#fc6ae7',
-                                            '&:hover': {
-                                                backgroundColor: '#d44bbe',
-                                            }
-                                        }}
-                                    >
-                                        Tải lại gợi ý
-                                    </Button>
-                                )}
                             </Box>
                         );
                     }
