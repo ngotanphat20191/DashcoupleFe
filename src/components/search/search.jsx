@@ -21,7 +21,7 @@ const Search = () => {
     const [indexskip, setindexskip] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedSort, setSelectedSort] = useState('ageAsc');
+    const [selectedSort, setSelectedSort] = useState('normal');
     const [turn, setTurn] = useState(() => {
         try {
             const storedTurn = localStorage.getItem("turn");
@@ -116,10 +116,13 @@ const Search = () => {
             const response = await matchesAxios.post('/search', {}, {
                 cancelToken: cancelTokenSource.token
             });
+            if (!response || typeof response.data === 'undefined') {
+                throw new Error("Không nhận được dữ liệu từ server.");
+            }
 
             const profileData = response.data;
 
-            if (!profileData || !profileData.userProfileMatchesEntityList || !Array.isArray(profileData.userProfileMatchesEntityList)) {
+            if (!profileData.userProfileMatchesEntityList || !Array.isArray(profileData.userProfileMatchesEntityList)) {
                 setError("Dữ liệu không hợp lệ. Vui lòng thử lại sau.");
                 setIsLoading(false);
                 return;
@@ -240,7 +243,7 @@ const Search = () => {
             }
         }
 
-        if (selectedSort) {
+        if (selectedSort && selectedSort !== 'normal') {
             switch (selectedSort) {
                 case 'ageAsc':
                     filteredList.sort((a, b) =>
@@ -261,6 +264,8 @@ const Search = () => {
                     break;
             }
             console.log("After sorting:", filteredList);
+        } else {
+            console.log("Using default order from backend");
         }
 
         setFilteredProfiles({...profile, userProfileMatchesEntityList: filteredList});

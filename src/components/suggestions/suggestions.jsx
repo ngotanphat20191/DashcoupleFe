@@ -21,7 +21,7 @@ const Suggestions = () => {
     const [indexskip, setindexskip] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedSort, setSelectedSort] = useState('ageAsc');
+    const [selectedSort, setSelectedSort] = useState('normal');
     const [turn, setTurn] = useState(() => {
         try {
             const storedTurn = localStorage.getItem("turn");
@@ -245,7 +245,7 @@ const Suggestions = () => {
             }
         }
 
-        if (selectedSort) {
+        if (selectedSort && selectedSort !== 'normal') {
             switch (selectedSort) {
                 case 'ageAsc':
                     filteredList.sort((a, b) =>
@@ -266,6 +266,8 @@ const Suggestions = () => {
                     break;
             }
             console.log("After sorting:", filteredList);
+        } else {
+            console.log("Using default order from backend");
         }
 
         setFilteredProfiles({...profile, userProfileMatchesEntityList: filteredList});

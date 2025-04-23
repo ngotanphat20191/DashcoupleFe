@@ -4,6 +4,10 @@ import React, {useEffect} from "react";
 
 const sortOptions = [
     {
+        value: 'normal',
+        label: 'Mặc định',
+    },
+    {
         value: 'ageAsc',
         label: 'Tuổi: từ nhỏ đến lớn',
     },
@@ -37,7 +41,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
         preference?.preferenceRecord?.preferenceAgeMin || 18,
         preference?.preferenceRecord?.preferenceAgeMax || 60
     ]);
-    const [selectedSort, setSelectedSort] = React.useState('ageAsc');
+    const [selectedSort, setSelectedSort] = React.useState('normal');
     const [selectedReligion, setSelectedReligion] = React.useState(
         preference?.preferenceRecord?.preferenceLocation || null
     );
@@ -166,7 +170,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                                 options={interestNames || []}
                                 getOptionLabel={(option) => option.name}
                                 sx={{
-                                    width: '250px',
+                                    width: '150px',
                                     margin: '0px 20px',
                                     '.MuiAutocomplete-tag': {
                                         fontSize: '14px',
@@ -232,7 +236,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                             onChange={handleReligionChange}
                             getOptionLabel={option => option}
                             sx={{
-                                width: '170px',
+                                width: '150px',
                                 '.MuiAutocomplete-tag': {
                                     fontSize: '14px',
                                     padding: '2px 6px',
@@ -278,7 +282,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                             onChange={handleCityChange}
                             getOptionLabel={option => option}
                             sx={{
-                                width: '170px',
+                                width: '150px',
                                 '.MuiAutocomplete-tag': {
                                     fontSize: '14px',
                                     padding: '2px 6px',
@@ -323,7 +327,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                             className="textFieldsearch"
                             value={selectedSort}
                             sx={{
-                                width: '200px',
+                                width: '150px',
                                 '.MuiAutocomplete-tag': {
                                     fontSize: '14px',
                                     padding: '2px 6px',

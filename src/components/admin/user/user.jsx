@@ -243,7 +243,7 @@ export default function User() {
                                                 </Select>
                                             </Stack>
                                             <Stack rowGap={1}>
-                                                <Typography variant="body2">Trình tự học vấn</Typography>
+                                                <Typography variant="body2">Theo thu tu</Typography>
                                                 <Select
                                                     defaultValue="asc"
                                                     onChange={(_, value) =>
