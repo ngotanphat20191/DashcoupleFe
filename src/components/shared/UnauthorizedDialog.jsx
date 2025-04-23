@@ -10,7 +10,7 @@ import {
   Box 
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const PUBLIC_ROUTES = [
   '/login', 
@@ -28,7 +28,7 @@ export default function UnauthorizedDialog() {
   
   const isTokenExpired = (token) => {
     try {
-      const decodedToken = jwt_decode(token);
+      const decodedToken = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       
       if (decodedToken.exp && decodedToken.exp < currentTime) {

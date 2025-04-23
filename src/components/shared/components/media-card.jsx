@@ -156,23 +156,19 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         if (!userID) return;
         
         try {
-            // Create cancel token for request
             const cancelTokenSource = createCancelToken();
             
-            // Make API call
             const response = await matchesAxios.post('/matches/create', {
                 UserIdTarget: userID
             }, {
                 cancelToken: cancelTokenSource.token
             });
             
-            // Success handling
             if (response.data) {
-                // Use a more user-friendly notification instead of alert
+                alert("Ghép đôi thành công")
                 console.log("Match created:", response.data);
             }
         } catch (err) {
-            // Error handling
             if (err.response?.status === 400) {
                 setError(err.response.data);
             } else {
@@ -1113,4 +1109,4 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
 }
 
 // Export the component as default
-export default memo(MediaCard);
+export default Fmemo(MediaCard);
