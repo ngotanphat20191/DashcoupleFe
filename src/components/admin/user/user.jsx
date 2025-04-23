@@ -206,7 +206,7 @@ export default function User() {
                                                     setSearchData(prev => ({ ...prev, gender: value }))
                                                 }
                                             >
-                                                <Option value="">Default</Option>
+                                                <Option value=""></Option>
                                                 <Option value="nam">Nam</Option>
                                                 <Option value="nữ">Nữ</Option>
                                             </Select>
@@ -219,7 +219,7 @@ export default function User() {
                                                     setSearchData(prev => ({ ...prev, relationship: value }))
                                                 }
                                             >
-                                                <Option value="">Default</Option>
+                                                <Option value=""></Option>
                                                 <Option value="người yêu">Người yêu</Option>
                                                 <Option value="bạn bè">Bạn bè</Option>
                                             </Select>
@@ -265,7 +265,7 @@ export default function User() {
                                                     setSearchData(prev => ({ ...prev, type: value }))
                                                 }
                                             >
-                                                <Option value="">Default</Option>
+                                                <Option value=""></Option>
                                                 <Option value="COUPLE">Couple</Option>
                                                 <Option value="ADMIN">Admin</Option>
                                             </Select>
@@ -278,7 +278,7 @@ export default function User() {
                                                     setSearchData(prev => ({ ...prev, status: value }))
                                                 }
                                             >
-                                                <Option value="">Default</Option>
+                                                <Option value=""></Option>
                                                 <Option value="Active">Hoạt động</Option>
                                                 <Option value="NotActive">Dừng hoạt động</Option>
                                             </Select>
@@ -291,7 +291,7 @@ export default function User() {
                                                     setSearchData(prev => ({ ...prev, religion: value }))
                                                 }
                                             >
-                                                <Option value="">Default</Option>
+                                                <Option value=""></Option>
                                                 <Option value="Phật giáo">Phật giáo</Option>
                                                 <Option value="Thiên chúa giáo">Thiên chúa giáo</Option>
                                                 <Option value="Kito giáo">Kito giáo</Option>

@@ -10,6 +10,7 @@ import {
   Box 
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import jwt_decode from 'jwt-decode';
 
 const PUBLIC_ROUTES = [
   '/login', 
@@ -21,16 +22,42 @@ const PUBLIC_ROUTES = [
 
 export default function UnauthorizedDialog() {
   const [open, setOpen] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState('Bạn cần đăng nhập để truy cập trang này.');
   const navigate = useNavigate();
   const location = useLocation();
   
+  const isTokenExpired = (token) => {
+    try {
+      const decodedToken = jwt_decode(token);
+      const currentTime = Date.now() / 1000;
+      
+      if (decodedToken.exp && decodedToken.exp < currentTime) {
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return true;
+    }
+  };
+  
   useEffect(() => {
-
     const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
-    const hasToken = !!localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    const hasToken = !!token;
     
-    if (!isPublicRoute && !hasToken) {
-      setOpen(true);
+    if (!isPublicRoute) {
+      if (!hasToken) {
+        setDialogMessage('Bạn cần đăng nhập để truy cập trang này.');
+        setOpen(true);
+      } else if (isTokenExpired(token)) {
+        setDialogMessage('Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.');
+        localStorage.removeItem('token');
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
     } else {
       setOpen(false);
     }
@@ -77,7 +104,7 @@ export default function UnauthorizedDialog() {
       </DialogTitle>
       <DialogContent>
         <Typography align="center" sx={{ mb: 2 }}>
-          Bạn cần đăng nhập để truy cập trang này.
+          {dialogMessage}
         </Typography>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>

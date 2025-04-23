@@ -47,13 +47,11 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
     const handleButtonClick = useCallback((direction) => {
         setSwipeEffect(direction);
         
-        // Use a single timeout for better performance
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => prevIndex + 1);
         }, 300);
         
-        // Clean up timeout to prevent memory leaks
         return () => clearTimeout(timer);
     }, []);
     
@@ -111,7 +109,6 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
     const handlePreviewCardClick = useCallback(() => {
         handlePreviewNextImage();
     }, [handlePreviewNextImage]);
-    // Optimize suggestion handlers with useCallback
     const handleSkipSuggestion = useCallback((currentIndex) => {
         if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
             const userId = profiles[currentIndex].userRecord.User_ID;
@@ -121,12 +118,10 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         }
     }, [setindexskip, profiles]);
     
-    // Optimize API calls with proper error handling and loading states
     const handleLikeSuggestion = useCallback(async (currentIndex, userID) => {
         if (!userID) return;
         
         try {
-            // Optimistically update UI
             if (setindexskip) {
                 setindexskip(prev => [...prev, userID]);
             }

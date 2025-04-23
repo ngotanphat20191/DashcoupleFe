@@ -1,17 +1,18 @@
-import {useEffect, useState, useCallback, memo, useMemo} from 'react';
+import {useEffect, useState, useCallback, useMemo, memo} from 'react';
 import SuggestionsFilters from '../suggestions/components/suggestions-filters.jsx';
 import ProfilesGrid from '../shared/profiles-grid.jsx';
 import Title from '../shared/title.jsx';
 import Divider from '@mui/material/Divider';
-import {Box, Stack, Typography, Button} from '@mui/material';
+import {Box, Stack, Typography, Button, Alert} from '@mui/material';
 import Homenav from '../home/homenav.jsx';
 import {religionNames} from '../../datas/template.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
-import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
+import {loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
+
 const Search = () => {
     const [profile, setprofile] = useState(null);
     const [filteredProfiles, setFilteredProfiles] = useState(null);
@@ -21,73 +22,61 @@ const Search = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedSort, setSelectedSort] = useState('ageAsc');
-    
-    const [turn, setturn] = useState(() => {
+    const [turn, setTurn] = useState(() => {
         try {
             const storedTurn = localStorage.getItem("turn");
-            return storedTurn !== null ? parseInt(storedTurn, 10) : 0;
+            if (storedTurn === null) {
+                return 1;
+            }
+            const parsedTurn = parseInt(storedTurn, 10);
+            return isNaN(parsedTurn) ? 1 : parsedTurn;
         } catch (e) {
-            return 0;
+            console.error("Error reading from localStorage:", e);
+            return 1;
         }
     });
+
     useEffect(() => {
+
         const cancelTokenSource = createCancelToken();
-        
         const fetchAllData = async () => {
             setIsLoading(true);
-            setError(null); // Reset any previous errors
-            
+            setError(null);
+
             try {
-                // Initialize parameters first
                 await initParemeter();
-                
-                // Fetch data in parallel
-                const [interestsResponse, preferenceResponse, profileResponse] = await Promise.all([
+
+                const [interestsResponse, preferenceResponse] = await Promise.all([
                     loginSignUpAxios.get('/signup/interest', {
                         cancelToken: cancelTokenSource.token
                     }),
                     matchesAxios.get('/suggestion/preference', {
                         cancelToken: cancelTokenSource.token
-                    }),
-                    matchesAxios.post('/search', {}, {
-                        cancelToken: cancelTokenSource.token
                     })
                 ]);
-                
-                const interests = interestsResponse.data;
-                const preference = preferenceResponse.data;
-                const profileData = profileResponse.data;
-                
-                if (!profileData || !Array.isArray(profileData)) {
-                    setError("Dữ liệu không hợp lệ. Vui lòng thử lại sau.");
-                    setIsLoading(false);
-                    return;
-                }
-                setinterests(interests);
-                setpreference(preference);
-                setprofile(profileData);
-                setFilteredProfiles(profileData);
-                setindexskip([]);
+
+                setinterests(interestsResponse.data);
+                setpreference(preferenceResponse.data);
+
+                await handleSuggestion();
+
                 setIsLoading(false);
-                
             } catch (err) {
                 if (axios.isCancel(err)) {
                     return;
                 }
-                
+
                 setIsLoading(false);
                 setError("Error loading data. Please try again.");
             }
         };
-        
+
         fetchAllData();
-        
+
         return () => {
-            // Cleanup function to cancel requests if component unmounts
             cancelTokenSource.cancel('Component unmounted');
         };
     }, []);
-
     useEffect(() => {
         const handleBeforeUnload = () => {
             localStorage.setItem("indexSuggestionSkip", JSON.stringify(indexskip));
@@ -97,143 +86,192 @@ const Search = () => {
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };
-    }, [indexskip, turn]);
+    }, [indexskip, turn])
+    const handleSkip = useCallback((data) => {
+        if (!data || !data.id) return;
+        setindexskip(prev => [...prev, data.id]);
+    }, []);
 
-    // Initialize parameters from localStorage
     const initParemeter = useCallback(() => {
         try {
-            // Initialize localStorage if needed
             if (localStorage.getItem("indexSuggestionSkip") === null) {
                 localStorage.setItem("indexSuggestionSkip", JSON.stringify([]));
             }
             if (localStorage.getItem("turn") === null) {
-                localStorage.setItem("turn", '0');
+                localStorage.setItem("turn", '1');
             }
-            
-            // Get values from localStorage
-            setturn(parseInt(localStorage.getItem("turn") || "0", 10));
+
+            setTurn(parseInt(localStorage.getItem("turn") || "1", 10));
             const storedIndexes = JSON.parse(localStorage.getItem("indexSuggestionSkip")) || [];
             setindexskip(storedIndexes);
-        } catch (e) {
-            console.error("Error initializing parameters:", e);
-            // Set defaults if localStorage fails
-            setturn(0);
+        } catch (err) {
+            setTurn(1);
             setindexskip([]);
         }
     }, []);
+    const handleSuggestion = useCallback(async () => {
+        try {
+            const cancelTokenSource = createCancelToken();
+
+            const response = await matchesAxios.post('/search', {}, {
+                cancelToken: cancelTokenSource.token
+            });
+
+            const profileData = response.data;
+
+            if (!profileData || !profileData.userProfileMatchesEntityList || !Array.isArray(profileData.userProfileMatchesEntityList)) {
+                setError("Dữ liệu không hợp lệ. Vui lòng thử lại sau.");
+                setIsLoading(false);
+                return;
+            }
+
+            setprofile(profileData);
+            setFilteredProfiles(profileData);
+
+            if (checkTime(profileData.listCreateTime)) {
+                setindexskip([]);
+                setTurn(1);
+            }
+        } catch (err) {
+            if (axios.isCancel(err)) {
+                return;
+            }
+
+            if (err.response?.status === 400) {
+                setError(err.response.data);
+            } else {
+                setError("Failed to load suggestions");
+            }
+        }
+    }, [turn]);
+
+    function checkTime(data) {
+        const listCreateTime = new Date(data);
+        const now = new Date();
+        const diffMs = now - listCreateTime;
+        const diffMinutes = diffMs / (1000 * 60);
+        if (diffMinutes >= 0 && diffMinutes <= 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     // Calculate age from date of birth
     const calculateAge = useCallback((dob) => {
         if (!dob) return 0;
-        
+
         try {
             const birth = new Date(dob);
             const today = new Date();
             let age = today.getFullYear() - birth.getFullYear();
             const monthDiff = today.getMonth() - birth.getMonth();
             const dayDiff = today.getDate() - birth.getDate();
-    
+
             if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
                 age--;
             }
-    
+
             return age;
         } catch (error) {
             console.error("Error calculating age:", error);
             return 0;
         }
     }, []);
-
-    // Filter and sort profiles based on preference
     useEffect(() => {
         if (!profile || !preference) return;
 
 
-        // Check if profile is an array
-        if (!Array.isArray(profile)) {
-            console.error("Profile data is not an array:", profile);
+        if (!profile.userProfileMatchesEntityList || !Array.isArray(profile.userProfileMatchesEntityList)) {
+            console.error("Profile data doesn't have valid userProfileMatchesEntityList property:", profile);
             return;
         }
 
-        // If the list is empty, don't proceed with filtering
-        if (profile.length === 0) {
+        if (profile.userProfileMatchesEntityList.length === 0) {
             console.log("No profiles to filter - empty list");
             return;
         }
 
-        // Create a copy of the original profiles
-        let filteredList = [...profile];
+        // First filter out profiles that are in the indexskip array
+        let filteredList = [...profile.userProfileMatchesEntityList].filter(item =>
+            !indexskip.includes(item.userRecord.User_ID)
+        );
+        console.log("After skipping disliked profiles:", filteredList);
 
-        // Filter by age range if preference is available
         if (preference.preferenceRecord) {
             const minAge = preference.preferenceRecord.preferenceAgeMin || 18;
             const maxAge = preference.preferenceRecord.preferenceAgeMax || 60;
-            
+
             filteredList = filteredList.filter(item => {
                 const age = calculateAge(item.userRecord.date_of_birth);
                 return age >= minAge && age <= maxAge;
             });
+            console.log("After age filter:", filteredList);
         }
 
-        // Filter by interests if preference interests are selected
         if (preference.preferenceInterest && preference.preferenceInterest.length > 0) {
             filteredList = filteredList.filter(item => {
-                // If the profile has no interests, filter it out when interests are selected
                 if (!item.interest || item.interest.length === 0) return false;
-                
-                // Check if any of the profile's interests match the selected interests
-                return item.interest.some(interestId => 
+
+                return item.interest.some(interestId =>
                     preference.preferenceInterest.includes(interestId)
                 );
             });
+            console.log("After interest filter:", filteredList);
         }
 
-        // Filter by religion if selected
         if (preference.preferenceRecord && preference.preferenceRecord.preferenceLocation) {
             const selectedReligion = preference.preferenceRecord.preferenceLocation;
             if (selectedReligion) {
-                filteredList = filteredList.filter(item => 
+                filteredList = filteredList.filter(item =>
                     item.userRecord.religion === selectedReligion
                 );
+                console.log("After religion filter:", filteredList);
+            }
+        }
+        
+        if (preference.preferenceRecord && preference.preferenceRecord.preferenceCity) {
+            const selectedCity = preference.preferenceRecord.preferenceCity;
+            if (selectedCity) {
+                filteredList = filteredList.filter(item => 
+                    item.userRecord.city === selectedCity
+                );
+                console.log("After city filter:", filteredList);
             }
         }
 
-        // Sort profiles based on selected sort option
         if (selectedSort) {
             switch (selectedSort) {
                 case 'ageAsc':
-                    filteredList.sort((a, b) => 
+                    filteredList.sort((a, b) =>
                         calculateAge(a.userRecord.date_of_birth) - calculateAge(b.userRecord.date_of_birth)
                     );
                     break;
                 case 'ageDesc':
-                    filteredList.sort((a, b) => 
+                    filteredList.sort((a, b) =>
                         calculateAge(b.userRecord.date_of_birth) - calculateAge(a.userRecord.date_of_birth)
                     );
                     break;
                 case 'alphabet':
-                    filteredList.sort((a, b) => 
+                    filteredList.sort((a, b) =>
                         a.userRecord.name.localeCompare(b.userRecord.name)
                     );
                     break;
                 default:
-                    // Default sorting (no sorting)
                     break;
             }
             console.log("After sorting:", filteredList);
         }
 
-        // Update filtered profiles
-        setFilteredProfiles(filteredList);
-    }, [profile, preference, selectedSort, calculateAge]);
+        setFilteredProfiles({...profile, userProfileMatchesEntityList: filteredList});
+        console.log("Updated filtered profiles:", {...profile, userProfileMatchesEntityList: filteredList});
+    }, [profile, preference, selectedSort, calculateAge, indexskip]);
 
-    // Handle sort change from SuggestionsFilters
     const handleSortChange = useCallback((sortValue) => {
         setSelectedSort(sortValue);
     }, []);
 
-    const searchContent = useMemo(() => {
-        // Show loading state
+    const suggestionsContent = useMemo(() => {
         if (isLoading) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -242,42 +280,40 @@ const Search = () => {
                 </Box>
             );
         }
-        
-        // Show error state
+
         if (error) {
             return (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
-                    <Typography color="error" variant="h6" sx={{ mb: 2 }}>
+                    <Alert severity="error" sx={{ mb: 2 }}>
                         {error}
-                    </Typography>
+                    </Alert>
                     <Button variant="contained" onClick={() => window.location.reload()}>
                         Thử lại
                     </Button>
                 </Box>
             );
         }
-        
-        // Main content when data is loaded
+
         return (
             <Stack style={{
-                alignItems: "center", 
-                border: "2px solid #fc6ae7", 
-                width: "80%", 
-                marginLeft: "200px", 
-                marginRight: "100px", 
-                marginTop: "50px", 
-                borderRadius: "20px", 
+                alignItems: "center",
+                border: "2px solid #fc6ae7",
+                width: "80%",
+                marginTop: "50px",
+                marginLeft: "200px",
+                marginRight: "100px",
+                borderRadius: "20px",
                 backgroundColor: "#ffe8fd"
             }}>
                 <MemoizedHomenav />
-                <MemoizedTitle textTitle="Tìm kiếm" />
-                
-                <Box sx={{ width: '100%', padding: '10px 20px 0' }}>
+                <MemoizedTitle textTitle="Gợi ý" />
+
+                <Box sx={{ width: '100%' ,  padding: '10px 20px 0' }}>
                     <Typography variant="h6" fontWeight="bold" color="#555">
-                        Bộ lọc tìm kiếm
+                        Bộ lọc gợi ý
                     </Typography>
                 </Box>
-                
+
                 {preference && interests && (
                     <SuggestionsFilters
                         preference={preference}
@@ -287,27 +323,26 @@ const Search = () => {
                         onSortChange={handleSortChange}
                     />
                 )}
-                
+
                 <Divider />
-                
                 {(() => {
-                    console.log("Render check:", filteredProfiles, interests);
-                    
-                    // Check if we have valid data to display
-                    if (!filteredProfiles || !Array.isArray(filteredProfiles) || 
-                        filteredProfiles.length === 0 || 
+                    if (!filteredProfiles || !filteredProfiles.userProfileMatchesEntityList ||
+                        !Array.isArray(filteredProfiles.userProfileMatchesEntityList) ||
+                        filteredProfiles.userProfileMatchesEntityList.length === 0 ||
                         !interests || !Array.isArray(interests)) {
-                        
+
                         return (
                             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh", flexDirection: "column" }}>
                                 <Typography variant="h6" color="#555" sx={{ mb: 2 }}>
-                                    {filteredProfiles && Array.isArray(filteredProfiles) && filteredProfiles.length === 0 
-                                        ? "Không có dữ liệu phù hợp với bộ lọc" 
-                                        : "Không có dữ liệu từ máy chủ. Vui lòng thử lại sau."}
+                                    {filteredProfiles && filteredProfiles.userProfileMatchesEntityList &&
+                                    filteredProfiles.userProfileMatchesEntityList.length === 0
+                                        ? "Không có gợi ý nào phù hợp với bộ lọc"
+                                        : "Không có gợi ý nào. Vui lòng thử lại sau."}
                                 </Typography>
-                                {filteredProfiles && Array.isArray(filteredProfiles) && filteredProfiles.length === 0 ? (
-                                    <Button 
-                                        variant="contained" 
+                                {filteredProfiles && filteredProfiles.userProfileMatchesEntityList &&
+                                filteredProfiles.userProfileMatchesEntityList.length === 0 ? (
+                                    <Button
+                                        variant="contained"
                                         onClick={() => {
                                             // Reset filters to default
                                             if (preference) {
@@ -318,7 +353,8 @@ const Search = () => {
                                                         ...preference.preferenceRecord,
                                                         preferenceAgeMin: 18,
                                                         preferenceAgeMax: 60,
-                                                        preferenceLocation: null
+                                                        preferenceLocation: null,
+                                                        preferenceCity: null
                                                     }
                                                 };
                                                 setpreference(resetPreference);
@@ -334,9 +370,9 @@ const Search = () => {
                                         Xóa bộ lọc
                                     </Button>
                                 ) : (
-                                    <Button 
-                                        variant="contained" 
-                                        onClick={() => window.location.reload()}
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleSuggestion}
                                         sx={{
                                             backgroundColor: '#fc6ae7',
                                             '&:hover': {
@@ -344,23 +380,21 @@ const Search = () => {
                                             }
                                         }}
                                     >
-                                        Tải lại dữ liệu
+                                        Tải lại gợi ý
                                     </Button>
                                 )}
                             </Box>
                         );
                     }
-                    
-                    // We have valid data, show the profiles
                     return (
                         <>
                             <Box sx={{ width: '100%', padding: '10px 20px' }}>
                                 <Typography variant="subtitle1" fontWeight="bold" color="#555">
-                                    Hiển thị {filteredProfiles.length} kết quả phù hợp
+                                    Hiển thị {filteredProfiles.userProfileMatchesEntityList.length} kết quả phù hợp
                                 </Typography>
                             </Box>
                             <ProfilesGrid
-                                profiles={filteredProfiles}
+                                profiles={filteredProfiles.userProfileMatchesEntityList}
                                 type="suggestion"
                                 indexSkip={indexskip}
                                 setindexskip={setindexskip}
@@ -371,9 +405,8 @@ const Search = () => {
                 })()}
             </Stack>
         );
-    }, [isLoading, error, filteredProfiles, preference, interests, indexskip, setindexskip, handleSortChange]);
-    
-    return searchContent;
-};
+    }, [isLoading, error, filteredProfiles, profile, preference, interests, indexskip, setindexskip, handleSuggestion, handleSortChange]);
 
-export default Search;
+    return suggestionsContent;
+};
+export default memo(Search);

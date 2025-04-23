@@ -32,6 +32,11 @@ export default function CityAndEducationFilter({ isLoading, searchData, handleSe
                     value={searchData.city}
                     disabled={isLoading}
                 >
+                    <Option 
+                        value="" 
+                        select-type="thanhpho"
+                        onClick={() => handleSelectChange('city', '')}
+                    ></Option>
                     {thanhpho.map((tp, index) => (
                         <Option
                             select-type="thanhpho"
@@ -51,6 +56,10 @@ export default function CityAndEducationFilter({ isLoading, searchData, handleSe
                     value={searchData.education}
                     disabled={isLoading}
                 >
+                    <Option 
+                        value="" 
+                        onClick={() => handleSelectChange('education', '')}
+                    ></Option>
                     {trinhdohocvan.map((tdhv, index) => (
                         <Option
                             value={tdhv}

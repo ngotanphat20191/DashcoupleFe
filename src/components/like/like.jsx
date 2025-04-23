@@ -15,6 +15,7 @@ const Like = () => {
     const [interests, setinterests] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [hasNoData, setHasNoData] = useState(false);
 
     useEffect(() => {
         const cancelTokenSource = createCancelToken();
@@ -36,6 +37,8 @@ const Like = () => {
                 setinterests(interestsResponse.data);
                 setprofile(likedResponse.data);
                 
+                // Check if there are no profiles
+                setHasNoData(likedResponse.data.length === 0);
                 setIsLoading(false);
             } catch (err) {
                 if (axios.isCancel(err)) {
@@ -70,6 +73,8 @@ const Like = () => {
             });
             
             setprofile(response.data);
+            // Check if there are no profiles
+            setHasNoData(response.data.length === 0);
             setIsLoading(false);
         } catch (err) {
             if (axios.isCancel(err)) {
@@ -128,13 +133,7 @@ const Like = () => {
                 <MemoizedTitle textTitle="Cơ hội ghép đôi" />
                 <MemoizedHomenav />
                 
-                {profile?.length > 0 && interests?.length > 0 ? (
-                    <ProfilesGrid
-                        profiles={profile}
-                        type="like"
-                        interests={interests}
-                    />
-                ) : (
+                {hasNoData ? (
                     <Box sx={{ 
                         display: "flex", 
                         flexDirection: "column",
@@ -193,10 +192,16 @@ const Like = () => {
                             Tải lại
                         </Button>
                     </Box>
+                ) : (
+                    <ProfilesGrid
+                        profiles={profile}
+                        type="like"
+                        interests={interests}
+                    />
                 )}
             </Stack>
         );
-    }, [isLoading, error, profile, interests, handleLiked]);
+    }, [isLoading, error, profile, interests, handleLiked, hasNoData]);
     
     return likeContent;
 };

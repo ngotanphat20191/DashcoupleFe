@@ -28,7 +28,6 @@ export const AuthGuard = ({ children }) => {
 
   const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
 
-  // If on a protected route and not authenticated, show unauthorized dialog
   if (!isAuthenticated && !isPublicRoute) {
     return <UnauthorizedDialog />;
   }

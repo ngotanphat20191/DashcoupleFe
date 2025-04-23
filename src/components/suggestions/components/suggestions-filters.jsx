@@ -16,7 +16,21 @@ const sortOptions = [
         label: 'Tên',
     },
 ];
-
+const thanhpho = [
+    "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu",
+    "Bắc Ninh", "Bến Tre", "Bình Định", "Bình Dương", "Bình Phước",
+    "Bình Thuận", "Cà Mau", "Cần Thơ", "Cao Bằng", "Đà Nẵng",
+    "Đắk Lắk", "Đắk Nông", "Điện Biên", "Đồng Nai", "Đồng Tháp",
+    "Gia Lai", "Hà Giang", "Hà Nam", "Hà Nội", "Hà Tĩnh",
+    "Hải Dương", "Hải Phòng", "Hậu Giang", "Hòa Bình", "Hưng Yên",
+    "Khánh Hòa", "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng",
+    "Lạng Sơn", "Lào Cai", "Long An", "Nam Định", "Nghệ An",
+    "Ninh Bình", "Ninh Thuận", "Phú Thọ", "Phú Yên", "Quảng Bình",
+    "Quảng Nam", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sóc Trăng",
+    "Sơn La", "Tây Ninh", "Thái Bình", "Thái Nguyên", "Thanh Hóa",
+    "Thừa Thiên Huế", "Tiền Giang", "TP. Hồ Chí Minh", "Trà Vinh", "Tuyên Quang",
+    "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
+];
 const SuggestionsFilters = ({preference, interestNames, religionNames, setpreference, onSortChange}) => {
     const tongiao = ['Phật giáo', 'Thiên chúa giáo', 'Kito giáo', 'Hindu giáo', 'Hồi giáo'];
     const [ageRange, setAgeRange] = React.useState([
@@ -26,6 +40,9 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
     const [selectedSort, setSelectedSort] = React.useState('ageAsc');
     const [selectedReligion, setSelectedReligion] = React.useState(
         preference?.preferenceRecord?.preferenceLocation || null
+    );
+    const [selectedCity, setSelectedCity] = React.useState(
+        preference?.preferenceRecord?.preferenceCity || null
     );
 
     // Update age range in preference when it changes
@@ -55,6 +72,19 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
             setpreference(updatedPreference);
         }
     }, [selectedReligion]);
+    
+    useEffect(() => {
+        if (preference && selectedCity !== undefined) {
+            const updatedPreference = {
+                ...preference,
+                preferenceRecord: {
+                    ...preference.preferenceRecord,
+                    preferenceCity: selectedCity
+                }
+            };
+            setpreference(updatedPreference);
+        }
+    }, [selectedCity]);
 
     const handleAgeChange = (event, newAgeRange) => {
         setAgeRange(newAgeRange);
@@ -71,6 +101,10 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
 
     const handleReligionChange = (event, newValue) => {
         setSelectedReligion(newValue);
+    };
+    
+    const handleCityChange = (event, newValue) => {
+        setSelectedCity(newValue);
     };
 
     return (
@@ -219,6 +253,52 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                                     {...params} 
                                     variant="outlined" 
                                     placeholder="Chọn tôn giáo" 
+                                    fullWidth
+                                />
+                            }
+                        />
+                    </div>
+                </div>
+                <div>
+                    <Typography
+                        id="discrete-slider"
+                        className="titleGutterbottomSuggest"
+                        align="center"
+                        fontWeight="bold"
+                        sx={{marginBottom: "10px"}}
+                    >
+                        Thành phố
+                    </Typography>
+                    <div className="interestChipsSuggest">
+                        <Autocomplete
+                            className="sliderSuggest"
+                            disablePortal
+                            options={thanhpho}
+                            value={selectedCity}
+                            onChange={handleCityChange}
+                            getOptionLabel={option => option}
+                            sx={{
+                                width: '170px',
+                                '.MuiAutocomplete-tag': {
+                                    fontSize: '14px',
+                                    padding: '2px 6px',
+                                    height: '24px',
+                                    backgroundColor: '#ffb8f1',
+                                    color: '#333'
+                                },
+                                '.MuiInputBase-root': {
+                                    minHeight: '32px',
+                                    fontSize: '14px'
+                                },
+                                '.MuiOutlinedInput-root': {
+                                    padding: '4px'
+                                }
+                            }}
+                            renderInput={(params) =>
+                                <TextField 
+                                    {...params} 
+                                    variant="outlined" 
+                                    placeholder="Chọn thành phố" 
                                     fullWidth
                                 />
                             }

@@ -16,24 +16,29 @@ const Visit = () => {
                 const res = await loginSignUpAxios.get('/signup/interest');
                 setinterests(res.data);
             } catch (err) {
+                console.error("Error fetching interests:", err);
             }
         };
         const fetchData = async () => {
             try {
                await handleLike();
             } catch (error) {
+                console.error("Error fetching likes:", error);
             }
         };
         fetchData();
-        fetchInterests()
+        fetchInterests();
     }, []);
     async function handleLike() {
         try {
             const response = await matchesAxios.get('/like');
             setprofile(response.data);
         } catch (err) {
+            console.error("Error in handleLike:", err);
             if (err.response?.status === 400) {
+                console.error("Bad request:", err.response.data);
             }
+            setprofile([]);
         }
     }
 
