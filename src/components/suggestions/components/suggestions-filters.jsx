@@ -138,7 +138,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                         getAriaValueText={value => `${value} tuổi`}
                         min={18}
                         max={60}
-                        style={{width: '150px'}}
+                        style={{width: '100px'}}
                         sx={{
                             color: '#fc6ae7',
                             '& .MuiSlider-thumb': {
@@ -170,7 +170,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                                 options={interestNames || []}
                                 getOptionLabel={(option) => option.name}
                                 sx={{
-                                    width: '150px',
+                                    width: '170px',
                                     margin: '0px 20px',
                                     '.MuiAutocomplete-tag': {
                                         fontSize: '14px',
@@ -236,7 +236,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                             onChange={handleReligionChange}
                             getOptionLabel={option => option}
                             sx={{
-                                width: '150px',
+                                width: '170px',
                                 '.MuiAutocomplete-tag': {
                                     fontSize: '14px',
                                     padding: '2px 6px',
@@ -282,7 +282,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                             onChange={handleCityChange}
                             getOptionLabel={option => option}
                             sx={{
-                                width: '150px',
+                                width: '170px',
                                 '.MuiAutocomplete-tag': {
                                     fontSize: '14px',
                                     padding: '2px 6px',
@@ -327,7 +327,7 @@ const SuggestionsFilters = ({preference, interestNames, religionNames, setprefer
                             className="textFieldsearch"
                             value={selectedSort}
                             sx={{
-                                width: '150px',
+                                width: '170px',
                                 '.MuiAutocomplete-tag': {
                                     fontSize: '14px',
                                     padding: '2px 6px',
