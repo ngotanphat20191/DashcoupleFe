@@ -60,6 +60,7 @@ const Chat = () => {
     const clientRef = useRef(null);
     const [openMenuId, setOpenMenuId] = useState(null);
     const client = clientRef.current;
+    const [connectionAttempts, setConnectionAttempts] = useState(0);
 
     const toggleMenu = (id) => {
         setOpenMenuId(prev => (prev === id ? null : id));
@@ -84,21 +85,24 @@ const Chat = () => {
         })
     };
     useEffect(() => {
+        if (!homepageData) return;
+
         // Configure SockJS to use a longer timeout
         const sockjsOptions = {
             transports: ['websocket', 'xhr-streaming', 'xhr-polling'],
             timeout: 30000 // 30 seconds timeout
         };
 
-        // Create SockJS connection with options
-        const socket = new SockJS('https://present-ghastly-puma.ngrok-free.app/api/websocket', null, sockjsOptions);
+        // Use the new secure websocket endpoint for ngrok connections
+        // This uses the new /api/wss endpoint we configured in the API Gateway
+        const socket = new SockJS('https://present-ghastly-puma.ngrok-free.app/api/wss', null, sockjsOptions);
 
         // Configure STOMP client
         const client = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,
-            heartbeatIncoming: 0,  // Disable heartbeat to avoid disconnections through ngrok
-            heartbeatOutgoing: 0,  // Disable heartbeat to avoid disconnections through ngrok
+            heartbeatIncoming: 4000,  // Set a reasonable heartbeat value
+            heartbeatOutgoing: 4000,  // Set a reasonable heartbeat value
             connectHeaders: {
                 'X-Forwarded-Proto': 'https',
                 'X-Forwarded-Port': '443'
@@ -109,6 +113,7 @@ const Chat = () => {
             onConnect: () => {
                 console.log("WebSocket connected successfully!");
                 setIsSocketConnected(true);
+                setConnectionAttempts(0); // Reset connection attempts on successful connection
 
                 client.subscribe(`/topic/message/${homepageData.userid}`, (res) => {
                     try {
@@ -149,14 +154,35 @@ const Chat = () => {
             onStompError: (frame) => {
                 console.error("STOMP Error:", frame);
                 setError('Connection error. Please try again.');
+                handleReconnect();
             },
             onWebSocketClose: (event) => {
                 console.log("WebSocket closed:", event);
+                handleReconnect();
             },
             onWebSocketError: (event) => {
                 console.error("WebSocket error:", event);
+                handleReconnect();
             }
         });
+
+        // Function to handle reconnection with exponential backoff
+        const handleReconnect = () => {
+            if (connectionAttempts < 5) { // Limit reconnection attempts
+                const delay = Math.min(1000 * Math.pow(2, connectionAttempts), 30000); // Exponential backoff with max 30s
+                console.log(`Attempting to reconnect in ${delay/1000} seconds...`);
+
+                setTimeout(() => {
+                    setConnectionAttempts(prev => prev + 1);
+                    if (client && !client.active) {
+                        client.activate();
+                    }
+                }, delay);
+            } else {
+                console.error("Maximum reconnection attempts reached");
+                setError("Unable to establish a stable connection. Please refresh the page.");
+            }
+        };
 
         // Activate the client
         client.activate();
@@ -168,8 +194,9 @@ const Chat = () => {
                 clientRef.current.deactivate();
             }
         };
-    }, [homepageData]);
+    }, [homepageData, connectionAttempts]);
 
+    // Rest of your component remains the same
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -302,7 +329,6 @@ const Chat = () => {
         setOpen(false);
         setVideoCallInfo(null);
     };
-
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
         const daysMap = ["T8", "T2", "T3", "T4", "T5", "T6", "T7"];
