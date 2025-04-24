@@ -11,8 +11,7 @@ const MemoizedMediaCard = memo(MediaCard);
 
 const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
     // Check for empty or invalid profiles
-    if (!profiles || _.isEmpty(profiles) || (Array.isArray(profiles) && profiles.length === 0)) {
-        console.log("ProfilesGrid: Empty or invalid profiles detected", profiles);
+    if (profiles.length === indexSkip.length) {
         return (
             <Box className="emptyPageWrapperProfileGrid" sx={{ 
                 display: "flex", 

@@ -31,6 +31,7 @@ import Link from '@mui/material/Link';
 import {baseAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
 import VideocamIcon from '@mui/icons-material/Videocam';
 import ChatImageUploader from './components/chatuploadimage.jsx';
+import ChatIconSelector from './components/chaticons.jsx';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const MemoizedHomenav = memo(Homenav);
@@ -61,6 +62,7 @@ const Chat = () => {
     const [openMenuId, setOpenMenuId] = useState(null);
     const client = clientRef.current;
     const [connectionAttempts, setConnectionAttempts] = useState(0);
+    const [previewImage, setPreviewImage] = useState(null);
 
     const toggleMenu = (id) => {
         setOpenMenuId(prev => (prev === id ? null : id));
@@ -259,7 +261,7 @@ const Chat = () => {
         };
     }, []);
 
-    const sendMessage = useCallback(async (flowMessageId, receiverId, content, image, time) => {
+    const sendMessage = useCallback(async (flowMessageId, receiverId, content, image, time, isIcon = null) => {
         if (!content?.trim() && !image) return;
 
         const messageData = {
@@ -268,6 +270,7 @@ const Chat = () => {
             content: content,
             time: time,
             image: image,
+            isIcon: isIcon
         };
 
         setMessageSocketComplete(prevMessages => [...prevMessages, messageData]);
@@ -288,6 +291,7 @@ const Chat = () => {
                 UserContent: content,
                 FlowMessageId: flowMessageId,
                 UserImage: image,
+                isIcon: isIcon
             });
         } catch (err) {
             console.error("Error sending message:", err);
@@ -328,6 +332,14 @@ const Chat = () => {
     const handleClose = () => {
         setOpen(false);
         setVideoCallInfo(null);
+    };
+    
+    const handleOpenImagePreview = (imageUrl) => {
+        setPreviewImage(imageUrl);
+    };
+    
+    const handleCloseImagePreview = () => {
+        setPreviewImage(null);
     };
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
@@ -372,7 +384,10 @@ const Chat = () => {
             ? messageSocketComplete[messageSocketComplete.length - 1]
             : null;
 
-        return _.map(profile, (matchedProfile) => {
+        return profile
+            .slice()
+            .sort((a, b) => new Date(b.LastMessageSentTime) - new Date(a.LastMessageSentTime))
+            .map((matchedProfile) => {
             const messageToShow = (lastMessage?.flowMessageId === matchedProfile.flowMessageId)
                 ? lastMessage.content
                 : matchedProfile.LastMessage;
@@ -560,17 +575,33 @@ const Chat = () => {
                                             <div className="textBubbleOther">
                                                 {userMessages.content && <div>{userMessages.content}</div>}
                                                 {userMessages.image && (
-                                                    <img
-                                                        src={userMessages.image}
-                                                        alt="Shared image"
-                                                        style={{
-                                                            maxWidth: '200px',
-                                                            maxHeight: '200px',
-                                                            borderRadius: '8px',
-                                                            marginTop: '5px',
-                                                            marginBottom: '5px'
-                                                        }}
-                                                    />
+                                                    userMessages.isIcon ? (
+                                                        <img
+                                                            src={userMessages.image}
+                                                            alt="Icon"
+                                                            style={{
+                                                                maxWidth: '50px',
+                                                                maxHeight: '50px',
+                                                                borderRadius: '8px',
+                                                                marginTop: '5px',
+                                                                marginBottom: '5px'
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <img
+                                                            src={userMessages.image}
+                                                            alt="Shared image"
+                                                            style={{
+                                                                maxWidth: '200px',
+                                                                maxHeight: '200px',
+                                                                borderRadius: '8px',
+                                                                marginTop: '5px',
+                                                                marginBottom: '5px',
+                                                                cursor: 'pointer'
+                                                            }}
+                                                            onClick={() => handleOpenImagePreview(userMessages.image)}
+                                                        />
+                                                    )
                                                 )}
                                                 <Typography style={{ color: "#888888", fontSize: "13px" }}>
                                                     {formatDate(userMessages.time)}
@@ -584,17 +615,33 @@ const Chat = () => {
                                         <div className="textBubbleMe">
                                             {userMessages.content && <div>{userMessages.content}</div>}
                                             {userMessages.image && (
-                                                <img
-                                                    src={userMessages.image}
-                                                    alt="Shared image"
-                                                    style={{
-                                                        maxWidth: '200px',
-                                                        maxHeight: '200px',
-                                                        borderRadius: '8px',
-                                                        marginTop: '5px',
-                                                        marginBottom: '5px'
-                                                    }}
-                                                />
+                                                userMessages.isIcon ? (
+                                                    <img
+                                                        src={userMessages.image}
+                                                        alt="Icon"
+                                                        style={{
+                                                            maxWidth: '50px',
+                                                            maxHeight: '50px',
+                                                            borderRadius: '8px',
+                                                            marginTop: '5px',
+                                                            marginBottom: '5px'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={userMessages.image}
+                                                        alt="Shared image"
+                                                        style={{
+                                                            maxWidth: '200px',
+                                                            maxHeight: '200px',
+                                                            borderRadius: '8px',
+                                                            marginTop: '5px',
+                                                            marginBottom: '5px',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                        onClick={() => handleOpenImagePreview(userMessages.image)}
+                                                    />
+                                                )
                                             )}
                                             <Typography style={{ color: "#888888", fontSize: "13px" }}>
                                                 {formatDate(userMessages.time)}
@@ -612,17 +659,33 @@ const Chat = () => {
                                                 <div className="textBubbleMe">
                                                     {message.content && <div>{message.content}</div>}
                                                     {message.image && (
-                                                        <img
-                                                            src={message.image}
-                                                            alt="Shared image"
-                                                            style={{
-                                                                maxWidth: '200px',
-                                                                maxHeight: '200px',
-                                                                borderRadius: '8px',
-                                                                marginTop: '5px',
-                                                                marginBottom: '5px'
-                                                            }}
-                                                        />
+                                                        message.isIcon ? (
+                                                            <img
+                                                                src={message.image}
+                                                                alt="Icon"
+                                                                style={{
+                                                                    maxWidth: '50px',
+                                                                    maxHeight: '50px',
+                                                                    borderRadius: '8px',
+                                                                    marginTop: '5px',
+                                                                    marginBottom: '5px'
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <img
+                                                                src={message.image}
+                                                                alt="Shared image"
+                                                                style={{
+                                                                    maxWidth: '200px',
+                                                                    maxHeight: '200px',
+                                                                    borderRadius: '8px',
+                                                                    marginTop: '5px',
+                                                                    marginBottom: '5px',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                                onClick={() => handleOpenImagePreview(message.image)}
+                                                            />
+                                                        )
                                                     )}
                                                     <Typography style={{ color: "#888888", fontSize: "13px" }}>
                                                         {formatDate(message.time)}
@@ -638,17 +701,33 @@ const Chat = () => {
                                                 <div className="textBubbleOther">
                                                     {message.content && <div>{message.content}</div>}
                                                     {message.image && (
-                                                        <img
-                                                            src={message.image}
-                                                            alt="Shared image"
-                                                            style={{
-                                                                maxWidth: '200px',
-                                                                maxHeight: '200px',
-                                                                borderRadius: '8px',
-                                                                marginTop: '5px',
-                                                                marginBottom: '5px'
-                                                            }}
-                                                        />
+                                                        message.isIcon ? (
+                                                            <img
+                                                                src={message.image}
+                                                                alt="Icon"
+                                                                style={{
+                                                                    maxWidth: '50px',
+                                                                    maxHeight: '50px',
+                                                                    borderRadius: '8px',
+                                                                    marginTop: '5px',
+                                                                    marginBottom: '5px'
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <img
+                                                                src={message.image}
+                                                                alt="Shared image"
+                                                                style={{
+                                                                    maxWidth: '200px',
+                                                                    maxHeight: '200px',
+                                                                    borderRadius: '8px',
+                                                                    marginTop: '5px',
+                                                                    marginBottom: '5px',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                                onClick={() => handleOpenImagePreview(message.image)}
+                                                            />
+                                                        )
                                                     )}
                                                     <Typography style={{ color: "#888888", fontSize: "13px" }}>
                                                         {formatDate(message.time)}
@@ -690,6 +769,13 @@ const Chat = () => {
                                             }}
                                             disabled={!checkroom}
                                         />
+                                        <ChatIconSelector
+                                            onIconSelected={(iconUrl) => {
+                                                const now = new Date().toLocaleString();
+                                                sendMessage(flowMessageID, targetID, null, iconUrl, now, 1);
+                                            }}
+                                            disabled={!checkroom}
+                                        />
                                         <Button variant="contained" style={{ marginLeft: 5 }} onClick={() => {
                                             const now = new Date().toLocaleString();
                                             sendMessage(flowMessageID, targetID, messageSend, null, now);
@@ -722,6 +808,33 @@ const Chat = () => {
                     </Box>
                 )}
             </Stack>
+
+            {/* Image Preview Dialog */}
+            <Dialog
+                open={!!previewImage}
+                onClose={handleCloseImagePreview}
+                maxWidth="lg"
+                fullWidth
+            >
+                <DialogContent sx={{ padding: 0, overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.9)' }}>
+                    {previewImage && (
+                        <img
+                            src={previewImage}
+                            alt="Full size preview"
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '90vh',
+                                objectFit: 'contain'
+                            }}
+                        />
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', justifyContent: 'center' }}>
+                    <Button onClick={handleCloseImagePreview} sx={{ color: 'white' }}>
+                        Đóng
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

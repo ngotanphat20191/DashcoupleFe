@@ -54,17 +54,34 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         
         return () => clearTimeout(timer);
     }, []);
-    
     const handleLikeButtonClick = useCallback((direction) => {
         setSwipeEffect(direction);
-        
+        const timer = setTimeout(() => {
+            setSwipeEffect(null);
+            setCurrentIndex(prevIndex => prevIndex + 1);
+        }, 300);
+        if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
+            const userId = profiles[currentIndex].userRecord.User_ID;
+            if (userId) {
+                setindexskip(prev => [...prev, userId]);
+            }
+        }
+        return () => clearTimeout(timer);
+    }, []);
+    const handleVisitButtonClick = useCallback((direction) => {
+        setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => {
                 return direction === "left" ? prevIndex - 1 : prevIndex + 1;
             });
         }, 300);
-        
+        if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
+            const userId = profiles[currentIndex].userRecord.User_ID;
+            if (userId) {
+                setindexskip(prev => [...prev, userId]);
+            }
+        }
         return () => clearTimeout(timer);
     }, []);
     // Optimize image navigation with memoized handlers
@@ -422,10 +439,10 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                     )}
                 </div>
                 <div className="buttons">
-                    <button className="prevLiking" onClick={() => handleLikeButtonClick("left")}>
+                    <button className="prevLiking" onClick={() => handleVisitButtonClick("left")}>
                         <GrPrevious size={40}/>
                     </button>
-                    <button className="nextLiking" onClick={() => handleLikeButtonClick("right")}>
+                    <button className="nextLiking" onClick={() => handleVisitButtonClick("right")}>
                         <GrNext size={40}/>
                     </button>
                 </div>
@@ -461,6 +478,32 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                         transition={{ duration: 0.3 }}
                                         onClick={() => handleCardClick(currentIndex)}
                                     >
+                                        <img
+                                            src='../../../assets/images/Nope.png'
+                                            alt="Nope"
+                                            style={{
+                                                position: 'absolute',
+                                                top: 20,
+                                                left: 20,
+                                                width: 100,
+                                                opacity: swipeEffect === 'left' ? 1 : 0,
+                                                transition: 'opacity 0.2s',
+                                                transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',
+                                            }}
+                                        />
+                                        <img
+                                            src='../../../assets/images/Match.png'
+                                            alt="Match"
+                                            style={{
+                                                position: 'absolute',
+                                                top: 20,
+                                                right: 20,
+                                                width: 100,
+                                                opacity: swipeEffect === 'right' ? 1 : 0,
+                                                transition: 'opacity 0.2s',
+                                                transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',
+                                            }}
+                                        />
                                         <div className="image-progress-bar">
                                             {profiles[currentIndex].images.map((_, idx) => (
                                                 <div
@@ -645,12 +688,12 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                     </div>
                     <div className="buttons">
                         <button className="dislike" onClick={() => {
-                            handleButtonClick("left")
+                            handleLikeButtonClick("left")
                         }}>
                             <FaTimes size={35}/>
                         </button>
                         <button className="like" onClick={() => {
-                            handleButtonClick("right")
+                            handleLikeButtonClick("right")
                             handleCreateMatches(profiles[currentIndex].userRecord.User_ID);
                         }}>
                             <FaHeart size={40}/>
@@ -901,6 +944,32 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                     transition={{ duration: 0.3 }}
                                     onClick={() => handleCardClick(currentIndex)}
                                 >
+                                    <img
+                                        src='../../../assets/images/Nope.png'
+                                        alt="Nope"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 20,
+                                            left: 20,
+                                            width: 100,
+                                            opacity: swipeEffect === 'left' ? 1 : 0,
+                                            transition: 'opacity 0.2s',
+                                            transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',
+                                        }}
+                                    />
+                                    <img
+                                        src='../../../assets/images/Match.png'
+                                        alt="Match"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 20,
+                                            right: 20,
+                                            width: 100,
+                                            opacity: swipeEffect === 'right' ? 1 : 0,
+                                            transition: 'opacity 0.2s',
+                                            transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',
+                                        }}
+                                    />
                                     <div className="image-progress-bar">
                                         {profiles[currentIndex].images.map((_, idx) => (
                                             <div

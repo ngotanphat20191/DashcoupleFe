@@ -30,6 +30,7 @@ const Nav = () => {
         baseAxios.get('/notification', {
         }).then((res) => {
             setNotifications(res.data)
+            console.log(res.data)
             fetchTotalNotifications();
         }).catch(err => {
             if(err.status === 400){
