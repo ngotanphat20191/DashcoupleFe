@@ -21,6 +21,9 @@ const NotificationDrawer = ({ toggleDrawer, notifications }) => {
                 case 'Chat':
                     message = `${content}`;
                     break;
+                case 'Payment':
+                    message = `${content}`;
+                    break;
                 default:
             }
             return message;
