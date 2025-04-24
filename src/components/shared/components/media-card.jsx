@@ -12,7 +12,8 @@ import {Box, Chip} from "@mui/material";
 import InterestsIcon from '@mui/icons-material/Interests';
 import { ImQuotesLeft, ImQuotesRight } from "react-icons/im";
 import {baseAxios, createCancelToken, matchesAxios} from "../../../config/axiosConfig.jsx";
-
+import matchicon from '../../../assets/images/Match.png'
+import nopeicon from '../../../assets/images/Nope.png'
 
 const MemoizedChip = memo(Chip);
 
@@ -479,26 +480,28 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                         onClick={() => handleCardClick(currentIndex)}
                                     >
                                         <img
-                                            src='../../../assets/images/Nope.png'
+                                            src={nopeicon}
                                             alt="Nope"
                                             style={{
                                                 position: 'absolute',
-                                                top: 20,
+                                                top: 40,
                                                 left: 20,
-                                                width: 100,
+                                                width: 200,
+                                                height: 200,
                                                 opacity: swipeEffect === 'left' ? 1 : 0,
                                                 transition: 'opacity 0.2s',
                                                 transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',
                                             }}
                                         />
                                         <img
-                                            src='../../../assets/images/Match.png'
+                                            src={matchicon}
                                             alt="Match"
                                             style={{
                                                 position: 'absolute',
-                                                top: 20,
+                                                top: 40,
                                                 right: 20,
-                                                width: 100,
+                                                width: 200,
+                                                height: 200,
                                                 opacity: swipeEffect === 'right' ? 1 : 0,
                                                 transition: 'opacity 0.2s',
                                                 transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',
@@ -945,26 +948,28 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                     onClick={() => handleCardClick(currentIndex)}
                                 >
                                     <img
-                                        src='../../../assets/images/Nope.png'
+                                        src={nopeicon}
                                         alt="Nope"
                                         style={{
                                             position: 'absolute',
-                                            top: 20,
+                                            top: 40,
                                             left: 20,
-                                            width: 100,
+                                            width: 200,
+                                            height: 200,
                                             opacity: swipeEffect === 'left' ? 1 : 0,
                                             transition: 'opacity 0.2s',
                                             transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',
                                         }}
                                     />
                                     <img
-                                        src='../../../assets/images/Match.png'
+                                        src={matchicon}
                                         alt="Match"
                                         style={{
                                             position: 'absolute',
-                                            top: 20,
+                                            top: 40,
                                             right: 20,
-                                            width: 100,
+                                            width: 200,
+                                            height: 200,
                                             opacity: swipeEffect === 'right' ? 1 : 0,
                                             transition: 'opacity 0.2s',
                                             transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',

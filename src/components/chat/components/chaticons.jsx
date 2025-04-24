@@ -2,19 +2,25 @@ import React, { useState } from 'react';
 import { Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import CloseIcon from '@mui/icons-material/Close';
+import laughicon from '../../../assets/images/laugh.png'
+import angryicon from '../../../assets/images/angry.png'
+import sadicon from '../../../assets/images/sad.png'
+import thumbupicon from '../../../assets/images/thumbs-up.png'
+import hearticon from '../../../assets/images/heart.png'
+import coolicon from '../../../assets/images/cool.png'
+import thinkhicon from '../../../assets/images/think.png'
+import hugicon from '../../../assets/images/hug.png'
 
-// Define a set of icon URLs for common emotions
 const ICON_URLS =
 [
-    '../../../assets/images/laugh.png',
-    '../../../assets/images/facebook-reactions.png',
-    '../../../assets/images/angry.png',
-    '../../../assets/images/sad.png',
-    '../../../assets/images/thumbs-up.png',
-    '../../../assets/images/heart.png',
-    '../../../assets/images/cool.png',
-    '../../../assets/images/think.png',
-    '../../../assets/images/hug.png',
+    laughicon,
+    angryicon,
+    sadicon,
+    thumbupicon,
+    hearticon,
+    coolicon,
+    thinkhicon,
+    hugicon,
 ];
 
 const ChatIconSelector = ({ onIconSelected, disabled }) => {
