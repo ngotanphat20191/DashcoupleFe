@@ -1,11 +1,16 @@
-import React, { useState, useEffect, memo, useRef } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Skeleton } from '@mui/material';
 
 /**
- * OptimizedImage
- * - src: either an HTTP URL string or a File/Blob object
- * - lazyLoad: boolean to enable IntersectionObserver
- * - shows a Skeleton until the actual image loads
+ * OptimizedImage component for faster image loading
+ *
+ * Supports:
+ * - URL string or local File object as src
+ * - Lazy loading with IntersectionObserver
+ * - Progressive loading with Skeleton
+ * - Error fallback image
+ * - External URL “hot path” optimization to prevent flicker
+ * - Memoized for performance
  */
 const OptimizedImage = ({
                             src,
@@ -15,72 +20,64 @@ const OptimizedImage = ({
                             height,
                             placeholderColor = "#f0f0f0",
                             fallbackSrc = "https://via.placeholder.com/150?text=Image+Not+Found",
-                            lazyLoad = false,
+                            lazyLoad = true,
                             ...props
                         }) => {
     const [isLoaded, setIsLoaded] = useState(false);
-    const [error, setError]     = useState(false);
+    const [error, setError] = useState(false);
     const [imageSrc, setImageSrc] = useState('');
-    const objectUrlRef = useRef(null);
-    const containerRef = useRef(null);
+    const [objectUrl, setObjectUrl] = useState(null);
 
-    // Now only HTTP(S) URLs are “external”
-    const isExternalUrl = typeof src === 'string' && /^https?:\/\//.test(src);
+    // Determine if src is a File object
+    const isFileObject = src instanceof File;
 
-    // 1️⃣ Initialize imageSrc from Blob/File or external URL
+    // Generate a unique ID for the image container
+    const imageId = `img-${alt?.replace(/\s+/g, '-')}-${isFileObject ? 'local-file' : src?.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '')}`;
+
+    // Initialize imageSrc based on File vs external URL
     useEffect(() => {
         if (!src) return;
 
-        if (src instanceof Blob) {
-            // Create a blob URL for any File/Blob
+        if (isFileObject) {
             const url = URL.createObjectURL(src);
             setImageSrc(url);
-            objectUrlRef.current = url;
-            return;
-        }
-
-        if (isExternalUrl) {
-            // Use remote HTTP(S) URL directly
+            setObjectUrl(url);
+        } else if (typeof src === 'string') {
             setImageSrc(src);
-            return;
+        } else {
+            setImageSrc('');
         }
 
-        // Otherwise clear out
-        setImageSrc('');
-    }, [src, isExternalUrl]);
-
-    // 2️⃣ Cleanup: revoke created blob URL on unmount
-    useEffect(() => {
         return () => {
-            if (objectUrlRef.current) {
-                URL.revokeObjectURL(objectUrlRef.current);
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
             }
         };
-    }, []);
+    }, [src]);
 
-    // 3️⃣ Lazy-loading: observe the container if desired
+    // Lazy loading for non-external, non-loaded src
     useEffect(() => {
-        if (!lazyLoad || imageSrc || isExternalUrl) return;
-        const obs = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    if (src instanceof Blob) {
-                        const url = URL.createObjectURL(src);
-                        setImageSrc(url);
-                        objectUrlRef.current = url;
-                    } else {
-                        setImageSrc(src);
-                    }
-                    obs.unobserve(entry.target);
-                }
-            });
-        }, { rootMargin: '100px', threshold: 0.1 });
+        if (!lazyLoad || imageSrc || isFileObject) return;
 
-        if (containerRef.current) obs.observe(containerRef.current);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setImageSrc(src);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { rootMargin: '100px', threshold: 0.1 }
+        );
+
+        const el = document.getElementById(imageId);
+        if (el) observer.observe(el);
+
         return () => {
-            if (containerRef.current) obs.unobserve(containerRef.current);
+            if (el) observer.unobserve(el);
         };
-    }, [src, imageSrc, lazyLoad, isExternalUrl]);
+    }, [src, imageSrc, lazyLoad, isFileObject, imageId]);
 
     const handleLoad = () => setIsLoaded(true);
     const handleError = () => {
@@ -90,10 +87,10 @@ const OptimizedImage = ({
 
     return (
         <div
-            ref={containerRef}
+            id={imageId}
             style={{
                 position: 'relative',
-                width:  width  || '100%',
+                width: width || '100%',
                 height: height || 'auto',
                 backgroundColor: placeholderColor,
                 overflow: 'hidden',
@@ -116,14 +113,14 @@ const OptimizedImage = ({
                 onLoad={handleLoad}
                 onError={handleError}
                 style={{
-                    display:    isLoaded ? 'block' : 'none',
-                    width:      '100%',
-                    height:     '100%',
-                    objectFit:  'cover',
+                    display: isLoaded ? 'block' : 'none',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
                     transition: 'opacity 0.3s ease-in-out',
-                    opacity:    isLoaded ? 1 : 0,
+                    opacity: isLoaded ? 1 : 0,
                 }}
-                loading={lazyLoad ? 'lazy' : 'eager'}
+                loading="lazy"
                 {...props}
             />
         </div>

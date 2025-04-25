@@ -75,9 +75,12 @@ function MediaCard({
         [availableProfiles.length]
     );
     const handleButtonClick = useCallback((direction) => {
-        const card = childRefs[currentIndex]?.current;
-        if (!card) return;
-        card.swipe(direction);
+        setSwipeEffect(direction);
+        setCurrentIndex(i => i + 1);
+        const timer = setTimeout(() => {
+            setSwipeEffect(null);
+        }, 300);
+        return () => clearTimeout(timer);
     }, []);
 
     const handleLikeButtonClick = useCallback((direction) => {
@@ -211,12 +214,6 @@ function MediaCard({
         }
     }, []);
     const onSwipe = useCallback(direction => {
-        setSwipeEffect(direction);
-        setCurrentIndex(i => i + 1);
-        const timer = setTimeout(() => {
-            setSwipeEffect(null);
-        }, 300);
-        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {

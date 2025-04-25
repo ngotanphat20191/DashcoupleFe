@@ -51,8 +51,8 @@ const ChatIconSelector = ({ onIconSelected, disabled }) => {
                 disabled={disabled}
                 sx={{
                     color: 'white',
-                    marginLeft: 5,
-                    marginTop: 5
+                    marginLeft: "5px",
+                    marginTop: "5px"
                 }}
             >
                 <EmojiEmotionsIcon />
