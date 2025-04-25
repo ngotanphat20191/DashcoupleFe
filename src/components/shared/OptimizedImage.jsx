@@ -85,9 +85,6 @@ const OptimizedImage = ({
                     decoding="async"
                     src={imageSource}
                     alt={alt}
-                    // className={className} <-- Apply to container instead if it's for layout
-                    onLoad={handleLoad}
-                    onError={handleError}
                     style={{
                         display: 'block', // Always block, visibility controlled by opacity/parent
                         width: '100%',
@@ -104,4 +101,4 @@ const OptimizedImage = ({
     );
 };
 
-export default memo(OptimizedImage); // Memoization is generally good here
+export default memo(OptimizedImage);

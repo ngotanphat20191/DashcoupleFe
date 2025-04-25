@@ -1,10 +1,12 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useState, useEffect } from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
 import OptimizedImage from '../../shared/OptimizedImage.jsx'; // Adjust the import path as needed
-import './editImage.css';
+import './editImage.css'; // Assuming you have some CSS
 
 const EditImage = ({ formData, setFormData }) => {
-    // Add or replace image at slot `index`
+    const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState({}); // To track individual uploads
+
     const handleAddImage = useCallback(
         (index) => {
             const fileInput = document.createElement('input');
@@ -14,25 +16,19 @@ const EditImage = ({ formData, setFormData }) => {
                 const file = event.target.files[0];
                 if (!file) return;
 
-                // *** THIS IS WHERE IT HAPPENS ***
-                // Create a temporary URL (blob:...) for preview
                 const objectUrl = URL.createObjectURL(file);
-                // ********************************
 
                 setFormData((prev) => {
                     const newFiles = [...prev.images];
                     const newList = [...prev.imagesList];
 
-                    // Revoke previous object URL if it exists for this slot
                     const previousUrl = newList[index];
                     if (previousUrl && typeof previousUrl === 'string' && previousUrl.startsWith('blob:')) {
                         URL.revokeObjectURL(previousUrl);
                     }
 
-                    newFiles[index] = file;      // Store the actual File object
-                    // *** AND HERE IT'S STORED FOR DISPLAY ***
-                    newList[index] = objectUrl;  // Store the Object URL (blob:...) for display
-                    // ****************************************
+                    newFiles[index] = file;
+                    newList[index] = objectUrl;
 
                     return { ...prev, images: newFiles, imagesList: newList };
                 });
@@ -41,20 +37,18 @@ const EditImage = ({ formData, setFormData }) => {
         },
         [setFormData]
     );
-    // Remove image at slot `index`
+
     const handleRemoveImage = useCallback(
         (index) => {
             setFormData((prev) => {
                 const newFiles = [...prev.images];
                 const newList = [...prev.imagesList];
 
-                // Get the URL to revoke *before* clearing the list
                 const urlToRevoke = newList[index];
 
                 newFiles[index] = null;
                 newList[index] = null;
 
-                // Revoke the object URL if it exists
                 if (urlToRevoke && typeof urlToRevoke === 'string' && urlToRevoke.startsWith('blob:')) {
                     URL.revokeObjectURL(urlToRevoke);
                 }
@@ -62,11 +56,71 @@ const EditImage = ({ formData, setFormData }) => {
                 return { ...prev, images: newFiles, imagesList: newList };
             });
         },
-        [setFormData] // Removed formData.imagesList dependency as we get it inside setFormData
+        [setFormData]
     );
 
-    // Cleanup object URLs on component unmount
-    React.useEffect(() => {
+    const uploadImageToImgbb = useCallback(async (file, index) => {
+        if (!file) return null;
+
+        const apiKey = 'YOUR_IMGBB_API_KEY'; // Replace with your actual API key
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error(`Imgbb upload failed for image ${index}:`, errorData);
+                return null;
+            }
+
+            const responseData = await response.json();
+            return responseData.data;
+        } catch (error) {
+            console.error(`Error uploading to Imgbb for image ${index}:`, error);
+            return null;
+        } finally {
+            setUploadProgress(prev => ({ ...prev, [index]: undefined })); // Clear progress
+        }
+    }, []);
+
+    const handleUploadAll = useCallback(async () => {
+        if (!formData.images || formData.images.length === 0) {
+            console.log("No images to upload.");
+            return;
+        }
+
+        setUploading(true);
+        const uploadedUrls = [];
+        const newUploadedList = [...(formData.uploadedUrls || [])]; // Assuming you want to store uploaded URLs
+
+        for (let i = 0; i < formData.images.length; i++) {
+            const file = formData.images[i];
+            if (file) {
+                setUploadProgress(prev => ({ ...prev, [i]: 'uploading' }));
+                const uploadResult = await uploadImageToImgbb(file, i);
+                if (uploadResult && uploadResult.url) {
+                    uploadedUrls.push(uploadResult.url);
+                    newUploadedList[i] = uploadResult.url; // Store the imgbb URL
+                    console.log(`Image ${i} uploaded:`, uploadResult.url);
+                } else {
+                    console.error(`Failed to upload image ${i}.`);
+                    newUploadedList[i] = 'failed'; // Indicate upload failure
+                }
+            }
+        }
+
+        setFormData(prev => ({ ...prev, uploadedUrls: newUploadedList }));
+        setUploading(false);
+        console.log("All uploads finished. Uploaded URLs:", uploadedUrls);
+        // Optionally, you can trigger a state update or callback here to inform the parent component
+    }, [formData.images, setFormData, uploadImageToImgbb]);
+
+    useEffect(() => {
         return () => {
             formData.imagesList.forEach(url => {
                 if (url && typeof url === 'string' && url.startsWith('blob:')) {
@@ -74,24 +128,22 @@ const EditImage = ({ formData, setFormData }) => {
                 }
             });
         };
-    }, [formData.imagesList]); // Effect runs when imagesList changes, cleanup runs on unmount
+    }, [formData.imagesList]);
 
     return (
         <div className="editImage">
             <div className="editphoto-grid">
-                {/* Make sure formData.imagesList is always an array */}
                 {(formData.imagesList || []).map((imageUrl, idx) => (
                     <div key={idx} className="editphoto-slot">
                         {imageUrl ? (
                             <>
                                 <OptimizedImage
-                                    // Pass the URL (string or blob: string)
                                     src={imageUrl}
                                     alt={`Uploaded image ${idx + 1}`}
                                     width="100%"
-                                    height="100%" // Ensure OptimizedImage container takes up space
+                                    height="100%"
                                     placeholderColor="#f8e1f4"
-                                    lazyLoad // Keep lazy loading if needed
+                                    lazyLoad
                                 />
                                 <button
                                     className="remove"
@@ -100,6 +152,15 @@ const EditImage = ({ formData, setFormData }) => {
                                 >
                                     <FaTimes />
                                 </button>
+                                {uploadProgress[idx] === 'uploading' && (
+                                    <div className="upload-status">Uploading...</div>
+                                )}
+                                {formData.uploadedUrls && formData.uploadedUrls[idx] && formData.uploadedUrls[idx] !== 'failed' && (
+                                    <div className="upload-success">Uploaded!</div>
+                                )}
+                                {formData.uploadedUrls && formData.uploadedUrls[idx] === 'failed' && (
+                                    <div className="upload-failed">Upload Failed</div>
+                                )}
                             </>
                         ) : (
                             <button
@@ -113,11 +174,11 @@ const EditImage = ({ formData, setFormData }) => {
                     </div>
                 ))}
             </div>
+            <button onClick={handleUploadAll} disabled={uploading}>
+                {uploading ? 'Uploading...' : 'Upload All Images'}
+            </button>
         </div>
     );
 };
 
-// Ensure formData and setFormData are stable if possible,
-// or consider wrapping EditImage in React.memo carefully if performance dictates.
-// export default memo(EditImage); <-- Use memo if props are stable
-export default EditImage; // Start without memo unless performance profiling shows it's needed
+export default memo(EditImage);

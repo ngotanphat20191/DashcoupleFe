@@ -166,6 +166,8 @@ function MediaCard({
                     setindexskip(prev => [...prev, userId]);
                 }
             }
+            setCurrentIndex(prevIndex => prevIndex + 1);
+
             const cancelTokenSource = createCancelToken();
             const response = await matchesAxios.post('/like/add', {
                 UserIdTarget: userID
