@@ -5,98 +5,105 @@ import { memo, useCallback } from "react";
 
 const EditImage = ({ formData, setFormData }) => {
     // Handle adding an image
-    const handleAddimage = useCallback((index) => {
+    const handleAddImage = useCallback((index) => {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
-        fileInput.accept = "image/*"; // Accept only images
+        fileInput.accept = "image/*";
+
         fileInput.onchange = (event) => {
             const file = event.target.files[0];
             if (file) {
-                // Create blob URL directly
+                // Create a blob URL for immediate display
                 const blobUrl = URL.createObjectURL(file);
 
-                // Update form data with blob URL and original file
-                setFormData((prevData) => {
-                    const newimages = [...prevData.images];
-                    const newList = [...prevData.imagesList];
+                console.log("Created blob URL:", blobUrl); // Debug output
 
-                    // Store original file for ImgBB upload
-                    newimages[index] = file;
-                    // Store blob URL for display
+                // Update form data with file and blob URL
+                setFormData((prevData) => {
+                    // Make copies of arrays to avoid mutating state directly
+                    const newImages = [...prevData.images];
+                    // Create imagesList array if it doesn't exist
+                    const newList = prevData.imagesList ? [...prevData.imagesList] :
+                        Array(prevData.images.length).fill(null);
+
+                    // Store file for later upload
+                    newImages[index] = file;
+                    // Store blob URL for immediate display
                     newList[index] = blobUrl;
+
+                    console.log("Updated imagesList:", newList); // Debug output
 
                     return {
                         ...prevData,
-                        images: newimages,
+                        images: newImages,
                         imagesList: newList
                     };
                 });
             }
         };
+
         fileInput.click();
     }, [setFormData]);
 
     // Handle removing an image
-    const handleRemoveimage = useCallback((index) => {
-        // Revoke object URL to prevent memory leaks
-        if (formData.imagesList[index] && typeof formData.imagesList[index] === 'string' &&
-            formData.imagesList[index] !== "loading") {
-            // Use direct URL.revokeObjectURL instead of cleanupImageUrl
+    const handleRemoveImage = useCallback((index) => {
+        // Clean up blob URL to prevent memory leaks
+        if (formData.imagesList &&
+            formData.imagesList[index] &&
+            typeof formData.imagesList[index] === 'string' &&
+            formData.imagesList[index].startsWith('blob:')) {
             URL.revokeObjectURL(formData.imagesList[index]);
         }
 
         // Update form data
         setFormData((prevData) => {
-            const newimages = [...prevData.images];
-            const newList = [...prevData.imagesList];
+            const newImages = [...prevData.images];
+            // Create imagesList array if it doesn't exist
+            const newList = prevData.imagesList ? [...prevData.imagesList] :
+                Array(prevData.images.length).fill(null);
 
-            newimages[index] = null;
+            newImages[index] = null;
             newList[index] = null;
 
             return {
                 ...prevData,
-                images: newimages,
+                images: newImages,
                 imagesList: newList
             };
         });
-    }, [formData.imagesList, setFormData]);
+    }, [formData, setFormData]);
+
+    // Ensure imagesList exists
+    const imagesList = formData.imagesList || Array(formData.images.length).fill(null);
 
     return (
         <div>
             <div className="editImage">
                 <div className="editphoto-grid">
-                    {formData.imagesList.map((image, index) => (
+                    {formData.images.map((_, index) => (
                         <div key={index} className="editphoto-slot">
-                            {image ? (
+                            {imagesList[index] ? (
                                 <div>
-                                    {image === "loading" ? (
-                                        <div className="loading-placeholder">
-                                            <span>Loading...</span>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <OptimizedImage
-                                                src={image}
-                                                alt={`Upload ${index + 1}`}
-                                                width="100%"
-                                                height="100%"
-                                                placeholderColor="#f8e1f4"
-                                                lazyLoad={true}
-                                            />
-                                            <button
-                                                className="remove"
-                                                onClick={() => handleRemoveimage(index)}
-                                                aria-label="Remove image"
-                                            >
-                                                <FaTimes />
-                                            </button>
-                                        </>
-                                    )}
+                                    <OptimizedImage
+                                        src={imagesList[index]}
+                                        alt={`Upload ${index + 1}`}
+                                        width="100%"
+                                        height="100%"
+                                        placeholderColor="#f8e1f4"
+                                        lazyLoad={true}
+                                    />
+                                    <button
+                                        className="remove"
+                                        onClick={() => handleRemoveImage(index)}
+                                        aria-label="Remove image"
+                                    >
+                                        <FaTimes />
+                                    </button>
                                 </div>
                             ) : (
                                 <button
                                     className="add"
-                                    onClick={() => handleAddimage(index)}
+                                    onClick={() => handleAddImage(index)}
                                     aria-label="Add image"
                                 >
                                     <FaPlus />
@@ -110,5 +117,4 @@ const EditImage = ({ formData, setFormData }) => {
     );
 };
 
-// Memoize the component to prevent unnecessary re-renders
 export default memo(EditImage);
