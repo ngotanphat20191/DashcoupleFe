@@ -74,7 +74,7 @@ const Like = () => {
             });
             
             setprofile(response.data);
-            console.log(respone.data);
+            console.log(response.data);
             setHasNoData(response.data.length === 0);
             setIsLoading(false);
         } catch (err) {
