@@ -1,9 +1,36 @@
 import { FaPlus, FaTimes } from "react-icons/fa";
 import OptimizedImage from "../../shared/OptimizedImage";
 import "./editImage.css";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect } from "react";
 
 const EditImage = ({ formData, setFormData }) => {
+    // Initialize imagesList from images if needed
+    useEffect(() => {
+        if (!formData.imagesList && formData.images) {
+            // Create imagesList based on images array
+            setFormData(prevData => {
+                const imagesList = prevData.images.map(img => {
+                    // If it's already a URL (starts with http or https or blob), use it directly
+                    if (img && (typeof img === 'string') &&
+                        (img.startsWith('http') || img.startsWith('blob'))) {
+                        return img;
+                    }
+                    // For File objects, create blob URLs
+                    else if (img instanceof File) {
+                        return URL.createObjectURL(img);
+                    }
+                    // For anything else, return null
+                    return null;
+                });
+
+                return {
+                    ...prevData,
+                    imagesList
+                };
+            });
+        }
+    }, [formData, setFormData]);
+
     // Handle adding an image
     const handleAddImage = useCallback((index) => {
         const fileInput = document.createElement("input");
@@ -15,14 +42,11 @@ const EditImage = ({ formData, setFormData }) => {
             if (file) {
                 // Create a blob URL for immediate display
                 const blobUrl = URL.createObjectURL(file);
-
-                console.log("Created blob URL:", blobUrl); // Debug output
+                console.log("Created blob URL:", blobUrl);
 
                 // Update form data with file and blob URL
                 setFormData((prevData) => {
-                    // Make copies of arrays to avoid mutating state directly
                     const newImages = [...prevData.images];
-                    // Create imagesList array if it doesn't exist
                     const newList = prevData.imagesList ? [...prevData.imagesList] :
                         Array(prevData.images.length).fill(null);
 
@@ -30,8 +54,6 @@ const EditImage = ({ formData, setFormData }) => {
                     newImages[index] = file;
                     // Store blob URL for immediate display
                     newList[index] = blobUrl;
-
-                    console.log("Updated imagesList:", newList); // Debug output
 
                     return {
                         ...prevData,
@@ -58,7 +80,6 @@ const EditImage = ({ formData, setFormData }) => {
         // Update form data
         setFormData((prevData) => {
             const newImages = [...prevData.images];
-            // Create imagesList array if it doesn't exist
             const newList = prevData.imagesList ? [...prevData.imagesList] :
                 Array(prevData.images.length).fill(null);
 
@@ -80,17 +101,19 @@ const EditImage = ({ formData, setFormData }) => {
         <div>
             <div className="editImage">
                 <div className="editphoto-grid">
-                    {formData.imagesList.map((_, index) => (
+                    {formData.images.map((_, index) => (
                         <div key={index} className="editphoto-slot">
-                            {formData.images[index] ? (
+                            {imagesList[index] ? (
                                 <div>
                                     <OptimizedImage
-                                        src={formData.images[index]}
+                                        src={imagesList[index]}
                                         alt={`Upload ${index + 1}`}
                                         width="100%"
                                         height="100%"
                                         placeholderColor="#f8e1f4"
                                         lazyLoad={true}
+                                        onLoad={() => console.log("Image loaded:", imagesList[index])}
+                                        onError={() => console.log("Image error:", imagesList[index])}
                                     />
                                     <button
                                         className="remove"
