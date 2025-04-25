@@ -79,7 +79,7 @@ const Suggestions = () => {
     }, []);
     useEffect(() => {
         const handleBeforeUnload = () => {
-            localStorage.setItem("indexSuggestionSkip", JSON.stringify(indexskip));
+            localStorage.setItem("indexSuggestionSkipSuggestions", JSON.stringify(indexskip));
             localStorage.setItem("turn", turn.toString());
         };
         window.addEventListener("beforeunload", handleBeforeUnload);
@@ -94,15 +94,15 @@ const Suggestions = () => {
 
     const initParemeter = useCallback(() => {
         try {
-            if (localStorage.getItem("indexSuggestionSkip") === null) {
-                localStorage.setItem("indexSuggestionSkip", JSON.stringify([]));
+            if (localStorage.getItem("indexSuggestionSkipSuggestionsSuggestions") === null) {
+                localStorage.setItem("indexSuggestionSkipSuggestions", JSON.stringify([]));
             }
             if (localStorage.getItem("turn") === null) {
                 localStorage.setItem("turn", '1');
             }
 
             setTurn(parseInt(localStorage.getItem("turn") || "1", 10));
-            const storedIndexes = JSON.parse(localStorage.getItem("indexSuggestionSkip")) || [];
+            const storedIndexes = JSON.parse(localStorage.getItem("indexSuggestionSkipSuggestions")) || [];
             setindexskip(storedIndexes);
         } catch (err) {
             setTurn(1);
