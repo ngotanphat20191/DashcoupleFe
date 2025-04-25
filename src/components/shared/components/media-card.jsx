@@ -73,14 +73,7 @@ function MediaCard({
         setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
-            setCurrentIndex(prevIndex => prevIndex + 1);
         }, 300);
-        if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
-            const userId = profiles[currentIndex].userRecord.User_ID;
-            if (userId) {
-                setindexskip(prev => [...prev, userId]);
-            }
-        }
         return () => clearTimeout(timer);
     }, []);
     const handleLikeButtonClick = useCallback((direction) => {
@@ -155,15 +148,25 @@ function MediaCard({
         handlePreviewNextImage();
     }, [handlePreviewNextImage]);
     const handleSkipSuggestion = useCallback((currentIndex) => {
+        if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
+            const userId = profiles[currentIndex].userRecord.User_ID;
+            if (userId) {
+                setindexskip(prev => [...prev, userId]);
+            }
+        }
+        setCurrentIndex(prevIndex => prevIndex + 1);
     }, [setindexskip, profiles]);
 
     const handleLikeSuggestion = useCallback(async (currentIndex, userID) => {
         if (!userID) return;
         try {
-            // Create cancel token for request
+            if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
+                const userId = profiles[currentIndex].userRecord.User_ID;
+                if (userId) {
+                    setindexskip(prev => [...prev, userId]);
+                }
+            }
             const cancelTokenSource = createCancelToken();
-
-            // Make API call
             const response = await matchesAxios.post('/like/add', {
                 UserIdTarget: userID
             }, {
