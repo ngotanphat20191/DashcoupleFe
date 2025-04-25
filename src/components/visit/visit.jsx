@@ -36,6 +36,7 @@ const Visit = () => {
         try {
             const response = await matchesAxios.get('/like');
             setprofile(response.data);
+            console.log(response.data);
         } catch (err) {
             console.error("Error in handleLike:", err);
             if (err.response?.status === 400) {
