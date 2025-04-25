@@ -76,7 +76,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
             setCurrentIndex(prevIndex => {
                 return direction === "left" ? prevIndex - 1 : prevIndex + 1;
             });
-        }, 800);
+        }, 500);
         if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
             const userId = profiles[currentIndex].userRecord.User_ID;
             if (userId) {
@@ -338,11 +338,11 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                             lineHeight: 1.2}}>
                                                             {profiles[currentIndex].userRecord.name.split(' ').pop()}
                                                         </Typography>
-                                                        <Typography sx={{fontWeight: 900, // Extra bold for thick text
-                                                            fontSize: "32px", // Adjust to match the image size
-                                                            color: "white", // White text fill
-                                                            WebkitTextStroke: "0.2x black", // Thicker black outline
-                                                            letterSpacing: "0.5px", // Slight spacing for clarity
+                                                        <Typography sx={{fontWeight: 900,
+                                                            fontSize: "32px",
+                                                            color: "white",
+                                                            WebkitTextStroke: "0.2x black",
+                                                            letterSpacing: "0.5px",
                                                             lineHeight: 1.2, marginLeft: '4px'}}>
                                                             {calculateAge(profiles[currentIndex].userRecord.date_of_birth)}
                                                         </Typography>
@@ -944,34 +944,34 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                     transition={{ duration: 0.3 }}
                                     onClick={() => handleCardClick(currentIndex)}
                                 >
-                                    <img
-                                        src={nopeicon}
-                                        alt="Nope"
-                                        style={{
-                                            position: 'absolute',
-                                            top: 40,
-                                            left: 20,
-                                            width: 200,
-                                            height: 200,
-                                            opacity: swipeEffect === 'left' ? 1 : 0,
-                                            transition: 'opacity 0.2s',
-                                            transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',
-                                        }}
-                                    />
-                                    <img
-                                        src={matchicon}
-                                        alt="Match"
-                                        style={{
-                                            position: 'absolute',
-                                            top: 40,
-                                            right: 20,
-                                            width: 200,
-                                            height: 200,
-                                            opacity: swipeEffect === 'right' ? 1 : 0,
-                                            transition: 'opacity 0.2s',
-                                            transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',
-                                        }}
-                                    />
+                                    {/*<img*/}
+                                    {/*    src={nopeicon}*/}
+                                    {/*    alt="Nope"*/}
+                                    {/*    style={{*/}
+                                    {/*        position: 'absolute',*/}
+                                    {/*        top: 40,*/}
+                                    {/*        left: 20,*/}
+                                    {/*        width: 200,*/}
+                                    {/*        height: 200,*/}
+                                    {/*        opacity: swipeEffect === 'left' ? 1 : 0,*/}
+                                    {/*        transition: 'opacity 0.2s',*/}
+                                    {/*        transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',*/}
+                                    {/*    }}*/}
+                                    {/*/>*/}
+                                    {/*<img*/}
+                                    {/*    src={matchicon}*/}
+                                    {/*    alt="Match"*/}
+                                    {/*    style={{*/}
+                                    {/*        position: 'absolute',*/}
+                                    {/*        top: 40,*/}
+                                    {/*        right: 20,*/}
+                                    {/*        width: 200,*/}
+                                    {/*        height: 200,*/}
+                                    {/*        opacity: swipeEffect === 'right' ? 1 : 0,*/}
+                                    {/*        transition: 'opacity 0.2s',*/}
+                                    {/*        transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',*/}
+                                    {/*    }}*/}
+                                    {/*/>*/}
                                     <div className="image-progress-bar">
                                         {profiles[currentIndex].images.map((_, idx) => (
                                             <div
