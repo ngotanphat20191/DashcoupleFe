@@ -382,17 +382,6 @@ const Chat = () => {
         const lastMessage = messageSocketComplete.length > 0
             ? messageSocketComplete[messageSocketComplete.length - 1]
             : null;
-        setProfile(prev =>
-            prev.map(profile => {
-                if (profile.UserTargetId === messageSocketComplete.targetID) {
-                    return {
-                        ...profile,
-                        LastMessageSentTime: new Date(),
-                    };
-                }
-                return profile;
-            })
-        );
         return profile
             .slice()
             .sort((a, b) => new Date(b.LastMessageSentTime) - new Date(a.LastMessageSentTime))
