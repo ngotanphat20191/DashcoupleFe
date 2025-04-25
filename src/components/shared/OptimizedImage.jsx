@@ -2,13 +2,10 @@ import React, { useState, useEffect, memo, useRef } from 'react';
 import { Skeleton } from '@mui/material';
 
 /**
- * OptimizedImage component for faster image loading
- *
- * - Supports URL strings and local File/Blob objects as `src`
- * - Lazy loading via IntersectionObserver (opt-in)
- * - Progressive loading placeholder with MUI Skeleton
- * - Error fallback image
- * - Cleans up created blob URLs on unmount
+ * OptimizedImage
+ * - src: either an HTTP URL string or a File/Blob object
+ * - lazyLoad: boolean to enable IntersectionObserver
+ * - shows a Skeleton until the actual image loads
  */
 const OptimizedImage = ({
                             src,
@@ -18,7 +15,7 @@ const OptimizedImage = ({
                             height,
                             placeholderColor = "#f0f0f0",
                             fallbackSrc = "https://via.placeholder.com/150?text=Image+Not+Found",
-                            lazyLoad = false,    // default off for immediate load; toggle true if you want lazy
+                            lazyLoad = false,
                             ...props
                         }) => {
     const [isLoaded, setIsLoaded] = useState(false);
@@ -27,14 +24,15 @@ const OptimizedImage = ({
     const objectUrlRef = useRef(null);
     const containerRef = useRef(null);
 
-    const isExternalUrl = typeof src === 'string' && (src.startsWith('http') || src.startsWith('blob:'));
+    // Now only HTTP(S) URLs are “external”
+    const isExternalUrl = typeof src === 'string' && /^https?:\/\//.test(src);
 
-    // 1️⃣ Initialize imageSrc based on Blob vs external URL
+    // 1️⃣ Initialize imageSrc from Blob/File or external URL
     useEffect(() => {
         if (!src) return;
 
-        // Accept both File and Blob
         if (src instanceof Blob) {
+            // Create a blob URL for any File/Blob
             const url = URL.createObjectURL(src);
             setImageSrc(url);
             objectUrlRef.current = url;
@@ -42,15 +40,16 @@ const OptimizedImage = ({
         }
 
         if (isExternalUrl) {
+            // Use remote HTTP(S) URL directly
             setImageSrc(src);
             return;
         }
 
-        // Otherwise clear
+        // Otherwise clear out
         setImageSrc('');
     }, [src, isExternalUrl]);
 
-    // 2️⃣ Cleanup blob URL on unmount
+    // 2️⃣ Cleanup: revoke created blob URL on unmount
     useEffect(() => {
         return () => {
             if (objectUrlRef.current) {
@@ -59,7 +58,7 @@ const OptimizedImage = ({
         };
     }, []);
 
-    // 3️⃣ Lazy-load support
+    // 3️⃣ Lazy-loading: observe the container if desired
     useEffect(() => {
         if (!lazyLoad || imageSrc || isExternalUrl) return;
         const obs = new IntersectionObserver(entries => {
@@ -109,7 +108,6 @@ const OptimizedImage = ({
                 />
             )}
 
-            {/* Simple debug fallback: replace with above <Skeleton> logic if desired */}
             <img
                 decoding="async"
                 src={error ? fallbackSrc : imageSrc}

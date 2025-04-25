@@ -76,13 +76,8 @@ function MediaCard({
     );
     const handleButtonClick = useCallback((direction) => {
         const card = childRefs[currentIndex]?.current;
-        if (!card) return;             // no-op if not ready
+        if (!card) return;
         card.swipe(direction);
-        setSwipeEffect(direction);
-        const timer = setTimeout(() => {
-            setSwipeEffect(null);
-        }, 300);
-        return () => clearTimeout(timer);
     }, []);
 
     const handleLikeButtonClick = useCallback((direction) => {
@@ -218,6 +213,10 @@ function MediaCard({
     const onSwipe = useCallback(direction => {
         setSwipeEffect(direction);
         setCurrentIndex(i => i + 1);
+        const timer = setTimeout(() => {
+            setSwipeEffect(null);
+        }, 300);
+        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
