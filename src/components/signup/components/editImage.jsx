@@ -18,17 +18,12 @@ const EditImage = ({ formData, setFormData }) => {
                 // Update form data with the blob URL and original file
                 setFormData((prevData) => {
                     const newimages = [...prevData.images];
-                    const newList = [...prevData.imagesList];
-
                     // Store original file for later upload to ImgBB
                     newimages[index] = file;
                     // Store blob URL for display
-                    newList[index] = blobUrl;
-
                     return {
                         ...prevData,
                         images: newimages,
-                        imagesList: newList
                     };
                 });
             }
@@ -39,31 +34,26 @@ const EditImage = ({ formData, setFormData }) => {
     // Handle removing an image
     const handleRemoveimage = useCallback((index) => {
         // Revoke object URL to prevent memory leaks
-        if (formData.imagesList[index] && typeof formData.imagesList[index] === 'string') {
-            URL.revokeObjectURL(formData.imagesList[index]);
+        if (formData.images[index] && typeof formData.images[index] === 'string') {
+            URL.revokeObjectURL(formData.images[index]);
         }
 
         // Update form data
         setFormData((prevData) => {
             const newimages = [...prevData.images];
-            const newList = [...prevData.imagesList];
-
             newimages[index] = null;
-            newList[index] = null;
-
             return {
                 ...prevData,
                 images: newimages,
-                imagesList: newList
             };
         });
-    }, [formData.imagesList, setFormData]);
+    }, [formData.images, setFormData]);
 
     return (
         <div>
             <div className="editImage">
                 <div className="editphoto-grid">
-                    {formData.imagesList.map((image, index) => (
+                    {formData.images.map((image, index) => (
                         <div key={index} className="editphoto-slot">
                             {image ? (
                                 <div>
