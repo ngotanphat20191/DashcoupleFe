@@ -65,12 +65,20 @@ function MediaCard({
             return 0;
         }
     }, []);
+    const availableProfiles = useMemo(
+        () => profiles.filter(p => !indexSkip.includes(p.userRecord.User_ID)),
+        [profiles, indexSkip]
+    );
+
     const childRefs = useMemo(
-        () => Array(profiles.length).fill(0).map(() => React.createRef()),
-        [profiles.length]
+        () => Array(availableProfiles.length).fill().map(() => React.createRef()),
+        [availableProfiles.length]
     );
     const handleButtonClick = useCallback((direction) => {
-        childRefs[currentIndex].current.swipe(direction);
+        const card = childRefs[currentIndex]?.current;
+        if (!card) return;             // no-op if not ready
+        card.swipe(direction);
+        setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
         }, 300);

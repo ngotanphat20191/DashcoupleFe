@@ -1,143 +1,95 @@
 import { FaPlus, FaTimes } from "react-icons/fa";
-import OptimizedImage from "../../shared/OptimizedImage";
-import { optimizeImage, cleanupImageUrl } from "../../../utils/imageUtils";
+import OptimizedImage from "../../shared/OptimizedImage"; // or use <img>
 import "./editImage.css";
 import { memo, useCallback } from "react";
 
 const EditImage = ({ formData, setFormData }) => {
-    // Handle adding an image
-    const handleAddimage = useCallback((index) => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/*"; // Accept only images
-        fileInput.onchange = async (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                try {
-                    // Show loading state while optimizing
-                    setFormData((prevData) => {
-                        const newList = [...prevData.imagesList];
-                        newList[index] = "loading";
-                        return { ...prevData, imagesList: newList };
-                    });
-                    
-                    // Optimize the image with custom options
-                    const { optimizedFile, imageUrl } = await optimizeImage(file, {
-                        maxWidth: 800,
-                        maxHeight: 800,
-                        quality: 0.8
-                    });
-                    
-                    // Update form data with optimized image (in a single update for better performance)
-                    setFormData((prevData) => {
-                        const newimages = [...prevData.images];
-                        const newList = [...prevData.imagesList];
-                        
-                        newimages[index] = optimizedFile;
-                        newList[index] = imageUrl;
-                        
-                        return { 
-                            ...prevData, 
-                            images: newimages,
-                            imagesList: newList
-                        };
-                    });
-                } catch (error) {
-                    console.error("Error optimizing image:", error);
-                    // Fallback to original method if optimization fails
-                    const imageUrl = URL.createObjectURL(file);
-                    
-                    setFormData((prevData) => {
-                        const newimages = [...prevData.images];
-                        const newList = [...prevData.imagesList];
-                        
-                        newimages[index] = file;
-                        newList[index] = imageUrl;
-                        
-                        return { 
-                            ...prevData, 
-                            images: newimages,
-                            imagesList: newList
-                        };
-                    });
-                }
-            }
-        };
-        fileInput.click();
-    }, [setFormData]);
+    // Create object URL for a File
+    const makeObjectUrl = useCallback(file => URL.createObjectURL(file), []);
 
-    // Handle removing an image
-    const handleRemoveimage = useCallback((index) => {
-        // Revoke object URL to prevent memory leaks
-        if (formData.imagesList[index] && typeof formData.imagesList[index] === 'string' && 
-            formData.imagesList[index] !== "loading") {
-            cleanupImageUrl(formData.imagesList[index]);
-        }
-        
-        // Update form data (in a single update for better performance)
-        setFormData((prevData) => {
-            const newimages = [...prevData.images];
-            const newList = [...prevData.imagesList];
-            
-            newimages[index] = null;
-            newList[index] = null;
-            
-            return { 
-                ...prevData, 
-                images: newimages,
-                imagesList: newList
+    // Add or replace image at slot `index`
+    const handleAddImage = useCallback(
+        index => {
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.accept = "image/*";
+            fileInput.onchange = event => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                // Immediately generate URL for preview
+                const url = makeObjectUrl(file);
+
+                setFormData(prev => {
+                    const newFiles = [...prev.images];
+                    const newList = [...prev.imagesList];
+                    newFiles[index] = file;      // keep the File if you need it later
+                    newList[index] = url;        // store the preview URL
+                    return { ...prev, images: newFiles, imagesList: newList };
+                });
             };
-        });
-    }, [formData.imagesList, setFormData]);
-    
+            fileInput.click();
+        },
+        [makeObjectUrl, setFormData]
+    );
+
+    // Remove image at slot `index`
+    const handleRemoveImage = useCallback(
+        index => {
+            const url = formData.imagesList[index];
+            if (url) {
+                // Revoke the object URL to free memory
+                URL.revokeObjectURL(url);
+            }
+
+            setFormData(prev => {
+                const newFiles = [...prev.images];
+                const newList  = [...prev.imagesList];
+                newFiles[index] = null;
+                newList[index]  = null;
+                return { ...prev, images: newFiles, imagesList: newList };
+            });
+        },
+        [formData.imagesList, setFormData]
+    );
+
     return (
-        <div>
-            <div className="editImage">
-                <div className="editphoto-grid">
-                    {formData.imagesList.map((image, index) => (
-                        <div key={index} className="editphoto-slot">
-                            {image ? (
-                                <div>
-                                    {image === "loading" ? (
-                                        <div className="loading-placeholder">
-                                            <span>Optimizing...</span>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <OptimizedImage 
-                                                src={image} 
-                                                alt={`Upload ${index + 1}`} 
-                                                width="100%" 
-                                                height="100%"
-                                                placeholderColor="#f8e1f4"
-                                                lazyLoad={true}
-                                            />
-                                            <button 
-                                                className="remove" 
-                                                onClick={() => handleRemoveimage(index)}
-                                                aria-label="Remove image"
-                                            >
-                                                <FaTimes />
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            ) : (
-                                <button 
-                                    className="add" 
-                                    onClick={() => handleAddimage(index)}
-                                    aria-label="Add image"
+        <div className="editImage">
+            <div className="editphoto-grid">
+                {formData.imagesList.map((slot, idx) => (
+                    <div key={idx} className="editphoto-slot">
+                        {slot ? (
+                            <>
+                                <OptimizedImage
+                                    src={slot}
+                                    alt={`Uploaded image ${idx + 1}`}
+                                    width="100%"
+                                    height="100%"
+                                    placeholderColor="#f8e1f4"
+                                    lazyLoad
+                                />
+                                <button
+                                    className="remove"
+                                    onClick={() => handleRemoveImage(idx)}
+                                    aria-label="Remove image"
                                 >
-                                    <FaPlus />
+                                    <FaTimes />
                                 </button>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                            </>
+                        ) : (
+                            <button
+                                className="add"
+                                onClick={() => handleAddImage(idx)}
+                                aria-label="Add image"
+                            >
+                                <FaPlus />
+                            </button>
+                        )}
+                    </div>
+                ))}
             </div>
         </div>
     );
 };
 
-// Memoize the component to prevent unnecessary re-renders
 export default memo(EditImage);

@@ -129,6 +129,7 @@ const OptimizedImage = ({
         )}
 
         <img
+            decoding="async"
             src={error ? fallbackSrc : imageSrc}
             alt={alt || 'Image'}
             className={className}
