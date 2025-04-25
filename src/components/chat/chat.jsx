@@ -145,7 +145,7 @@ const Chat = () => {
                             body: JSON.stringify({ signal: "ping" }),
                         });
                     }
-                }, 10000); // 10 seconds
+                }, 30000); // 10 seconds
 
                 client.onDisconnect = () => {
                     console.log("WebSocket disconnected");
