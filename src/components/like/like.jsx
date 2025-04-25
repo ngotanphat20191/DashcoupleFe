@@ -1,12 +1,12 @@
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import Title from '../shared/title.jsx';
+import ProfilesGrid from '../shared/profiles-grid.jsx'; // Use ProfilesGrid instead of direct MediaCard
 import {Alert, Box, Button, Grid, Stack, Typography} from '@mui/material';
 import Homenav from '../home/homenav.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import {createCancelToken, loginSignUpAxios, matchesAxios} from "../../config/axiosConfig.jsx";
 import CandidateList from './CandidateList.jsx';
-import MediaCard from '../shared/components/media-card.jsx';
 
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
@@ -19,7 +19,6 @@ const Like = () => {
     const [error, setError] = useState(null);
     const [hasNoData, setHasNoData] = useState(false);
     const [selectedProfileIndex, setSelectedProfileIndex] = useState(0);
-    const [mediaCardKey, setMediaCardKey] = useState(0);
 
     useEffect(() => {
         const cancelTokenSource = createCancelToken();
@@ -97,8 +96,6 @@ const Like = () => {
     // Handler for selecting a profile from the candidate list
     const handleSelectCandidate = useCallback((index) => {
         setSelectedProfileIndex(index);
-        // Increment the key to force a re-render of MediaCard
-        setMediaCardKey(prevKey => prevKey + 1);
     }, []);
 
     // Handle navigation between profiles
@@ -165,7 +162,6 @@ const Like = () => {
                 {profile && Array.isArray(profile) && profile.length > 0 && (
                     <Box sx={{width: '100%', p: 3}}>
                         <Grid container spacing={3} sx={{minHeight: 'calc(100vh - 200px)'}}>
-                            {/* Left side: Candidate List */}
                             <Grid item xs={12} sm={12} md={4} lg={4} sx={{height: '100%'}}>
                                 <Typography variant="h6" sx={{mb: 1, fontWeight: 'bold', color: '#bb2caa'}}>
                                     Danh sách ứng viên
@@ -179,30 +175,26 @@ const Like = () => {
                                 </Box>
                             </Grid>
 
-                            {/* Right side: Media Card - Use a key to force re-render */}
                             <Grid item xs={12} sm={12} md={8} lg={8}>
                                 <Typography variant="h6" sx={{mb: 1, fontWeight: 'bold', color: '#bb2caa'}}>
                                     Chi tiết ứng viên
                                 </Typography>
-                                <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                                    <MediaCard
-                                        key={mediaCardKey}
-                                        profiles={profile}
-                                        type="like"
-                                        interests={interests}
-                                        initialIndex={selectedProfileIndex}
-                                        enableCircularNav={true}
-                                        totalProfiles={profile.length}
-                                        onNavigate={handleProfileNavigation}
-                                    />
-                                </Box>
+                                <ProfilesGrid
+                                    profiles={profile}
+                                    type="liking"
+                                    interests={interests}
+                                    currentIndex={selectedProfileIndex}
+                                    enableCircularNav={true}
+                                    totalProfiles={profile.length}
+                                    onNavigate={handleProfileNavigation}
+                                />
                             </Grid>
                         </Grid>
                     </Box>
                 )}
             </Stack>
         );
-    }, [isLoading, error, profile, interests, handleLiked, selectedProfileIndex, handleSelectCandidate, handleProfileNavigation, mediaCardKey]);
+    }, [isLoading, error, profile, interests, handleLiked, selectedProfileIndex, handleSelectCandidate, handleProfileNavigation]);
 };
 
 export default memo(Like);

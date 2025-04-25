@@ -6,17 +6,7 @@ import './profiles-grid.css';
 
 const MemoizedMediaCard = memo(MediaCard);
 
-const ProfilesGrid = ({
-                          profiles,
-                          type,
-                          indexSkip,
-                          setindexskip,
-                          interests,
-                          currentIndex = 0,
-                          enableCircularNav = false,
-                          totalProfiles = 0,
-                          onNavigate = null
-                      }) => {
+const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests, currentIndex = 0}) => {
     const gridContent = useMemo(() => {
         if (type === "liking" || type === "like" || type === "preview") {
             return (
@@ -26,10 +16,7 @@ const ProfilesGrid = ({
                             profiles={profiles}
                             type={type}
                             interests={interests}
-                            initialIndex={currentIndex}
-                            enableCircularNav={enableCircularNav}
-                            totalProfiles={totalProfiles}
-                            onNavigate={onNavigate}
+                            initialIndex={currentIndex} // Pass the initial index to MediaCard
                         />
                     </Grid>
                 </Grid>
@@ -45,16 +32,13 @@ const ProfilesGrid = ({
                             indexSkip={indexSkip}
                             setindexskip={setindexskip}
                             interests={interests}
-                            initialIndex={currentIndex}
-                            enableCircularNav={enableCircularNav}
-                            totalProfiles={totalProfiles}
-                            onNavigate={onNavigate}
+                            initialIndex={currentIndex} // Pass the initial index here too
                         />
                     </Grid>
                 </Grid>
             );
         }
-    }, [profiles, type, indexSkip, setindexskip, interests, currentIndex, enableCircularNav, totalProfiles, onNavigate]);
+    }, [profiles, type, indexSkip, setindexskip, interests, currentIndex]);
 
     return (
         <div className="wrapperProfileGrid">

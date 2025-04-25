@@ -275,6 +275,19 @@ const Chat = () => {
         setMessageSocketComplete(prevMessages => [...prevMessages, messageData]);
         setMessageSend("");
 
+        setProfile(prevProfile => {
+            return prevProfile.map(profile => {
+                if (profile.FlowMessageId === flowMessageId) {
+                    return {
+                        ...profile,
+                        LastMessage: content || (image ? "Sent an image" : ""),
+                        LastMessageSentTime: time // Update the time to current time
+                    };
+                }
+                return profile;
+            });
+        });
+
         try {
             if (client && client.connected) {
                 client.publish({
@@ -354,10 +367,32 @@ const Chat = () => {
     const formatDays = (dateStr) => {
         const date = new Date(dateStr);
         const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        const isToday = date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+
+        const isYesterday = date.getDate() === yesterday.getDate() &&
+            date.getMonth() === yesterday.getMonth() &&
+            date.getFullYear() === yesterday.getFullYear();
+
         const timeDiff = today - date;
         const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const daysMap = ["T8", "T2", "T3", "T4", "T5", "T6", "T7"];
-        return daysDiff > 7 ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}` : daysMap[date.getDay()];
+
+        if (isToday) {
+            const hours = date.getHours().toString().padStart(2, "0");
+            const minutes = date.getMinutes().toString().padStart(2, "0");
+            return `${hours}:${minutes}`;
+        } else if (daysDiff < 7) {
+            const daysMap = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]; // Adjusted for Sunday as first day
+            return daysMap[date.getDay()];
+        } else {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${day}/${month}`;
+        }
     };
 
     const handleGetFullMessage = (FlowMessageId, UserTargetId) => {
