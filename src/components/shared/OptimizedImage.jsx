@@ -1,3 +1,4 @@
+// src/shared/OptimizedImage.jsx
 import React, { useState, useEffect, memo, useRef } from 'react';
 import { Skeleton } from '@mui/material';
 
@@ -6,7 +7,7 @@ const OptimizedImage = ({
                             alt = 'Image',
                             className,
                             width = '100%',
-                            height = 'auto', // Can be '100%' if parent container controls size
+                            height = '100%', // Set to 100% to fill container
                             placeholderColor = '#f0f0f0',
                             fallbackSrc = 'https://via.placeholder.com/150?text=Image+Not+Found',
                             lazyLoad = true,
@@ -55,6 +56,7 @@ const OptimizedImage = ({
     };
 
     // Determine the source to use for the img tag
+    // Use currentSrc for loading, switch to fallbackSrc only if error occurs
     const imageSource = error ? fallbackSrc : currentSrc;
 
     return (
@@ -63,13 +65,13 @@ const OptimizedImage = ({
                 position: 'relative',
                 width,
                 height,
-                backgroundColor: !isLoaded ? placeholderColor : 'transparent', // Show placeholder color only when loading
+                backgroundColor: !isLoaded && currentSrc ? placeholderColor : 'transparent', // Show placeholder bg only when loading an actual src
                 overflow: 'hidden',
             }}
             className={className} // Apply className to the container div
         >
             {/* Show Skeleton only when loading and src is actually present */}
-            {!isLoaded && currentSrc && (
+            {!isLoaded && currentSrc && !error && (
                 <Skeleton
                     variant="rectangular"
                     width="100%"
@@ -83,15 +85,20 @@ const OptimizedImage = ({
                 <img
                     ref={imgRef}
                     decoding="async"
+                    // IMPORTANT: Use imageSource which handles the fallback logic
                     src={imageSource}
                     alt={alt}
+                    // className={className} <-- Apply to container instead if it's for layout
+                    onLoad={handleLoad}
+                    onError={handleError}
                     style={{
                         display: 'block', // Always block, visibility controlled by opacity/parent
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
+                        objectFit: 'cover', // Cover ensures the image fills the container
                         transition: 'opacity 0.3s ease-in-out',
-                        opacity: isLoaded && !error ? 1 : 0, // Fade in when loaded and no error
+                        // Fade in when loaded and no error, otherwise stay hidden (or show fallback via src)
+                        opacity: isLoaded && !error ? 1 : 0,
                     }}
                     loading={lazyLoad ? 'lazy' : 'eager'}
                     {...props}
@@ -101,4 +108,4 @@ const OptimizedImage = ({
     );
 };
 
-export default memo(OptimizedImage);
+export default memo(OptimizedImage); // Memoization is generally good here
