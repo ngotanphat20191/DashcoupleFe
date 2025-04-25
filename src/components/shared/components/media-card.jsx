@@ -73,6 +73,7 @@ function MediaCard({
         setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
+            setCurrentIndex(prevIndex => prevIndex + 1);
         }, 300);
         if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
             const userId = profiles[currentIndex].userRecord.User_ID;
