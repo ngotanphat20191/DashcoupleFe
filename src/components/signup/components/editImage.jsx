@@ -80,12 +80,12 @@ const EditImage = ({ formData, setFormData }) => {
         <div>
             <div className="editImage">
                 <div className="editphoto-grid">
-                    {formData.images.map((_, index) => (
+                    {formData.imagesList.map((_, index) => (
                         <div key={index} className="editphoto-slot">
-                            {imagesList[index] ? (
+                            {images[index] ? (
                                 <div>
                                     <OptimizedImage
-                                        src={imagesList[index]}
+                                        src={images[index]}
                                         alt={`Upload ${index + 1}`}
                                         width="100%"
                                         height="100%"
