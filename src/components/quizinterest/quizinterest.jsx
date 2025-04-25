@@ -36,6 +36,8 @@ const QuizInterest = () => {
             ],
         },
     ];
+    const [progressStage, setProgressStage] = useState(1);
+    const [progressPercent, setProgressPercent] = useState(10);
 
     const showQuestion = (index) => {
         resetState();
@@ -78,19 +80,42 @@ const QuizInterest = () => {
         setQuestionPage(false);
         setProcessing(true);
 
+        setProgressStage(1);
+        setProgressPercent(10);
+
+        const stage1Timer = setTimeout(() => {
+            setProgressStage(2);
+            setProgressPercent(45);
+        }, 1500);
+
+        const stage2Timer = setTimeout(() => {
+            setProgressStage(3);
+            setProgressPercent(68);
+        }, 3000);
+
         baseAxios.post('/suggestionInterest/add', {
             questionIDlist: selectedQuestionsID,
             questionlist: selectedQuestions,
             answer: selectedAnswers
         })
             .then((res) => {
-                console.log("Backend response:", res.data);
-                setProcessing(false);
-                setResult(res.data);
+                setProgressStage(4);
+                setProgressPercent(100);
+
+                setTimeout(() => {
+                    setProcessing(false);
+                    setResult(res.data);
+                }, 800);
             })
             .catch((err) => {
                 console.error(err);
+                setProcessing(false);
             });
+
+        return () => {
+            clearTimeout(stage1Timer);
+            clearTimeout(stage2Timer);
+        };
     };
 
     const startQuiz = () => {
@@ -122,6 +147,7 @@ const QuizInterest = () => {
     useEffect(() => {
         startQuiz();
     }, []);
+
     return (
         <div className="quizContainer">
             <div className="quiz">
@@ -150,18 +176,77 @@ const QuizInterest = () => {
                 ) : (
                     <>
                         { processing ? (
-                            <div style={{ display: 'flex', flexDirection: 'column'}}>
-                                <div style={{ maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <img
-                                        src="https://media.tenor.com/On7kvXhzml4AAAAC/loading-gif.gif"
-                                        alt="Wating Icon"
-                                        width="60"
-                                        height="60"
-                                    />Đang xử lý dữ liệu
+                            <div className="quizProcessingContainer">
+                                <div className="quizProgressBarWrapper">
+                                    <div className="quizProgressBarTitle">
+                                        <span>Đang xử lý dữ liệu sở thích của bạn</span>
+                                        <span className="quizProgressPercentage">{progressPercent}%</span>
+                                    </div>
+                                    <div className="quizProgressBarOuter">
+                                        <div
+                                            className="quizProgressBarInner"
+                                            style={{ width: `${progressPercent}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+
+                                <div className="quizProcessingSteps">
+                                    <div className={`quizProcessingStep ${progressStage >= 1 ? 'completed' : ''}`}>
+                                        <div className="quizStepIcon">
+                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10" fill="#ff4081" />
+                                                <path d="M8 12L11 15L16 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div className="quizStepContent">
+                                            <div className="quizStepTitle">Thu thập câu trả lời</div>
+                                            <div className="quizStepDescription">Đã lưu {selectedAnswers.length} câu trả lời của bạn</div>
+                                        </div>
+                                    </div>
+
+                                    <div className={`quizProcessingStep ${progressStage >=2 ? 'completed' : ''}`}>
+                                        <div className="quizStepIcon">
+                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10" fill="#ff4081" />
+                                                <path d="M8 12L11 15L16 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div className="quizStepContent">
+                                            <div className="quizStepTitle">Phân tích sở thích</div>
+                                            <div className="quizStepDescription">Đang tìm các mẫu và xu hướng trong sở thích của bạn</div>
+                                        </div>
+                                    </div>
+
+                                    <div className={`quizProcessingStep ${progressStage >= 3 ? 'completed' : ''}`}>
+                                        <div className="quizStepIcon">
+                                            <div className="quizStepLoader"></div>
+                                        </div>
+                                        <div className="quizStepContent">
+                                            <div className="quizStepTitle">Tìm kiếm đề xuất</div>
+                                            <div className="quizStepDescription">Đang tìm những người phù hợp với sở thích của bạn</div>
+                                        </div>
+                                    </div>
+
+                                    <div className={`quizProcessingStep ${progressStage >= 4 ? 'completed' : ''}`}>
+                                        <div className="quizStepIcon">
+                                            <span>4</span>
+                                        </div>
+                                        <div className="quizStepContent">
+                                            <div className="quizStepTitle">Hoàn thành</div>
+                                            <div className="quizStepDescription">Tạo báo cáo kết quả và cập nhật hồ sơ của bạn</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="quizProcessingTip">
+                                    <div className="quizTipIcon">💡</div>
+                                    <div className="quizTipText">
+                                        Mẹo: Các câu trả lời chân thực sẽ giúp bạn tìm được đối tượng phù hợp nhất!
+                                    </div>
                                 </div>
                             </div>
                         ) : (
-                            result.checkpercentage == true ? (
+                            result?.checkpercentage == true ? (
                             <div style={{display: 'flex', flexDirection: 'column',alignItems: 'center', marginTop:"10px"}}>
                                 <div style={{maxWidth: "100%", display: 'flex', alignItems: 'center', gap: '10px'}}>
                                     <img
@@ -184,7 +269,7 @@ const QuizInterest = () => {
                                     fontWeight: "bold",
                                     marginTop: "5px"
                                 }}>
-                                    Phần trăm sở thích gợi ý phù hợp: {result.percentage}
+                                    Phần trăm sở thích gợi ý phù hợp: {result?.percentage}
                                 </div>
                                 <div style={{
                                     width: "100%",
@@ -193,7 +278,7 @@ const QuizInterest = () => {
                                     fontWeight: "bold",
                                     marginTop: "5px"
                                 }}>
-                                    Sở thích: {result.interestNameList?.join(', ')}
+                                    Sở thích: {result?.interestNameList?.join(', ')}
                                 </div>
                                 <div style={{width: "100%", alignItems: 'center', textAlign: 'center', marginTop: "5px"}}>Dữ liệu sở
                                     thích gợi ý sẽ được lưu danh sách sở thích của bạn
@@ -222,7 +307,7 @@ const QuizInterest = () => {
                                             fontWeight: "bold",
                                             marginTop: "5px"
                                         }}>
-                                            Phần trăm sở thích gợi ý phù hợp: {result.percentage}
+                                            Phần trăm sở thích gợi ý phù hợp: {result?.percentage}
                                         </div>
                                         <div style={{
                                             width: "100%",
@@ -231,7 +316,7 @@ const QuizInterest = () => {
                                             fontWeight: "bold",
                                             marginTop: "5px"
                                         }}>
-                                            Sở thích: {result.interestNameList?.join(', ')}
+                                            Sở thích: {result?.interestNameList?.join(', ')}
                                         </div>
                                         <div style={{width: "100%", alignItems: 'center', textAlign: 'center', marginTop: "5px"}}>
                                             Do tỷ lệ khớp sở thích không vượt qua 70% nên không thể lưu lại thông tin sở thích trên. Hãy thử lại lần sau nha !

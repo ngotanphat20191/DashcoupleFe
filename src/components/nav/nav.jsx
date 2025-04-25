@@ -68,7 +68,7 @@ const Nav = () => {
         setNotifMenu({ ...notifMenu, right: open });
     };
     return (
-        <AppBar position="static" className="Appbarnav" style={{backgroundColor: "#fc6ae7"}}>
+        <AppBar position="static" className="Appbarnav" style={{backgroundColor: "rgba(84,25,73,0.83)"}}>
             <Toolbar>
                 <Typography variant="h6" className="matchaLogo">
                     <Link
@@ -76,7 +76,9 @@ const Nav = () => {
                         className="LogonavIcon"
                         style={{color:"white",  textDecoration: "none"}}
                     >
-                        DashCouple
+                        <img src={"https://res.cloudinary.com/de25mkp9v/image/upload/v1745576387/Dash_Couple_nlr1jw.svg"} alt={"logo"}
+                            style={{height: '2rem', transform: 'translateY(.25rem)'}}
+                        />
                     </Link>
                 </Typography>
                 {isLoggedIn ? (

@@ -4,12 +4,12 @@ import AreaMatchCharts from "../../components/admin/dashboard/areaCharts/AreaMat
 import AreaMatchTable from "../../components/admin/dashboard/areaTable/AreaMatchTable.jsx"
 import AreaCards from "../../components/admin/dashboard/areaCards/AreaCards.jsx"
 import AreaPaymentTable from "../../components/admin/dashboard/areaTable/AreaPaymentTable.jsx"
-import { useState, useEffect } from "react";
+import {useEffect, useState} from "react";
 import {adminAxios} from "../../config/axiosConfig.jsx"
 
 const Dashboard = () => {
-  const [statisticData, setStatisticData] = useState(null);
-  const [date, setDate] = useState([
+    const [statisticData, setStatisticData] = useState(null);
+    const [date, setDate] = useState([
         {
             startDate: null,
             endDate: null,
@@ -25,8 +25,8 @@ const Dashboard = () => {
     const getStatisticData = () => {
         adminAxios.get('/statistic')
             .then((res) => {
-            setStatisticData(res.data)
-        }).catch(err => {
+                setStatisticData(res.data)
+            }).catch(err => {
             console.log(err.response.data)
         })
     };
@@ -69,7 +69,7 @@ const Dashboard = () => {
                 </>
             )}
         </div>
-  );
+    );
 };
 
 export default Dashboard;
