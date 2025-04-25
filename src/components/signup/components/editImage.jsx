@@ -14,11 +14,22 @@ const EditImage = ({ formData, setFormData }) => {
                 const file = event.target.files[0];
                 if (!file) return;
 
+                // Create a temporary URL for preview
+                const objectUrl = URL.createObjectURL(file);
+
                 setFormData((prev) => {
                     const newFiles = [...prev.images];
                     const newList = [...prev.imagesList];
-                    newFiles[index] = file;      // Store the File object
-                    newList[index] = file;       // Store the File object for preview
+
+                    // Revoke previous object URL if it exists for this slot
+                    const previousUrl = newList[index];
+                    if (previousUrl && typeof previousUrl === 'string' && previousUrl.startsWith('blob:')) {
+                        URL.revokeObjectURL(previousUrl);
+                    }
+
+                    newFiles[index] = file;      // Store the File object for potential upload
+                    newList[index] = objectUrl;  // Store the Object URL for display
+
                     return { ...prev, images: newFiles, imagesList: newList };
                 });
             };
@@ -30,37 +41,54 @@ const EditImage = ({ formData, setFormData }) => {
     // Remove image at slot `index`
     const handleRemoveImage = useCallback(
         (index) => {
-            const url = formData.imagesList[index];
-            if (url && typeof url === 'string' && url.startsWith('blob:')) {
-                // Revoke the object URL to free memory
-                URL.revokeObjectURL(url);
-            }
-
             setFormData((prev) => {
                 const newFiles = [...prev.images];
                 const newList = [...prev.imagesList];
+
+                // Get the URL to revoke *before* clearing the list
+                const urlToRevoke = newList[index];
+
                 newFiles[index] = null;
                 newList[index] = null;
+
+                // Revoke the object URL if it exists
+                if (urlToRevoke && typeof urlToRevoke === 'string' && urlToRevoke.startsWith('blob:')) {
+                    URL.revokeObjectURL(urlToRevoke);
+                }
+
                 return { ...prev, images: newFiles, imagesList: newList };
             });
         },
-        [formData.imagesList, setFormData]
+        [setFormData] // Removed formData.imagesList dependency as we get it inside setFormData
     );
+
+    // Cleanup object URLs on component unmount
+    React.useEffect(() => {
+        return () => {
+            formData.imagesList.forEach(url => {
+                if (url && typeof url === 'string' && url.startsWith('blob:')) {
+                    URL.revokeObjectURL(url);
+                }
+            });
+        };
+    }, [formData.imagesList]); // Effect runs when imagesList changes, cleanup runs on unmount
 
     return (
         <div className="editImage">
             <div className="editphoto-grid">
-                {formData.imagesList.map((slot, idx) => (
+                {/* Make sure formData.imagesList is always an array */}
+                {(formData.imagesList || []).map((imageUrl, idx) => (
                     <div key={idx} className="editphoto-slot">
-                        {slot ? (
+                        {imageUrl ? (
                             <>
                                 <OptimizedImage
-                                    src={slot}
+                                    // Pass the URL (string or blob: string)
+                                    src={imageUrl}
                                     alt={`Uploaded image ${idx + 1}`}
                                     width="100%"
-                                    height="100%"
+                                    height="100%" // Ensure OptimizedImage container takes up space
                                     placeholderColor="#f8e1f4"
-                                    lazyLoad
+                                    lazyLoad // Keep lazy loading if needed
                                 />
                                 <button
                                     className="remove"
@@ -86,4 +114,7 @@ const EditImage = ({ formData, setFormData }) => {
     );
 };
 
-export default memo(EditImage);
+// Ensure formData and setFormData are stable if possible,
+// or consider wrapping EditImage in React.memo carefully if performance dictates.
+// export default memo(EditImage); <-- Use memo if props are stable
+export default EditImage; // Start without memo unless performance profiling shows it's needed

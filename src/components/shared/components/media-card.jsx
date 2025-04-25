@@ -69,12 +69,17 @@ function MediaCard({
     useEffect(() => {
         setCurrentIndex(initialIndex);
     }, [initialIndex]);
-
     const handleButtonClick = useCallback((direction) => {
         setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
         }, 300);
+        if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
+            const userId = profiles[currentIndex].userRecord.User_ID;
+            if (userId) {
+                setindexskip(prev => [...prev, userId]);
+            }
+        }
         return () => clearTimeout(timer);
     }, []);
     const handleLikeButtonClick = useCallback((direction) => {
@@ -149,12 +154,6 @@ function MediaCard({
         handlePreviewNextImage();
     }, [handlePreviewNextImage]);
     const handleSkipSuggestion = useCallback((currentIndex) => {
-        if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
-            const userId = profiles[currentIndex].userRecord.User_ID;
-            if (userId) {
-                setindexskip(prev => [...prev, userId]);
-            }
-        }
     }, [setindexskip, profiles]);
 
     const handleLikeSuggestion = useCallback(async (currentIndex, userID) => {
