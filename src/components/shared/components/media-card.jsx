@@ -2,7 +2,7 @@ import './media-card.css';
 
 import '../profiles-grid.css';
 import '../title.css';
-import {memo, useCallback, useEffect, useState} from "react";
+import React, {memo, useCallback, useEffect, useMemo, useState} from "react";
 import TinderCard from "react-tinder-card";
 import {FaArrowLeft, FaArrowRight, FaCity, FaHeart, FaStar, FaTimes} from "react-icons/fa";
 import {GrNext, GrPrevious} from "react-icons/gr";
@@ -65,22 +65,18 @@ function MediaCard({
             return 0;
         }
     }, []);
-
-    useEffect(() => {
-        setCurrentIndex(initialIndex);
-    }, [initialIndex]);
-
-    // Memoize event handlers to prevent unnecessary recreations
+    const childRefs = useMemo(
+        () => Array(profiles.length).fill(0).map(() => React.createRef()),
+        [profiles.length]
+    );
     const handleButtonClick = useCallback((direction) => {
-        setSwipeEffect(direction);
-
+        childRefs[currentIndex].current.swipe(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
-            setCurrentIndex(prevIndex => prevIndex + 1);
         }, 300);
-
         return () => clearTimeout(timer);
     }, []);
+
     const handleLikeButtonClick = useCallback((direction) => {
         setSwipeEffect(direction);
         const timer = setTimeout(() => {
@@ -111,7 +107,7 @@ function MediaCard({
         }
         return () => clearTimeout(timer);
     }, []);
-    // Optimize image navigation with memoized handlers
+
     const handleNextImage = useCallback((profileIndex) => {
         if (!profiles || !profiles[profileIndex] || !profiles[profileIndex].images) return;
 
@@ -145,7 +141,6 @@ function MediaCard({
         setImagePreviewIndex(prev => (prev - 1 + profiles.images.length) % profiles.images.length);
     }, [profiles]);
 
-    // Simplify card click handlers by reusing the navigation functions
     const handleCardClick = useCallback((profileIndex) => {
         handleNextImage(profileIndex);
     }, [handleNextImage]);
@@ -164,30 +159,22 @@ function MediaCard({
 
     const handleLikeSuggestion = useCallback(async (currentIndex, userID) => {
         if (!userID) return;
-
         try {
             if (setindexskip) {
                 setindexskip(prev => [...prev, userID]);
             }
-
-            // Create cancel token for request
             const cancelTokenSource = createCancelToken();
 
-            // Make API call
             const response = await matchesAxios.post('/like/add', {
                 UserIdTarget: userID
             }, {
                 cancelToken: cancelTokenSource.token
             });
 
-            // Success handling (already updated UI optimistically)
         } catch (err) {
-            // Revert optimistic update on error
             if (setindexskip) {
                 setindexskip(prev => prev.filter(id => id !== userID));
             }
-
-            // Error handling
             if (err.response?.status === 400) {
                 setError(err.response.data);
             } else {
@@ -220,9 +207,15 @@ function MediaCard({
             }
         }
     }, []);
-    const onSwipe = (direction) => {
-        setCurrentIndex((prevIndex) => prevIndex + 1);
-    };
+    const onSwipe = useCallback(direction => {
+        setSwipeEffect(direction);
+        setCurrentIndex(i => i + 1);
+    }, []);
+
+    useEffect(() => {
+        setCurrentIndex(initialIndex);
+    }, [initialIndex]);
+
     useEffect(() => {
         if (!profiles || !Array.isArray(profiles) || profiles.length === 0 || !indexSkip || !Array.isArray(indexSkip)) {
             return;
@@ -947,6 +940,7 @@ function MediaCard({
                         <div className="tinderCards__container">
                             {profiles[currentIndex] && (
                                 <TinderCard
+                                    ref={childRefs[currentIndex]}
                                     className="swipe"
                                     key={profiles[currentIndex].userRecord.User_ID}
                                     preventSwipe={["up", "down"]}
