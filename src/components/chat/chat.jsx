@@ -395,7 +395,7 @@ const Chat = () => {
             const dateToShow = (lastMessage?.flowMessageId === matchedProfile.flowMessageId)
                 ? lastMessage.time
                 : matchedProfile.LastMessageSentTime;
-            const unreadCount = messageSocketComplete[messageSocketComplete.length - 1]?.flowMessageId == matchedProfile.FlowMessageId
+            const unreadCount = messageSocketComplete[messageSocketComplete.length - 1]?.flowMessageId === matchedProfile.FlowMessageId
                 ? 0 : messageSocketComplete.filter(msg => msg.flowMessageId === matchedProfile.FlowMessageId).length;
 
             const handleClick = () => {

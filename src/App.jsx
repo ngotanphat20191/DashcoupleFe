@@ -69,8 +69,6 @@ function AppRoutes() {
             root.style.background = 'url("/stardot.jpg")';
         } else if (location.pathname === "/login/admin") {
             root.style.background = 'rgb(64,60,84)';
-        } else {
-            root.style.background = 'url("/sakura.jpg") no-repeat center center / cover';
         }
     }, [location.pathname]);
 

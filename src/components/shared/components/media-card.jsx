@@ -358,10 +358,10 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                         <img
                                                             src="https://cdn-icons-png.flaticon.com/512/3199/3199999.png"
                                                             alt="Education Icon"
-                                                            width="40"
-                                                            height="40"
+                                                            width="35"
+                                                            height="35"
                                                         />
-                                                        <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
+                                                        <Typography sx={{ fontSize: "16px", alignItems: "bottom", marginLeft: '4px' }}>
                                                             Đang tìm kiếm {profiles[currentIndex].userRecord.relationship}
                                                         </Typography>
                                                     </div>
@@ -608,10 +608,10 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                             <img
                                                                 src="https://cdn-icons-png.flaticon.com/512/3199/3199999.png"
                                                                 alt="Education Icon"
-                                                                width="40"
-                                                                height="40"
+                                                                width="35"
+                                                                height="35"
                                                             />
-                                                            <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
+                                                            <Typography sx={{ fontSize: "16px", alignItems: "bottom", marginLeft: '4px' }}>
                                                                 Đang tìm kiếm {profiles[currentIndex].userRecord.relationship}
                                                             </Typography>
                                                         </div>
@@ -833,10 +833,10 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                                 <img
                                                                     src="https://cdn-icons-png.flaticon.com/512/3199/3199999.png"
                                                                     alt="Education Icon"
-                                                                    width="40"
-                                                                    height="40"
+                                                                    width="35"
+                                                                    height="35"
                                                                 />
-                                                                <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
+                                                                <Typography sx={{ fontSize: "16px", alignItems: "bottom", marginLeft: '4px' }}>
                                                                     Đang tìm kiếm {profiles.userRecord.relationship}
                                                                 </Typography>
                                                             </div>
@@ -1076,10 +1076,10 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                                         <img
                                                             src="https://cdn-icons-png.flaticon.com/512/3199/3199999.png"
                                                             alt="Education Icon"
-                                                            width="40"
-                                                            height="40"
+                                                            width="35"
+                                                            height="35"
                                                         />
-                                                        <Typography sx={{ fontSize: "18px", alignItems: "bottom", marginLeft: '4px' }}>
+                                                        <Typography sx={{ fontSize: "16px", alignItems: "bottom", marginLeft: '4px' }}>
                                                             Đang tìm kiếm {profiles[currentIndex].userRecord.relationship}
                                                         </Typography>
                                                     </div>
