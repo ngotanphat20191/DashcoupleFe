@@ -759,13 +759,6 @@ const Chat = () => {
                                             }
                                         }}
                                     >
-                                        <ChatIconSelector
-                                            onIconSelected={(iconUrl) => {
-                                                const now = new Date().toLocaleString();
-                                                sendMessage(flowMessageID, targetID, null, iconUrl, now, 1);
-                                            }}
-                                            disabled={!checkroom}
-                                        />
                                     </TextField>
                                 </Grid>
                                 <Grid item sm={2} xs={12} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -795,6 +788,13 @@ const Chat = () => {
                                         >
                                             <VideocamIcon />
                                         </Button>
+                                        <ChatIconSelector
+                                            onIconSelected={(iconUrl) => {
+                                                const now = new Date().toLocaleString();
+                                                sendMessage(flowMessageID, targetID, null, iconUrl, now, 1);
+                                            }}
+                                            disabled={!checkroom}
+                                        />
                                     </div>
                                 </Grid>
 
