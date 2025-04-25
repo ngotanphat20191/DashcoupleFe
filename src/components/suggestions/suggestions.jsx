@@ -94,7 +94,7 @@ const Suggestions = () => {
 
     const initParemeter = useCallback(() => {
         try {
-            if (localStorage.getItem("indexSuggestionSkipSuggestionsSuggestions") === null) {
+            if (localStorage.getItem("indexSuggestionSkipSuggestions") === null) {
                 localStorage.setItem("indexSuggestionSkipSuggestions", JSON.stringify([]));
             }
             if (localStorage.getItem("turn") === null) {

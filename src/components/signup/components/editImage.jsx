@@ -1,57 +1,53 @@
-import { FaPlus, FaTimes } from "react-icons/fa";
-import OptimizedImage from "../../shared/OptimizedImage"; // or use <img>
-import "./editImage.css";
-import { memo, useCallback } from "react";
+import React, { memo, useCallback } from 'react';
+import { FaPlus, FaTimes } from 'react-icons/fa';
+import OptimizedImage from './OptimizedImage';
+import './editImage.css';
 
+/**
+ * EditImage: grid of slots where each slot can:
+ *  - show an “Add” button if empty
+ *  - show a preview + remove button if URL/Blob is present
+ */
 const EditImage = ({ formData, setFormData }) => {
-    // Create object URL for a File
+    // Create object URL for a File/Blob
     const makeObjectUrl = useCallback(file => URL.createObjectURL(file), []);
 
-    // Add or replace image at slot `index`
-    const handleAddImage = useCallback(
-        index => {
-            const fileInput = document.createElement("input");
-            fileInput.type = "file";
-            fileInput.accept = "image/*";
-            fileInput.onchange = event => {
-                const file = event.target.files[0];
-                if (!file) return;
+    // Add/replace slot at `index`
+    const handleAddImage = useCallback((index) => {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-                // Immediately generate URL for preview
-                const url = makeObjectUrl(file);
-
-                setFormData(prev => {
-                    const newFiles = [...prev.images];
-                    const newList = [...prev.imagesList];
-                    newFiles[index] = file;      // keep the File if you need it later
-                    newList[index] = url;        // store the preview URL
-                    return { ...prev, images: newFiles, imagesList: newList };
-                });
-            };
-            fileInput.click();
-        },
-        [makeObjectUrl, setFormData]
-    );
-
-    // Remove image at slot `index`
-    const handleRemoveImage = useCallback(
-        index => {
-            const url = formData.imagesList[index];
-            if (url) {
-                // Revoke the object URL to free memory
-                URL.revokeObjectURL(url);
-            }
+            const url = makeObjectUrl(file);
 
             setFormData(prev => {
-                const newFiles = [...prev.images];
-                const newList  = [...prev.imagesList];
-                newFiles[index] = null;
-                newList[index]  = null;
-                return { ...prev, images: newFiles, imagesList: newList };
+                const imgs = [...prev.images];
+                const list = [...prev.imagesList];
+                imgs[index] = file;  // store File if needed
+                list[index] = url;   // store preview URL
+                return { ...prev, images: imgs, imagesList: list };
             });
-        },
-        [formData.imagesList, setFormData]
-    );
+        };
+        fileInput.click();
+    }, [makeObjectUrl, setFormData]);
+
+    // Remove slot at `index`
+    const handleRemoveImage = useCallback((index) => {
+        const url = formData.imagesList[index];
+        if (url) {
+            URL.revokeObjectURL(url);
+        }
+        setFormData(prev => {
+            const imgs = [...prev.images];
+            const list = [...prev.imagesList];
+            imgs[index] = null;
+            list[index]   = null;
+            return { ...prev, images: imgs, imagesList: list };
+        });
+    }, [formData.imagesList, setFormData]);
 
     return (
         <div className="editImage">
@@ -66,7 +62,7 @@ const EditImage = ({ formData, setFormData }) => {
                                     width="100%"
                                     height="100%"
                                     placeholderColor="#f8e1f4"
-                                    lazyLoad
+                                    lazyLoad={false}
                                 />
                                 <button
                                     className="remove"
