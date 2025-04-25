@@ -51,7 +51,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => prevIndex + 1);
-        }, 300);
+        }, 800);
         
         return () => clearTimeout(timer);
     }, []);
@@ -60,7 +60,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => prevIndex + 1);
-        }, 300);
+        }, 800);
         if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
             const userId = profiles[currentIndex].userRecord.User_ID;
             if (userId) {
@@ -69,14 +69,14 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         }
         return () => clearTimeout(timer);
     }, []);
-    const handleVisitButtonClick = useCallback((direction) => {
+    const handleVisitButtonClick = useCallback( (direction) => {
         setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => {
                 return direction === "left" ? prevIndex - 1 : prevIndex + 1;
             });
-        }, 300);
+        }, 800);
         if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
             const userId = profiles[currentIndex].userRecord.User_ID;
             if (userId) {
@@ -119,7 +119,6 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         setImagePreviewIndex(prev => (prev - 1 + profiles.images.length) % profiles.images.length);
     }, [profiles]);
     
-    // Simplify card click handlers by reusing the navigation functions
     const handleCardClick = useCallback((profileIndex) => {
         handleNextImage(profileIndex);
     }, [handleNextImage]);
@@ -197,19 +196,18 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
     const onSwipe = (direction) => {
         setCurrentIndex((prevIndex) => prevIndex + 1);
     };
+    const availableProfiles = useMemo(
+        () => profiles.filter(p => !indexSkip.includes(p.userRecord.User_ID)),
+        [profiles, indexSkip]
+    );
     useEffect(() => {
         if (!profiles || !Array.isArray(profiles) || profiles.length === 0 || !indexSkip || !Array.isArray(indexSkip)) {
             return;
         }
-        
-        // Check if current profile should be skipped
-        if (profiles[currentIndex] && profiles[currentIndex].userRecord && 
+        if (profiles[currentIndex] && profiles[currentIndex].userRecord &&
             indexSkip.includes(profiles[currentIndex].userRecord.User_ID)) {
-            
-            // Find next valid index
             let nextIndex = currentIndex + 1;
             let foundValidProfile = false;
-            
             while (nextIndex < profiles.length) {
                 if (profiles[nextIndex] && profiles[nextIndex].userRecord && 
                     !indexSkip.includes(profiles[nextIndex].userRecord.User_ID)) {
@@ -218,7 +216,6 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                 }
                 nextIndex++;
             }
-            
             if (foundValidProfile) {
                 setCurrentIndex(nextIndex);
             }
