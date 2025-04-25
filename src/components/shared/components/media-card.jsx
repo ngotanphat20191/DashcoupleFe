@@ -51,7 +51,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => prevIndex + 1);
-        }, 800);
+        }, 500);
         
         return () => clearTimeout(timer);
     }, []);
@@ -60,7 +60,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => prevIndex + 1);
-        }, 800);
+        }, 500);
         if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
             const userId = profiles[currentIndex].userRecord.User_ID;
             if (userId) {
@@ -923,7 +923,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                     preventSwipe={["up", "down"]}
                                     onSwipe={onSwipe}
                                 >
-                                    {profiles[currentIndex].userRecord && !indexSkip.includes(profiles[currentIndex].userRecord.User_ID) && (
+                                    {profiles[currentIndex].userRecord && (
                                         <motion.div
                                         className="card"
                                         style={{
