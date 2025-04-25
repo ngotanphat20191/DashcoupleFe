@@ -127,3 +127,9 @@ const OptimizedImage = ({
                 }}
                 loading={lazyLoad ? 'lazy' : 'eager'}
                 {...props}
+            />
+        </div>
+    );
+};
+
+export default memo(OptimizedImage);
