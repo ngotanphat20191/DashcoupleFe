@@ -923,6 +923,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                     preventSwipe={["up", "down"]}
                                     onSwipe={onSwipe}
                                 >
+                                    {profiles[currentIndex].userRecord && !indexSkip.includes(profiles[currentIndex].userRecord.User_ID) && (
                                         <motion.div
                                         className="card"
                                         style={{
@@ -1150,6 +1151,7 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                                         </Box>
                                     </div>
                                 </motion.div>
+                                    )}
                             </TinderCard>
                         )}
                     </div>
