@@ -159,12 +159,7 @@ function MediaCard({
 
     const handleLikeSuggestion = useCallback(async (currentIndex, userID) => {
         if (!userID) return;
-
         try {
-            if (setindexskip) {
-                setindexskip(prev => [...prev, userID]);
-            }
-
             // Create cancel token for request
             const cancelTokenSource = createCancelToken();
 

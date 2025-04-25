@@ -14,8 +14,10 @@ const EditImage = ({ formData, setFormData }) => {
                 const file = event.target.files[0];
                 if (!file) return;
 
-                // Create a temporary URL for preview
+                // *** THIS IS WHERE IT HAPPENS ***
+                // Create a temporary URL (blob:...) for preview
                 const objectUrl = URL.createObjectURL(file);
+                // ********************************
 
                 setFormData((prev) => {
                     const newFiles = [...prev.images];
@@ -27,8 +29,10 @@ const EditImage = ({ formData, setFormData }) => {
                         URL.revokeObjectURL(previousUrl);
                     }
 
-                    newFiles[index] = file;      // Store the File object for potential upload
-                    newList[index] = objectUrl;  // Store the Object URL for display
+                    newFiles[index] = file;      // Store the actual File object
+                    // *** AND HERE IT'S STORED FOR DISPLAY ***
+                    newList[index] = objectUrl;  // Store the Object URL (blob:...) for display
+                    // ****************************************
 
                     return { ...prev, images: newFiles, imagesList: newList };
                 });
@@ -37,7 +41,6 @@ const EditImage = ({ formData, setFormData }) => {
         },
         [setFormData]
     );
-
     // Remove image at slot `index`
     const handleRemoveImage = useCallback(
         (index) => {
