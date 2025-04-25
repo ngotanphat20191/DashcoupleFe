@@ -12,18 +12,23 @@ const EditImage = ({ formData, setFormData }) => {
         fileInput.onchange = (event) => {
             const file = event.target.files[0];
             if (file) {
-                // Create a blob URL directly without optimization
+                // Create blob URL directly
                 const blobUrl = URL.createObjectURL(file);
 
-                // Update form data with the blob URL and original file
+                // Update form data with blob URL and original file
                 setFormData((prevData) => {
                     const newimages = [...prevData.images];
-                    // Store original file for later upload to ImgBB
+                    const newList = [...prevData.imagesList];
+
+                    // Store original file for ImgBB upload
                     newimages[index] = file;
                     // Store blob URL for display
+                    newList[index] = blobUrl;
+
                     return {
                         ...prevData,
                         images: newimages,
+                        imagesList: newList
                     };
                 });
             }
@@ -34,44 +39,59 @@ const EditImage = ({ formData, setFormData }) => {
     // Handle removing an image
     const handleRemoveimage = useCallback((index) => {
         // Revoke object URL to prevent memory leaks
-        if (formData.images[index] && typeof formData.images[index] === 'string') {
-            URL.revokeObjectURL(formData.images[index]);
+        if (formData.imagesList[index] && typeof formData.imagesList[index] === 'string' &&
+            formData.imagesList[index] !== "loading") {
+            // Use direct URL.revokeObjectURL instead of cleanupImageUrl
+            URL.revokeObjectURL(formData.imagesList[index]);
         }
 
         // Update form data
         setFormData((prevData) => {
             const newimages = [...prevData.images];
+            const newList = [...prevData.imagesList];
+
             newimages[index] = null;
+            newList[index] = null;
+
             return {
                 ...prevData,
                 images: newimages,
+                imagesList: newList
             };
         });
-    }, [formData.images, setFormData]);
+    }, [formData.imagesList, setFormData]);
 
     return (
         <div>
             <div className="editImage">
                 <div className="editphoto-grid">
-                    {formData.images.map((image, index) => (
+                    {formData.imagesList.map((image, index) => (
                         <div key={index} className="editphoto-slot">
                             {image ? (
                                 <div>
-                                    <OptimizedImage
-                                        src={image}
-                                        alt={`Upload ${index + 1}`}
-                                        width="100%"
-                                        height="100%"
-                                        placeholderColor="#f8e1f4"
-                                        lazyLoad={true}
-                                    />
-                                    <button
-                                        className="remove"
-                                        onClick={() => handleRemoveimage(index)}
-                                        aria-label="Remove image"
-                                    >
-                                        <FaTimes />
-                                    </button>
+                                    {image === "loading" ? (
+                                        <div className="loading-placeholder">
+                                            <span>Loading...</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <OptimizedImage
+                                                src={image}
+                                                alt={`Upload ${index + 1}`}
+                                                width="100%"
+                                                height="100%"
+                                                placeholderColor="#f8e1f4"
+                                                lazyLoad={true}
+                                            />
+                                            <button
+                                                className="remove"
+                                                onClick={() => handleRemoveimage(index)}
+                                                aria-label="Remove image"
+                                            >
+                                                <FaTimes />
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             ) : (
                                 <button

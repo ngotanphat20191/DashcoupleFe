@@ -7,50 +7,87 @@ import ProfilePerInfo from './profilePerInfo.jsx'
 import MediaCard from '../../shared/components/media-card.jsx'
 import {IMGUR_CLIENT_ID} from "../../../config/firebaseConfig.jsx";
 import {baseAxios} from "../../../config/axiosConfig.jsx";
+
 const ProfileInfo = ({ interests, formData, setFormData }) => {
     const containerRef = useRef(null);
     const [viewStatus, setViewStatus] = useState(1);
+    const [isUploading, setIsUploading] = useState(false);
+
     const handleSubmit = async () => {
         try {
-            const uploadedImages = await Promise.all(
-                // eslint-disable-next-line react/prop-types
-                formData.images.map(async (image) => {
-                    if(image instanceof File) {
-                        const imageData = new FormData();
-                        imageData.append("image", image);
+            setIsUploading(true);
 
-                        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGUR_CLIENT_ID}`, {
-                            method: "POST",
-                            body: imageData,
-                        });
-                        const data = await response.json();
+            // Filter out null values and process only File objects
+            const filesToUpload = formData.images.filter(img => img instanceof File);
 
-                        if (data.success) {
-                            return data.data.url;
-                        } else {
-                            console.error("ImgBB Response Error:", data);
-                            return null;
-                        }
+            // Upload each file to ImgBB
+            const uploadPromises = filesToUpload.map(async (image, index) => {
+                const imageData = new FormData();
+                imageData.append("image", image);
+
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGUR_CLIENT_ID}`, {
+                    method: "POST",
+                    body: imageData,
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    return {
+                        index,
+                        url: data.data.url
+                    };
+                } else {
+                    console.error("ImgBB Response Error:", data);
+                    return {
+                        index,
+                        url: null
+                    };
+                }
+            });
+
+            // Wait for all uploads to complete
+            const uploadResults = await Promise.all(uploadPromises);
+
+            // Create a new images array with uploaded URLs
+            const newImages = [...formData.images];
+
+            // Replace File objects with URLs from ImgBB
+            uploadResults.forEach(result => {
+                if (result.url) {
+                    // Find the index in the original array
+                    const originalIndex = formData.images.indexOf(filesToUpload[result.index]);
+                    if (originalIndex !== -1) {
+                        newImages[originalIndex] = result.url;
                     }
-                    else return image;
-                })
-            );
+                }
+            });
 
-            const validImages = uploadedImages.filter((url) => url !== null);
-
-            setFormData((prevData) => ({
+            // Update formData with new images array containing URLs
+            setFormData(prevData => ({
                 ...prevData,
-                images: validImages,
+                images: newImages,
             }));
-            sendEditProfileRequest(formData)
+
+            // Send updated profile info to backend
+            await sendEditProfileRequest(newImages);
+            setIsUploading(false);
+
         } catch (error) {
             console.error("Error uploading images:", error);
             alert("Error uploading images.");
+            setIsUploading(false);
         }
     }
-    function sendEditProfileRequest() {
-        console.log(formData);
-        baseAxios.post('/profile', {
+
+    function sendEditProfileRequest(uploadedImages) {
+        const updatedFormData = {
+            ...formData,
+            images: uploadedImages || formData.images
+        };
+
+        console.log("Sending profile update:", updatedFormData);
+
+        return baseAxios.post('/profile', {
             token: localStorage.getItem('token'),
             about: formData.userRecord.about,
             name: formData.userRecord.name,
@@ -64,15 +101,16 @@ const ProfileInfo = ({ interests, formData, setFormData }) => {
             phonenumber: "",
             Education: formData.userRecord.education,
             relationship: formData.userRecord.relationship,
-            images: formData.images,
+            images: uploadedImages || formData.images,
             interests: formData.interest,
         }).then((res) => {
             console.log(res.data)
             setViewStatus(1);
         }).catch(err => {
             console.log(err)
-        })
+        });
     }
+
     return (
         <div style={{flexGrow: 1}}>
             <div className="headerButton">
@@ -85,9 +123,11 @@ const ProfileInfo = ({ interests, formData, setFormData }) => {
                     <EditImage formData={formData} setFormData={setFormData}></EditImage>
                     <ProfilePerInfo containerRef={containerRef} formData={formData} setFormData={setFormData}></ProfilePerInfo>
                     <ProfileInterest interests={interests} containerRef={containerRef} formData={formData} setFormData={setFormData}></ProfileInterest>
-                    <button className="save" onClick={handleSubmit}>Save</button>
+                    <button className="save" onClick={handleSubmit} disabled={isUploading}>
+                        {isUploading ? "Uploading..." : "Save"}
+                    </button>
                 </div>
-                ) : (
+            ) : (
                 <div>
                     <MediaCard
                         profiles={formData}
@@ -96,7 +136,7 @@ const ProfileInfo = ({ interests, formData, setFormData }) => {
                         interests={interests}
                     />
                 </div>
-                )
+            )
             }
         </div>
     );
