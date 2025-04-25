@@ -1,14 +1,16 @@
-import {useEffect, useState, useCallback, useMemo, memo} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import Title from '../shared/title.jsx';
-import ProfilesGrid from '../shared/profiles-grid.jsx';
-import {Box, Stack, Typography, Button, Alert} from '@mui/material';
+import ProfilesGrid from '../shared/profiles-grid.jsx'; // Use ProfilesGrid instead of direct MediaCard
+import {Alert, Box, Button, Grid, Stack, Typography} from '@mui/material';
 import Homenav from '../home/homenav.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
-import {baseAxios, loginSignUpAxios, createCancelToken, matchesAxios} from "../../config/axiosConfig.jsx";
+import {createCancelToken, loginSignUpAxios, matchesAxios} from "../../config/axiosConfig.jsx";
+import CandidateList from './CandidateList.jsx';
 
 const MemoizedHomenav = memo(Homenav);
 const MemoizedTitle = memo(Title);
+const MemoizedCandidateList = memo(CandidateList);
 
 const Like = () => {
     const [profile, setprofile] = useState(null);
@@ -16,14 +18,15 @@ const Like = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [hasNoData, setHasNoData] = useState(false);
+    const [selectedProfileIndex, setSelectedProfileIndex] = useState(0);
 
     useEffect(() => {
         const cancelTokenSource = createCancelToken();
-        
+
         const fetchAllData = async () => {
             setIsLoading(true);
             setError(null);
-            
+
             try {
                 const [interestsResponse, likedResponse] = await Promise.all([
                     loginSignUpAxios.get('/signup/interest', {
@@ -33,10 +36,10 @@ const Like = () => {
                         cancelToken: cancelTokenSource.token
                     })
                 ]);
-                
+
                 setinterests(interestsResponse.data);
                 setprofile(likedResponse.data);
-                
+
                 // Check if there are no profiles
                 setHasNoData(!likedResponse.data || likedResponse.data.length === 0 || !Array.isArray(likedResponse.data));
                 console.log("Like data loaded:", likedResponse.data);
@@ -45,7 +48,7 @@ const Like = () => {
                 if (axios.isCancel(err)) {
                     return;
                 }
-                
+
                 setIsLoading(false);
                 if (err.response?.status === 400) {
                     setError(err.response.data);
@@ -54,34 +57,32 @@ const Like = () => {
                 }
             }
         };
-        
+
         fetchAllData();
-        
+
         return () => {
             cancelTokenSource.cancel('Component unmounted');
         };
     }, []);
-    
-    // Memoize the handleLiked function to prevent unnecessary recreations
+
     const handleLiked = useCallback(async () => {
         setIsLoading(true);
-        setError(null); // Reset error state when retrying
+        setError(null);
         const cancelTokenSource = createCancelToken();
-        
+
         try {
             const response = await matchesAxios.get('/liked', {
                 cancelToken: cancelTokenSource.token
             });
-            
+
             setprofile(response.data);
-            console.log(response.data);
             setHasNoData(response.data.length === 0);
             setIsLoading(false);
         } catch (err) {
             if (axios.isCancel(err)) {
                 return;
             }
-            
+
             setIsLoading(false);
             if (err.response?.status === 400) {
                 setError(err.response.data);
@@ -91,21 +92,49 @@ const Like = () => {
             }
         }
     }, []);
-    const likeContent = useMemo(() => {
+
+    // Handler for selecting a profile from the candidate list
+    const handleSelectCandidate = useCallback((index) => {
+        setSelectedProfileIndex(index);
+    }, []);
+
+    // Handle navigation between profiles
+    const handleProfileNavigation = useCallback((direction, currentIndex) => {
+        if (!profile || !Array.isArray(profile) || profile.length <= 1) return;
+
+        let newIndex;
+        if (direction === "left") {
+            // Going to next profile
+            newIndex = (currentIndex + 1) % profile.length;
+        } else if (direction === "right") {
+            // Going to previous profile
+            newIndex = (currentIndex - 1 + profile.length) % profile.length;
+        }
+
+        setSelectedProfileIndex(newIndex);
+    }, [profile]);
+
+    return useMemo(() => {
         if (isLoading) {
             return (
-                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-                    <CircularProgress />
-                    <Typography sx={{ ml: 2 }}>Đang tải dữ liệu...</Typography>
+                <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100vh"}}>
+                    <CircularProgress/>
+                    <Typography sx={{ml: 2}}>Đang tải dữ liệu...</Typography>
                 </Box>
             );
         }
-        
+
         // Show error state
         if (error) {
             return (
-                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
-                    <Alert severity="error" sx={{ mb: 2 }}>
+                <Box sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100vh",
+                    flexDirection: "column"
+                }}>
+                    <Alert severity="error" sx={{mb: 2}}>
                         {error}
                     </Alert>
                     <Button variant="contained" onClick={() => handleLiked()}>
@@ -114,35 +143,58 @@ const Like = () => {
                 </Box>
             );
         }
-        
+
         return (
             <Stack style={{
-                alignItems: "center", 
-                border: "2px solid #fc6ae7", 
+                alignItems: "center",
+                border: "2px solid #fc6ae7",
                 width: "80%",
                 height: "100%",
-                marginLeft: "200px", 
-                marginRight: "100px", 
-                marginTop: "50px", 
-                borderRadius: "20px", 
+                marginLeft: "200px",
+                marginRight: "100px",
+                marginTop: "50px",
+                borderRadius: "20px",
                 backgroundColor: "#ffe8fd"
             }}>
-                <MemoizedTitle textTitle="Cơ hội ghép đôi" />
-                <MemoizedHomenav />
-                
+                <MemoizedTitle textTitle="Cơ hội ghép đôi"/>
+                <MemoizedHomenav/>
+
                 {profile && Array.isArray(profile) && profile.length > 0 && (
-                    <ProfilesGrid
-                        profiles={profile}
-                        type="like"
-                        interests={interests}
-                    />
+                    <Box sx={{width: '100%', p: 3}}>
+                        <Grid container spacing={3} sx={{minHeight: 'calc(100vh - 200px)'}}>
+                            <Grid item xs={12} sm={12} md={4} lg={4} sx={{height: '100%'}}>
+                                <Typography variant="h6" sx={{mb: 1, fontWeight: 'bold', color: '#bb2caa'}}>
+                                    Danh sách ứng viên
+                                </Typography>
+                                <Box sx={{height: 'calc(100% - 40px)'}}>
+                                    <MemoizedCandidateList
+                                        profiles={profile}
+                                        currentIndex={selectedProfileIndex}
+                                        onSelectCandidate={handleSelectCandidate}
+                                    />
+                                </Box>
+                            </Grid>
+
+                            <Grid item xs={12} sm={12} md={8} lg={8}>
+                                <Typography variant="h6" sx={{mb: 1, fontWeight: 'bold', color: '#bb2caa'}}>
+                                    Chi tiết ứng viên
+                                </Typography>
+                                <ProfilesGrid
+                                    profiles={profile}
+                                    type="liking"
+                                    interests={interests}
+                                    currentIndex={selectedProfileIndex}
+                                    enableCircularNav={true}
+                                    totalProfiles={profile.length}
+                                    onNavigate={handleProfileNavigation}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Box>
                 )}
             </Stack>
         );
-    }, [isLoading, error, profile, interests, handleLiked, hasNoData]);
-    
-    return likeContent;
+    }, [isLoading, error, profile, interests, handleLiked, selectedProfileIndex, handleSelectCandidate, handleProfileNavigation]);
 };
 
-// Export memoized component for better performance
 export default memo(Like);

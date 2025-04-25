@@ -1,16 +1,12 @@
-import { memo, useMemo } from 'react';
+import {memo, useMemo} from 'react';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import _ from 'lodash';
-import Typography from '@mui/material/Typography';
 import MediaCard from './components/media-card.jsx';
 import './profiles-grid.css';
 
 const MemoizedMediaCard = memo(MediaCard);
 
-const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
-    // Check for empty or invalid profiles
+const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests, currentIndex = 0}) => {
     const gridContent = useMemo(() => {
         if (type === "liking" || type === "like" || type === "preview") {
             return (
@@ -20,8 +16,9 @@ const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
                             profiles={profiles}
                             type={type}
                             interests={interests}
-                       />
-                     </Grid>
+                            initialIndex={currentIndex} // Pass the initial index to MediaCard
+                        />
+                    </Grid>
                 </Grid>
             );
         } else {
@@ -35,13 +32,14 @@ const ProfilesGrid = ({profiles, type, indexSkip, setindexskip, interests}) => {
                             indexSkip={indexSkip}
                             setindexskip={setindexskip}
                             interests={interests}
+                            initialIndex={currentIndex} // Pass the initial index here too
                         />
-                   </Grid>
-                 </Grid>
+                    </Grid>
+                </Grid>
             );
         }
-    }, [profiles, type, indexSkip, setindexskip, interests]);
-    
+    }, [profiles, type, indexSkip, setindexskip, interests, currentIndex]);
+
     return (
         <div className="wrapperProfileGrid">
             <Container>
