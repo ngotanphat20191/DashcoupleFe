@@ -1,53 +1,51 @@
 import React, { memo, useCallback } from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
-import OptimizedImage from '../../shared/OptimizedImage.jsx';  // adjust path
+import OptimizedImage from '../../shared/OptimizedImage.jsx'; // Adjust the import path as needed
 import './editImage.css';
 
-/**
- * EditImage: displays a grid of slots
- * - Empty slot: “Add” button
- * - Filled slot: image preview + remove button
- * - Uses OptimizedImage for previews
- */
 const EditImage = ({ formData, setFormData }) => {
-    // Helper to create blob URL for preview
-    const makeObjectUrl = useCallback(file => URL.createObjectURL(file), []);
+    // Add or replace image at slot `index`
+    const handleAddImage = useCallback(
+        (index) => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
 
-    // Handler to add/replace an image in slot `index`
-    const handleAddImage = useCallback(index => {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.onchange = e => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const url = makeObjectUrl(file);
+                setFormData((prev) => {
+                    const newFiles = [...prev.images];
+                    const newList = [...prev.imagesList];
+                    newFiles[index] = file;      // Store the File object
+                    newList[index] = file;       // Store the File object for preview
+                    return { ...prev, images: newFiles, imagesList: newList };
+                });
+            };
+            fileInput.click();
+        },
+        [setFormData]
+    );
 
-            setFormData(prev => {
-                const imgs = [...prev.images];
-                const list = [...prev.imagesList];
-                imgs[index] = file;   // store the File itself
-                list[index] = url;    // store the blob URL for preview
-                return { ...prev, images: imgs, imagesList: list };
+    // Remove image at slot `index`
+    const handleRemoveImage = useCallback(
+        (index) => {
+            const url = formData.imagesList[index];
+            if (url && typeof url === 'string' && url.startsWith('blob:')) {
+                // Revoke the object URL to free memory
+                URL.revokeObjectURL(url);
+            }
+
+            setFormData((prev) => {
+                const newFiles = [...prev.images];
+                const newList = [...prev.imagesList];
+                newFiles[index] = null;
+                newList[index] = null;
+                return { ...prev, images: newFiles, imagesList: newList };
             });
-        };
-        fileInput.click();
-    }, [makeObjectUrl, setFormData]);
-
-    // Handler to remove an image from slot `index`
-    const handleRemoveImage = useCallback(index => {
-        const url = formData.imagesList[index];
-        if (url) {
-            URL.revokeObjectURL(url);  // free memory
-        }
-        setFormData(prev => {
-            const imgs = [...prev.images];
-            const list = [...prev.imagesList];
-            imgs[index] = null;
-            list[index] = null;
-            return { ...prev, images: imgs, imagesList: list };
-        });
-    }, [formData.imagesList, setFormData]);
+        },
+        [formData.imagesList, setFormData]
+    );
 
     return (
         <div className="editImage">
@@ -62,7 +60,7 @@ const EditImage = ({ formData, setFormData }) => {
                                     width="100%"
                                     height="100%"
                                     placeholderColor="#f8e1f4"
-                                    lazyLoad={false}
+                                    lazyLoad
                                 />
                                 <button
                                     className="remove"

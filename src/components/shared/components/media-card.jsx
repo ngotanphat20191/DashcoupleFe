@@ -74,7 +74,6 @@ function MediaCard({
         setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
-            setCurrentIndex(prevIndex => prevIndex + 1);
         }, 300);
         return () => clearTimeout(timer);
     }, []);
