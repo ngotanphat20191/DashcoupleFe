@@ -914,64 +914,64 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                         </div>
                 ) : (
                     <div className="tinderCards">
-                    <Typography style={{fontSize: '24px', fontWeight: 'bold', marginBottom:'10px'}}>{index === '1' ? 'Hẹn hò': 'Bạn bè'}</Typography>
-                    <div className="tinderCards__container">
-                        {profiles[currentIndex] && (
-                            <TinderCard
-                                className="swipe"
-                                key={profiles[currentIndex].userRecord.User_ID}
-                                preventSwipe={["up", "down"]}
-                                onSwipe={onSwipe}
-                            >
-                                {profiles[currentIndex].userRecord && !indexSkip.includes(profiles[currentIndex].userRecord.User_ID) && (
-                                <motion.div
-                                    className="card"
-                                    style={{
-                                        backgroundImage: `url(${profiles[currentIndex].images[imageIndex[currentIndex]]})`,
-                                        backgroundSize: "cover",
-                                        backgroundPosition: "center",
-                                    }}
-                                    initial={{ x: 0, opacity: 1 }}
-                                    animate={
-                                        swipeEffect === "left"
-                                            ? { x: -200, opacity: 0 }
-                                            : swipeEffect === "right"
-                                                ? { x: 200, opacity: 0 }
-                                                : swipeEffect === "up"
-                                                    ? { y: -200, opacity: 0 }
-                                                    : {}
-                                    }
-                                    transition={{ duration: 0.3 }}
-                                    onClick={() => handleCardClick(currentIndex)}
+                        <Typography style={{fontSize: '24px', fontWeight: 'bold', marginBottom:'10px'}}>{index === '1' ? 'Hẹn hò': 'Bạn bè'}</Typography>
+                        <div className="tinderCards__container">
+                            {profiles[currentIndex] && (
+                                <TinderCard
+                                    className="swipe"
+                                    key={profiles[currentIndex].userRecord.User_ID}
+                                    preventSwipe={["up", "down"]}
+                                    onSwipe={onSwipe}
                                 >
-                                    {/*<img*/}
-                                    {/*    src={nopeicon}*/}
-                                    {/*    alt="Nope"*/}
-                                    {/*    style={{*/}
-                                    {/*        position: 'absolute',*/}
-                                    {/*        top: 40,*/}
-                                    {/*        left: 20,*/}
-                                    {/*        width: 200,*/}
-                                    {/*        height: 200,*/}
-                                    {/*        opacity: swipeEffect === 'left' ? 1 : 0,*/}
-                                    {/*        transition: 'opacity 0.2s',*/}
-                                    {/*        transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',*/}
-                                    {/*    }}*/}
-                                    {/*/>*/}
-                                    {/*<img*/}
-                                    {/*    src={matchicon}*/}
-                                    {/*    alt="Match"*/}
-                                    {/*    style={{*/}
-                                    {/*        position: 'absolute',*/}
-                                    {/*        top: 40,*/}
-                                    {/*        right: 20,*/}
-                                    {/*        width: 200,*/}
-                                    {/*        height: 200,*/}
-                                    {/*        opacity: swipeEffect === 'right' ? 1 : 0,*/}
-                                    {/*        transition: 'opacity 0.2s',*/}
-                                    {/*        transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',*/}
-                                    {/*    }}*/}
-                                    {/*/>*/}
+                                    {profiles[currentIndex].userRecord && !indexSkip.includes(profiles[currentIndex].userRecord.User_ID) && (
+                                        <motion.div
+                                        className="card"
+                                        style={{
+                                            backgroundImage: `url(${profiles[currentIndex].images[imageIndex[currentIndex]]})`,
+                                            backgroundSize: "cover",
+                                            backgroundPosition: "center",
+                                        }}
+                                        initial={{ x: 0, opacity: 1 }}
+                                        animate={
+                                            swipeEffect === "left"
+                                                ? { x: -200, opacity: 0 }
+                                                : swipeEffect === "right"
+                                                    ? { x: 200, opacity: 0 }
+                                                    : swipeEffect === "up"
+                                                        ? { y: -200, opacity: 0 }
+                                                        : {}
+                                        }
+                                        transition={{ duration: 0.3 }}
+                                        onClick={() => handleCardClick(currentIndex)}
+                                    >
+                                    <img
+                                        src={nopeicon}
+                                        alt="Nope"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 40,
+                                            left: 20,
+                                            width: 200,
+                                            height: 200,
+                                            opacity: swipeEffect === 'left' ? 1 : 0,
+                                            transition: 'opacity 0.2s',
+                                            transform: swipeEffect === 'left' ? 'rotate(-20deg)' : 'none',
+                                        }}
+                                    />
+                                    <img
+                                        src={matchicon}
+                                        alt="Match"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 40,
+                                            right: 20,
+                                            width: 200,
+                                            height: 200,
+                                            opacity: swipeEffect === 'right' ? 1 : 0,
+                                            transition: 'opacity 0.2s',
+                                            transform: swipeEffect === 'right' ? 'rotate(20deg)' : 'none',
+                                        }}
+                                    />
                                     <div className="image-progress-bar">
                                         {profiles[currentIndex].images.map((_, idx) => (
                                             <div
