@@ -85,7 +85,6 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
         }
         return () => clearTimeout(timer);
     }, []);
-    // Optimize image navigation with memoized handlers
     const handleNextImage = useCallback((profileIndex) => {
         if (!profiles || !profiles[profileIndex] || !profiles[profileIndex].images) return;
         
@@ -143,24 +142,19 @@ function MediaCard({interests, type, profiles, index, setindexskip, indexSkip}) 
                 setindexskip(prev => [...prev, userID]);
             }
             
-            // Create cancel token for request
             const cancelTokenSource = createCancelToken();
             
-            // Make API call
             const response = await matchesAxios.post('/like/add', {
                 UserIdTarget: userID
             }, {
                 cancelToken: cancelTokenSource.token
             });
             
-            // Success handling (already updated UI optimistically)
         } catch (err) {
-            // Revert optimistic update on error
             if (setindexskip) {
                 setindexskip(prev => prev.filter(id => id !== userID));
             }
-            
-            // Error handling
+
             if (err.response?.status === 400) {
                 setError(err.response.data);
             } else {
