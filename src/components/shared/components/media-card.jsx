@@ -2,7 +2,7 @@ import './media-card.css';
 
 import '../profiles-grid.css';
 import '../title.css';
-import React, {memo, useCallback, useEffect, useMemo, useState} from "react";
+import {memo, useCallback, useEffect, useState} from "react";
 import TinderCard from "react-tinder-card";
 import {FaArrowLeft, FaArrowRight, FaCity, FaHeart, FaStar, FaTimes} from "react-icons/fa";
 import {GrNext, GrPrevious} from "react-icons/gr";
@@ -65,29 +65,23 @@ function MediaCard({
             return 0;
         }
     }, []);
-    const availableProfiles = useMemo(
-        () => profiles.filter(p => !indexSkip.includes(p.userRecord.User_ID)),
-        [profiles, indexSkip]
-    );
 
-    const childRefs = useMemo(
-        () => Array(availableProfiles.length).fill().map(() => React.createRef()),
-        [availableProfiles.length]
-    );
+    useEffect(() => {
+        setCurrentIndex(initialIndex);
+    }, [initialIndex]);
+
     const handleButtonClick = useCallback((direction) => {
-        setSwipeEffect(direction);
-        setCurrentIndex(i => i + 1);
-        const timer = setTimeout(() => {
-            setSwipeEffect(null);
-        }, 300);
-        return () => clearTimeout(timer);
-    }, []);
-
-    const handleLikeButtonClick = useCallback((direction) => {
         setSwipeEffect(direction);
         const timer = setTimeout(() => {
             setSwipeEffect(null);
             setCurrentIndex(prevIndex => prevIndex + 1);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, []);
+    const handleLikeButtonClick = useCallback((direction) => {
+        setSwipeEffect(direction);
+        const timer = setTimeout(() => {
+            setSwipeEffect(null);
         }, 300);
         if (setindexskip && profiles && profiles[currentIndex] && profiles[currentIndex].userRecord) {
             const userId = profiles[currentIndex].userRecord.User_ID;
@@ -113,7 +107,7 @@ function MediaCard({
         }
         return () => clearTimeout(timer);
     }, []);
-
+    // Optimize image navigation with memoized handlers
     const handleNextImage = useCallback((profileIndex) => {
         if (!profiles || !profiles[profileIndex] || !profiles[profileIndex].images) return;
 
@@ -147,6 +141,7 @@ function MediaCard({
         setImagePreviewIndex(prev => (prev - 1 + profiles.images.length) % profiles.images.length);
     }, [profiles]);
 
+    // Simplify card click handlers by reusing the navigation functions
     const handleCardClick = useCallback((profileIndex) => {
         handleNextImage(profileIndex);
     }, [handleNextImage]);
@@ -165,22 +160,30 @@ function MediaCard({
 
     const handleLikeSuggestion = useCallback(async (currentIndex, userID) => {
         if (!userID) return;
+
         try {
             if (setindexskip) {
                 setindexskip(prev => [...prev, userID]);
             }
+
+            // Create cancel token for request
             const cancelTokenSource = createCancelToken();
 
+            // Make API call
             const response = await matchesAxios.post('/like/add', {
                 UserIdTarget: userID
             }, {
                 cancelToken: cancelTokenSource.token
             });
 
+            // Success handling (already updated UI optimistically)
         } catch (err) {
+            // Revert optimistic update on error
             if (setindexskip) {
                 setindexskip(prev => prev.filter(id => id !== userID));
             }
+
+            // Error handling
             if (err.response?.status === 400) {
                 setError(err.response.data);
             } else {
@@ -213,13 +216,8 @@ function MediaCard({
             }
         }
     }, []);
-    const onSwipe = useCallback(direction => {
-    }, []);
-
-    useEffect(() => {
-        setCurrentIndex(initialIndex);
-    }, [initialIndex]);
-
+    const onSwipe = (direction) => {
+    };
     useEffect(() => {
         if (!profiles || !Array.isArray(profiles) || profiles.length === 0 || !indexSkip || !Array.isArray(indexSkip)) {
             return;
@@ -944,7 +942,6 @@ function MediaCard({
                         <div className="tinderCards__container">
                             {profiles[currentIndex] && (
                                 <TinderCard
-                                    ref={childRefs[currentIndex]}
                                     className="swipe"
                                     key={profiles[currentIndex].userRecord.User_ID}
                                     preventSwipe={["up", "down"]}
