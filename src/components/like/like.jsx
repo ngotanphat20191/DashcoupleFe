@@ -181,7 +181,7 @@ const Like = () => {
                                 </Typography>
                                 <ProfilesGrid
                                     profiles={profile}
-                                    type="liking"
+                                    type="like"
                                     interests={interests}
                                     currentIndex={selectedProfileIndex}
                                     enableCircularNav={true}

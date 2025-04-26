@@ -128,7 +128,7 @@ const Visit = () => {
                     </Button>
                     <ProfilesGrid
                         profiles={profile}
-                        type="like"
+                        type="liking"
                         interests={interests}
                         indexSkip={[]}
                         currentIndex={selectedProfileIndex}
