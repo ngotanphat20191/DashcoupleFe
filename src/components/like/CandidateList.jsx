@@ -45,7 +45,7 @@ const CandidateList = memo(({ profiles, currentIndex, onSelectCandidate }) => {
                         : 'https://via.placeholder.com/150';
 
                     const birthDate = user.date_of_birth ? new Date(user.date_of_birth) : null;
-                    const age = birthDate ? new Date().getFullYear() - birthDate.getFullYear() : 'N/A';
+                    const age = birthDate ? new Date().getFullYear() - birthDate.getFullYear()-1 : 'N/A';
 
                     return (
                         <ListItem
