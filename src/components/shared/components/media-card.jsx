@@ -202,11 +202,7 @@ function MediaCard({
             }, {
                 cancelToken: cancelTokenSource.token
             });
-
-            if (response.data) {
-                alert("Ghép đôi thành công")
-                console.log("Match created:", response.data);
-            }
+            alert("Ghép đôi thành công")
         } catch (err) {
             if (err.response?.status === 400) {
                 setError(err.response.data);
