@@ -128,7 +128,7 @@ const Visit = () => {
                     </Button>
                     <ProfilesGrid
                         profiles={profile}
-                        type="liking"
+                        type="like"
                         interests={interests}
                         indexSkip={[]}
                         currentIndex={selectedProfileIndex}
@@ -167,7 +167,7 @@ const LikesList = memo(({profiles, onSelectProfile}) => {
                         : 'https://via.placeholder.com/150';
 
                     const birthDate = user.date_of_birth ? new Date(user.date_of_birth) : null;
-                    const age = birthDate ? new Date().getFullYear() - birthDate.getFullYear() : 'N/A';
+                    const age = birthDate ? new Date().getFullYear() - birthDate.getFullYear()-1 : 'N/A';
 
                     return (
                         <Grid item xs={12} sm={6} md={4} key={user.User_ID || index}>
